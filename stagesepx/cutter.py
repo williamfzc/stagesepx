@@ -30,14 +30,19 @@ class VideoCutRange(object):
         result = list()
         if is_random:
             return random.sample(range(self.start, self.end), frame_count)
-        length = self.end - self.start
+        length = self.get_length()
         for _ in range(1, frame_count + 1):
             cur = int(self.start + length / frame_count * _)
             result.append(cur)
         return result
 
+    def get_length(self):
+        return self.end - self.start
+
     def __str__(self):
         return f'<VideoCutRange [{self.start}-{self.end}] {self.ssim}>'
+
+    __repr__ = __str__
 
 
 class VideoCutResult(object):
@@ -47,7 +52,15 @@ class VideoCutResult(object):
         self.video_path = video_path
         self.ssim_list = ssim_list
 
-    def get_unstable_range(self) -> typing.List[VideoCutRange]:
+    @staticmethod
+    def _length_filter(range_list: typing.List[VideoCutRange], limit: int) -> typing.List[VideoCutRange]:
+        after = list()
+        for each in range_list:
+            if each.get_length() >= limit:
+                after.append(each)
+        return after
+
+    def get_unstable_range(self, limit: int = None) -> typing.List[VideoCutRange]:
         middle = np.mean([i.ssim for i in self.ssim_list])
         change_range_list = sorted([i for i in self.ssim_list if i.ssim < middle], key=lambda x: x.start)
 
@@ -66,9 +79,12 @@ class VideoCutResult(object):
                     break
             merged_change_range_list.append(cur)
             i += 1
+        if limit:
+            merged_change_range_list = self._length_filter(merged_change_range_list, limit)
+        logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
         return merged_change_range_list
 
-    def get_stable_range(self) -> typing.List[VideoCutRange]:
+    def get_stable_range(self, limit: int = None) -> typing.List[VideoCutRange]:
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range()
         range_list = [
@@ -83,6 +99,9 @@ class VideoCutResult(object):
                     0,
                 )
             )
+        if limit:
+            range_list = self._length_filter(range_list, limit)
+        logger.debug(f'stable range of [{self.video_path}]: {range_list}')
         return sorted(range_list, key=lambda x: x.start)
 
     def pick_and_save(self,
