@@ -28,6 +28,13 @@ def get_current_frame_time(video_cap: cv2.VideoCapture) -> float:
     return video_cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
 
 
+def get_frame(video_cap: cv2.VideoCapture, frame_id: int) -> np.ndarray:
+    video_jump(video_cap, frame_id)
+    ret, frame = video_cap.read()
+    assert ret
+    return frame
+
+
 def turn_grey(old: np.ndarray) -> np.ndarray:
     try:
         return cv2.cvtColor(old, cv2.COLOR_RGB2GRAY)
@@ -42,7 +49,7 @@ def turn_binary(old: np.ndarray) -> np.ndarray:
 
 def compress_frame(old: np.ndarray, compress_rate: float = None, interpolation: int = None) -> np.ndarray:
     if not compress_rate:
-        compress_rate = 0.125
+        compress_rate = 0.2
     if not interpolation:
         interpolation = cv2.INTER_AREA
 

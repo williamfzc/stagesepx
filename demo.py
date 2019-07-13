@@ -1,10 +1,11 @@
 from stagesepx.cutter import VideoCutter
+from stagesepx.toolbox import get_frame, video_capture
 
-c = VideoCutter(period=10)
-res = c.cut('video/demo_video.mp4')
+import cv2
+
+video_path = 'video/demo_video.mp4'
+c = VideoCutter(period=4)
+res = c.cut(video_path)
 stable = res.get_stable_range()
 unstable = res.get_unstable_range()
-
-for each_unstable in unstable:
-    print(each_unstable)
-    print(each_unstable.pick(2)[0])
+res.pick_and_save(stable, 3)

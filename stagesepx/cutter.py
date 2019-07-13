@@ -2,6 +2,8 @@ import os
 import typing
 import random
 import numpy as np
+import cv2
+import time
 from loguru import logger
 
 from stagesepx import toolbox
@@ -29,7 +31,7 @@ class VideoCutRange(object):
         if is_random:
             return random.sample(range(self.start, self.end), frame_count)
         length = self.end - self.start
-        for _ in range(1, frame_count):
+        for _ in range(1, frame_count + 1):
             cur = int(self.start + length / frame_count * _)
             result.append(cur)
         return result
@@ -82,6 +84,33 @@ class VideoCutResult(object):
                 )
             )
         return sorted(range_list, key=lambda x: x.start)
+
+    def pick_and_save(self,
+                      range_list: typing.List[VideoCutRange],
+                      frame_count: int,
+                      to_dir: str = None,
+                      *args, **kwargs):
+        stage_list = list()
+        for index, each_range in enumerate(range_list):
+            picked = each_range.pick(frame_count, *args, **kwargs)
+            stage_list.append((index, picked))
+
+        # create parent dir
+        if not to_dir:
+            to_dir = str(int(time.time()))
+        os.makedirs(to_dir, exist_ok=True)
+
+        for each_stage_id, each_frame_list in stage_list:
+            # create sub dir
+            each_stage_dir = os.path.join(to_dir, str(each_stage_id))
+            os.makedirs(each_stage_dir, exist_ok=True)
+
+            with toolbox.video_capture(self.video_path) as cap:
+                for index, each_frame_id in enumerate(each_frame_list):
+                    each_frame_path = os.path.join(each_stage_dir, f'{index}.png')
+                    each_frame = toolbox.get_frame(cap, each_frame_id)
+                    cv2.imwrite(each_frame_path, each_frame)
+                    logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
 
 
 class VideoCutter(object):
