@@ -3,6 +3,7 @@ import typing
 import random
 import numpy as np
 import cv2
+import uuid
 from loguru import logger
 
 from stagesepx import toolbox
@@ -125,8 +126,8 @@ class VideoCutResult(object):
             os.makedirs(each_stage_dir, exist_ok=True)
 
             with toolbox.video_capture(self.video_path) as cap:
-                for index, each_frame_id in enumerate(each_frame_list):
-                    each_frame_path = os.path.join(each_stage_dir, f'{index}.png')
+                for each_frame_id in each_frame_list:
+                    each_frame_path = os.path.join(each_stage_dir, f'{uuid.uuid4()}.png')
                     each_frame = toolbox.get_frame(cap, each_frame_id)
                     cv2.imwrite(each_frame_path, each_frame)
                     logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
