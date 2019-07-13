@@ -1,11 +1,19 @@
 from stagesepx.cutter import VideoCutter
-from stagesepx.toolbox import get_frame, video_capture
+from stagesepx.classifier import SSIMClassifier
+from stagesepx.reporter import Reporter
 
-import cv2
 
+# cut
 video_path = 'video/demo_video.mp4'
-c = VideoCutter(period=4)
-res = c.cut(video_path)
+cutter = VideoCutter(period=4)
+res = cutter.cut(video_path)
 stable = res.get_stable_range()
-unstable = res.get_unstable_range()
-res.pick_and_save(stable, 3)
+data_home = res.pick_and_save(stable, 3)
+
+# classify
+cl = SSIMClassifier()
+cl.load(data_home)
+res = cl.classify(video_path)
+
+# draw
+Reporter.draw(res)

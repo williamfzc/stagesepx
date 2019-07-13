@@ -89,7 +89,7 @@ class VideoCutResult(object):
                       range_list: typing.List[VideoCutRange],
                       frame_count: int,
                       to_dir: str = None,
-                      *args, **kwargs):
+                      *args, **kwargs) -> str:
         stage_list = list()
         for index, each_range in enumerate(range_list):
             picked = each_range.pick(frame_count, *args, **kwargs)
@@ -97,7 +97,7 @@ class VideoCutResult(object):
 
         # create parent dir
         if not to_dir:
-            to_dir = str(int(time.time()))
+            to_dir = toolbox.get_timestamp_str()
         os.makedirs(to_dir, exist_ok=True)
 
         for each_stage_id, each_frame_list in stage_list:
@@ -111,6 +111,8 @@ class VideoCutResult(object):
                     each_frame = toolbox.get_frame(cap, each_frame_id)
                     cv2.imwrite(each_frame_path, each_frame)
                     logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
+
+        return to_dir
 
 
 class VideoCutter(object):

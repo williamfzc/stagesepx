@@ -42,6 +42,8 @@ class SSIMClassifier(_BaseClassifier):
             logger.debug(f'stage [{stage_name}] found, and got {len(stage_pic_list)} pics')
 
     def classify(self, video_path: str) -> typing.List[ClassifierResult]:
+        assert self.data, 'should load data first'
+
         final_result: typing.List[ClassifierResult] = list()
         with toolbox.video_capture(video_path) as cap:
             ret, frame = cap.read()
