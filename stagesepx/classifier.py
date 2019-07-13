@@ -1,7 +1,9 @@
 import pathlib
 import typing
 import cv2
+import numpy as np
 from loguru import logger
+from sklearn.svm import SVC
 
 from stagesepx import toolbox
 
@@ -25,10 +27,6 @@ class ClassifierResult(object):
 
 
 class _BaseClassifier(object):
-    pass
-
-
-class SSIMClassifier(_BaseClassifier):
     def __init__(self):
         self.data: typing.Dict[str, typing.List[pathlib.Path]] = dict()
 
@@ -36,11 +34,16 @@ class SSIMClassifier(_BaseClassifier):
         p = pathlib.Path(data_home)
         stage_dir_list = p.iterdir()
         for each in stage_dir_list:
+            # load dir only
+            if each.is_file():
+                continue
             stage_name = each.name
             stage_pic_list = [i.absolute() for i in each.iterdir()]
             self.data[stage_name] = stage_pic_list
             logger.debug(f'stage [{stage_name}] found, and got {len(stage_pic_list)} pics')
 
+
+class SSIMClassifier(_BaseClassifier):
     def classify(self, video_path: str) -> typing.List[ClassifierResult]:
         assert self.data, 'should load data first'
 
@@ -62,9 +65,57 @@ class SSIMClassifier(_BaseClassifier):
                     logger.debug(f'stage [{each_stage_name}]: {ssim}')
 
                 result = max(result, key=lambda x: x[1])
-                logger.info(f'frame {frame_id} ({frame_timestamp}) belongs to {result[0]}')
+                logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result[0]}')
 
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result[0]))
+                ret, frame = cap.read()
+        return final_result
+
+
+class SVMClassifier(_BaseClassifier):
+    def __init__(self):
+        super().__init__()
+        self._model = None
+
+    def train(self):
+        if not self._model:
+            self._model = SVC(gamma='auto')
+
+        train_data = list()
+        train_label = list()
+        for each_label, each_label_pic_list in self.data.items():
+            for each_pic in each_label_pic_list:
+                logger.debug(f'loading {each_pic} ...')
+                each_pic_object = cv2.imread(each_pic.as_posix())
+                each_pic_object = toolbox.compress_frame(each_pic_object).flatten()
+                train_data.append(each_pic_object)
+                train_label.append(each_label)
+        logger.debug('data ready')
+        self._model.fit(train_data, train_label)
+        logger.debug('train finished')
+
+    def predict(self, pic_path: str) -> str:
+        pic_object = cv2.imread(pic_path)
+        return self.predict_with_object(pic_object)
+
+    def predict_with_object(self, pic_object: np.ndarray) -> str:
+        pic_object = toolbox.compress_frame(pic_object).reshape(1, -1)
+        return self._model.predict(pic_object)[0]
+
+    def classify(self, video_path: str) -> typing.List[ClassifierResult]:
+        assert self.data, 'should load data first'
+
+        final_result: typing.List[ClassifierResult] = list()
+        with toolbox.video_capture(video_path) as cap:
+            ret, frame = cap.read()
+            while ret:
+                frame_id = toolbox.get_current_frame_id(cap)
+                frame_timestamp = toolbox.get_current_frame_time(cap)
+                result = self.predict_with_object(frame)
+
+                logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')
+
+                final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
                 ret, frame = cap.read()
         return final_result
 
@@ -73,4 +124,3 @@ if __name__ == '__main__':
     s = SSIMClassifier()
     s.load('../1562999463')
     res = s.classify('../video/demo_video.mp4')
-
