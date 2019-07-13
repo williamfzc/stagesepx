@@ -62,7 +62,7 @@ class SSIMClassifier(_BaseClassifier):
                     logger.debug(f'stage [{each_stage_name}]: {ssim}')
 
                 result = max(result, key=lambda x: x[1])
-                logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result[0]}')
+                logger.info(f'frame {frame_id} ({frame_timestamp}) belongs to {result[0]}')
 
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result[0]))
                 ret, frame = cap.read()

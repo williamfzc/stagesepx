@@ -3,7 +3,6 @@ import typing
 import random
 import numpy as np
 import cv2
-import time
 from loguru import logger
 
 from stagesepx import toolbox
@@ -40,7 +39,7 @@ class VideoCutRange(object):
         return self.end - self.start
 
     def __str__(self):
-        return f'<VideoCutRange [{self.start}-{self.end}] {self.ssim}>'
+        return f'<VideoCutRange [{self.start}-{self.end}] ssim={self.ssim}>'
 
     __repr__ = __str__
 
@@ -112,6 +111,7 @@ class VideoCutResult(object):
         stage_list = list()
         for index, each_range in enumerate(range_list):
             picked = each_range.pick(frame_count, *args, **kwargs)
+            logger.info(f'pick {picked} in range {each_range}')
             stage_list.append((index, picked))
 
         # create parent dir
@@ -180,8 +180,10 @@ class VideoCutter(object):
         return ssim_list
 
     def cut(self, video_path: str) -> VideoCutResult:
+        logger.info(f'start cutting: {video_path}')
         assert os.path.isfile(video_path), f'video [{video_path}] not existed'
         ssim_list = self.convert_video_into_ssim_list(video_path)
+        logger.info(f'cut finished: {video_path}')
         return VideoCutResult(
             video_path,
             ssim_list,
