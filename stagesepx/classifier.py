@@ -3,7 +3,7 @@ import typing
 import cv2
 import numpy as np
 from loguru import logger
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 
 from stagesepx import toolbox
 
@@ -44,8 +44,12 @@ class _BaseClassifier(object):
 
 
 class SSIMClassifier(_BaseClassifier):
-    def classify(self, video_path: str) -> typing.List[ClassifierResult]:
+    def classify(self, video_path: str, threshold: float = None) -> typing.List[ClassifierResult]:
+        logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
+
+        if not threshold:
+            threshold = 0.9
 
         final_result: typing.List[ClassifierResult] = list()
         with toolbox.video_capture(video_path) as cap:
@@ -65,6 +69,9 @@ class SSIMClassifier(_BaseClassifier):
                     logger.debug(f'stage [{each_stage_name}]: {ssim}')
 
                 result = max(result, key=lambda x: x[1])
+                if result[1] < threshold:
+                    logger.debug('not a known stage, set it -1')
+                    result[0] = '-1'
                 logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result[0]}')
 
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result[0]))
@@ -79,7 +86,7 @@ class SVMClassifier(_BaseClassifier):
 
     def train(self):
         if not self._model:
-            self._model = SVC(gamma='auto')
+            self._model = LinearSVC()
 
         train_data = list()
         train_label = list()
@@ -103,7 +110,9 @@ class SVMClassifier(_BaseClassifier):
         return self._model.predict(pic_object)[0]
 
     def classify(self, video_path: str) -> typing.List[ClassifierResult]:
+        logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
+        assert self._model, 'should train before classify'
 
         final_result: typing.List[ClassifierResult] = list()
         with toolbox.video_capture(video_path) as cap:

@@ -10,17 +10,19 @@ from stagesepx import toolbox
 
 
 class VideoCutRange(object):
-    def __init__(self, start: int, end: int, ssim: float):
+    def __init__(self, video_path: str, start: int, end: int, ssim: float):
+        self.video_path = video_path
         self.start = start
         self.end = end
         self.ssim = ssim
 
     def can_merge(self, another: 'VideoCutRange'):
-        return self.end == another.start
+        return (self.end == another.start) and self.video_path == another.video_path
 
     def merge(self, another: 'VideoCutRange') -> 'VideoCutRange':
         assert self.can_merge(another)
         return __class__(
+            self.video_path,
             self.start,
             another.end,
             (self.ssim + another.ssim) / 2,
@@ -38,6 +40,18 @@ class VideoCutRange(object):
 
     def get_length(self):
         return self.end - self.start
+
+    def is_stable(self, threshold: float = None):
+        if not threshold:
+            threshold = 0.95
+
+        with toolbox.video_capture(self.video_path) as cap:
+            start = toolbox.get_frame(video_cap=cap, frame_id=self.start)
+            end = toolbox.get_frame(video_cap=cap, frame_id=self.end)
+            start, end = [toolbox.compress_frame(i) for i in [start, end]]
+            ssim = toolbox.compare_ssim(start, end)
+
+        return ssim > threshold
 
     def __str__(self):
         return f'<VideoCutRange [{self.start}-{self.end}] ssim={self.ssim}>'
@@ -88,12 +102,13 @@ class VideoCutResult(object):
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range()
         range_list = [
-            VideoCutRange(total_range[0], unstable_range_list[0].start, 0),
-            VideoCutRange(unstable_range_list[-1].end, total_range[-1], 0),
+            VideoCutRange(self.video_path, total_range[0], unstable_range_list[0].start, 0),
+            VideoCutRange(self.video_path, unstable_range_list[-1].end, total_range[-1], 0),
         ]
         for i in range(len(unstable_range_list) - 1):
             range_list.append(
                 VideoCutRange(
+                    self.video_path,
                     unstable_range_list[i].end,
                     unstable_range_list[i + 1].start,
                     0,
@@ -166,6 +181,7 @@ class VideoCutter(object):
 
                 ssim_list.append(
                     VideoCutRange(
+                        video_path,
                         start=start_frame_id,
                         end=end_frame_id,
                         ssim=ssim,
