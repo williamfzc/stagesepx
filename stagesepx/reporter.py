@@ -1,5 +1,5 @@
 import typing
-from pyecharts.charts import Line, Bar, Grid
+from pyecharts.charts import Line, Bar, Page
 from pyecharts import options as opts
 from loguru import logger
 
@@ -12,18 +12,25 @@ class Reporter(object):
 
     @classmethod
     def draw(cls, data_list: typing.List[ClassifierResult], report_path: str = None):
-        x_axis = [i.frame_id for i in data_list]
+        x_axis = [str(i.timestamp) for i in data_list]
         y_axis = [i.stage for i in data_list]
 
-        # ugly chained call ...
-        line = Line() \
-            .add_xaxis(x_axis) \
-            .add_yaxis("stage", y_axis, is_step=True, is_symbol_show=True) \
-            .set_global_opts(title_opts=opts.TitleOpts(title=cls.__TITLE__))
+        line = Line()
+        line.add_xaxis(x_axis)
+        line.add_yaxis("stage",
+                       y_axis,
+                       is_step=True,
+                       is_symbol_show=True)
+        line.set_global_opts(
+            title_opts=opts.TitleOpts(title=cls.__TITLE__),
 
+            toolbox_opts=opts.ToolboxOpts(is_show=True),
+            tooltip_opts=opts.TooltipOpts(is_show=True, trigger='axis', axis_pointer_type='cross'),
+        )
+
+        bar = Bar()
         x_axis = sorted(list(set([i.stage for i in data_list])))
-        bar = Bar() \
-            .add_xaxis(x_axis)
+        bar.add_xaxis(x_axis)
         y_axis = list()
         for each_stage_name in x_axis:
             each_stage = sorted([i for i in data_list if i.stage == each_stage_name], key=lambda x: x.frame_id)
@@ -31,16 +38,15 @@ class Reporter(object):
             y_axis.append(time_cost)
         bar.add_yaxis('time cost', y_axis)
         bar.set_global_opts(
-            title_opts=opts.TitleOpts(title="Time Cost", pos_top="48%"),
-            legend_opts=opts.LegendOpts(pos_top="48%"),
+            title_opts=opts.TitleOpts(title="Time Cost"),
         )
         logger.debug(f'time cost: {dict(zip(x_axis, y_axis))}')
 
-        grid = Grid() \
-            .add(line, grid_opts=opts.GridOpts(pos_bottom="60%")) \
-            .add(bar, grid_opts=opts.GridOpts(pos_top="60%"))
+        page = Page(page_title=cls.__TITLE__)
+        page.add(line)
+        page.add(bar)
 
         if not report_path:
             report_path = f'{toolbox.get_timestamp_str()}.html'
         logger.info(f'save report to {report_path}')
-        grid.render(path=report_path)
+        page.render(path=report_path)
