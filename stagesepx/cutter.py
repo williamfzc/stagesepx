@@ -44,14 +44,8 @@ class VideoCutRange(object):
     def is_stable(self, threshold: float = None):
         if not threshold:
             threshold = 0.95
-
-        with toolbox.video_capture(self.video_path) as cap:
-            start = toolbox.get_frame(video_cap=cap, frame_id=self.start)
-            end = toolbox.get_frame(video_cap=cap, frame_id=self.end)
-            start, end = [toolbox.compress_frame(i) for i in [start, end]]
-            ssim = toolbox.compare_ssim(start, end)
-
-        return ssim > threshold
+        # TODO if range is too large? ( > 10)
+        return self.ssim > threshold
 
     def __str__(self):
         return f'<VideoCutRange [{self.start}-{self.end}] ssim={self.ssim}>'
@@ -75,8 +69,9 @@ class VideoCutResult(object):
         return after
 
     def get_unstable_range(self, limit: int = None) -> typing.List[VideoCutRange]:
-        middle = np.mean([i.ssim for i in self.ssim_list])
-        change_range_list = sorted([i for i in self.ssim_list if i.ssim < middle], key=lambda x: x.start)
+        change_range_list = sorted(
+            [i for i in self.ssim_list if not i.is_stable()],
+            key=lambda x: x.start)
 
         # merge
         i = 0
@@ -100,7 +95,7 @@ class VideoCutResult(object):
 
     def get_stable_range(self, limit: int = None) -> typing.List[VideoCutRange]:
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
-        unstable_range_list = self.get_unstable_range()
+        unstable_range_list = self.get_unstable_range(limit)
         range_list = [
             VideoCutRange(self.video_path, total_range[0], unstable_range_list[0].start, 0),
             VideoCutRange(self.video_path, unstable_range_list[-1].end, total_range[-1], 0),
