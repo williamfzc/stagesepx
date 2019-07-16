@@ -2,6 +2,7 @@ import cv2
 import contextlib
 import time
 import random
+import typing
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim
@@ -28,6 +29,16 @@ def get_current_frame_id(video_cap: cv2.VideoCapture) -> int:
 
 def get_current_frame_time(video_cap: cv2.VideoCapture) -> float:
     return video_cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
+
+
+def get_frame_count(video_cap: cv2.VideoCapture) -> int:
+    return int(video_cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+
+def get_frame_size(video_cap: cv2.VideoCapture) -> typing.Tuple[int, int]:
+    h = video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    w = video_cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    return int(w), int(h)
 
 
 def get_frame(video_cap: cv2.VideoCapture, frame_id: int) -> np.ndarray:

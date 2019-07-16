@@ -158,6 +158,11 @@ class VideoCutter(object):
     def convert_video_into_ssim_list(self, video_path: str) -> typing.List[VideoCutRange]:
         ssim_list = list()
         with toolbox.video_capture(video_path) as cap:
+            # get video info
+            frame_count = toolbox.get_frame_count(cap)
+            frame_size = toolbox.get_frame_size(cap)
+            logger.debug(f'total frame count: {frame_count}, size: {frame_size}')
+
             # load the first two frames
             _, start = cap.read()
             start_frame_id = toolbox.get_current_frame_id(cap)
