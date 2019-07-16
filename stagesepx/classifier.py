@@ -49,7 +49,7 @@ class SSIMClassifier(_BaseClassifier):
         assert self.data, 'should load data first'
 
         if not threshold:
-            threshold = 0.9
+            threshold = 0.85
 
         final_result: typing.List[ClassifierResult] = list()
         with toolbox.video_capture(video_path) as cap:
@@ -61,10 +61,13 @@ class SSIMClassifier(_BaseClassifier):
 
                 result = list()
                 for each_stage_name, each_stage_pic_list in self.data.items():
-                    target_pic = cv2.imread(each_stage_pic_list[0].as_posix())
-                    target_pic = toolbox.compress_frame(target_pic)
-
-                    ssim = toolbox.compare_ssim(frame, target_pic)
+                    each_result = list()
+                    for each in each_stage_pic_list:
+                        target_pic = cv2.imread(each.as_posix())
+                        target_pic = toolbox.compress_frame(target_pic)
+                        each_pic_ssim = toolbox.compare_ssim(frame, target_pic)
+                        each_result.append(each_pic_ssim)
+                    ssim = max(each_result)
                     result.append((each_stage_name, ssim))
                     logger.debug(f'stage [{each_stage_name}]: {ssim}')
 
