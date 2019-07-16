@@ -1,6 +1,8 @@
 import pathlib
 import typing
 import cv2
+import os
+import pickle
 import numpy as np
 from loguru import logger
 from sklearn.svm import LinearSVC
@@ -86,6 +88,31 @@ class SVMClassifier(_BaseClassifier):
     def __init__(self):
         super().__init__()
         self._model = None
+
+    def clean_model(self):
+        self._model = None
+
+    def save_model(self, model_path: str, overwrite: bool = None):
+        logger.debug(f'save model to {model_path}')
+        # assert model file
+        if os.path.isfile(model_path) and not overwrite:
+            raise FileExistsError(f'model file {model_path} already existed, you can set `overwrite` True to cover it')
+        # assert model data is not empty
+        assert self._model, 'model is empty'
+        with open(model_path, 'wb') as f:
+            pickle.dump(self._model, f)
+
+    def load_model(self, model_path: str, overwrite: bool = None):
+        logger.debug(f'load model from {model_path}')
+        # assert model file
+        assert os.path.isfile(model_path), f'model file {model_path} not existed'
+        # assert model data is empty
+        if self._model and not overwrite:
+            raise RuntimeError(f'model is not empty, you can set `overwrite` True to cover it')
+
+        # joblib raise an error ( i have no idea about how to fix it ) here, so use pickle instead
+        with open(model_path, 'rb') as f:
+            self._model = pickle.load(f)
 
     def train(self):
         if not self._model:
