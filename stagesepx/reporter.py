@@ -1,5 +1,5 @@
 import typing
-from pyecharts.charts import Line, Bar, Page
+from pyecharts.charts import Line, Bar, Page, Pie
 from pyecharts import options as opts
 from loguru import logger
 
@@ -42,9 +42,13 @@ class Reporter(object):
         )
         logger.debug(f'time cost: {dict(zip(x_axis, y_axis))}')
 
+        pie = Pie()
+        pie.add('', [list(z) for z in zip(x_axis, y_axis)])
+
         page = Page(page_title=cls.__TITLE__)
         page.add(line)
         page.add(bar)
+        page.add(pie)
 
         if not report_path:
             report_path = f'{toolbox.get_timestamp_str()}.html'
