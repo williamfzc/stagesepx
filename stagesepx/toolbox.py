@@ -1,6 +1,7 @@
 import cv2
 import contextlib
 import time
+import random
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim
@@ -59,4 +60,6 @@ def compress_frame(old: np.ndarray, compress_rate: float = None, interpolation: 
 
 
 def get_timestamp_str() -> str:
-    return str(time.time()).replace('.', '')
+    time_str = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    salt = random.randint(10, 99)
+    return f'{time_str}{salt}'
