@@ -5,6 +5,11 @@
 
 ---
 
+[![Build Status](https://travis-ci.org/williamfzc/stagesepx.svg?branch=master)](https://travis-ci.org/williamfzc/stagesepx)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability)
+
+---
+
 ## 目标
 
 - 视频阶段划分
