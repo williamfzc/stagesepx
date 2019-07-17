@@ -46,10 +46,6 @@ class _BaseClassifier(object):
 
 
 class SSIMClassifier(_BaseClassifier):
-    def __init__(self):
-        # TODO 指定分析算法 （是否进行特征提取等）
-        pass
-
     def classify(self, video_path: str, threshold: float = None) -> typing.List[ClassifierResult]:
         logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
@@ -89,9 +85,25 @@ class SSIMClassifier(_BaseClassifier):
 
 
 class SVMClassifier(_BaseClassifier):
-    def __init__(self):
+    FEATURE_DICT = {
+        'hog': toolbox.turn_hog_desc,
+        # TODO not implemented
+        # 'surf': toolbox.turn_surf_desc,
+
+        # do not use feature transform
+        'none': lambda x: x,
+    }
+
+    def __init__(self, feature_type: str = None):
         super().__init__()
+
+        if not feature_type:
+            feature_type = 'hog'
+        if feature_type not in self.FEATURE_DICT:
+            raise AttributeError(f'no feature func named {feature_type}')
+        self.feature_func = self.FEATURE_DICT[feature_type]
         self._model = None
+        logger.debug(f'feature function: {feature_type}')
 
     def clean_model(self):
         self._model = None
@@ -129,7 +141,7 @@ class SVMClassifier(_BaseClassifier):
                 logger.debug(f'loading {each_pic} ...')
                 each_pic_object = cv2.imread(each_pic.as_posix())
                 each_pic_object = toolbox.compress_frame(each_pic_object)
-                each_pic_object = toolbox.turn_hog_desc(each_pic_object)
+                each_pic_object = self.feature_func(each_pic_object).flatten()
                 train_data.append(each_pic_object)
                 train_label.append(each_label)
         logger.debug('data ready')
@@ -142,7 +154,8 @@ class SVMClassifier(_BaseClassifier):
 
     def predict_with_object(self, pic_object: np.ndarray) -> str:
         pic_object = toolbox.compress_frame(pic_object)
-        pic_object = toolbox.turn_hog_desc(pic_object).reshape(1, -1)
+        pic_object = self.feature_func(pic_object)
+        pic_object = pic_object.reshape(1, -1)
         return self._model.predict(pic_object)[0]
 
     def classify(self, video_path: str) -> typing.List[ClassifierResult]:
