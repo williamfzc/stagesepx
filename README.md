@@ -69,8 +69,13 @@ pip install stagesepx
 
 ### 例子
 
-- [切割器 cut.py](./example/cut.py)
-- [分类器 classify.py](./example/classify.py)
+sample code中提供了详细的注释。
+
+- 切割器
+    - [常规分类器](./example/cut.py)
+- 分类器
+    - [常规分类器](./example/classify.py)
+    - [SVM分类器](./example/classify_with_svm.py)
 
 ## 实现原理
 

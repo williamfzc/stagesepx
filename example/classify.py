@@ -23,6 +23,7 @@ for each in res:
     print(each.timestamp)
     # 它被划分为什么类型
     print(each.stage)
+    break
 
 # 为了更方便的可读性，stagesepx已经内置了图表绘制功能
 # 你可以直接把分析结果绘制成图表
