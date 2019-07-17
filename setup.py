@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 
-
 setup(
     name='stagesepx',
     version='0.1.0',
@@ -20,6 +19,7 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         'opencv-python',
+        'opencv-contrib-python==3.4.2.17',
         'numpy',
         'loguru',
         'scikit-image',

@@ -46,6 +46,10 @@ class _BaseClassifier(object):
 
 
 class SSIMClassifier(_BaseClassifier):
+    def __init__(self):
+        # TODO 指定分析算法 （是否进行特征提取等）
+        pass
+
     def classify(self, video_path: str, threshold: float = None) -> typing.List[ClassifierResult]:
         logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
@@ -124,7 +128,8 @@ class SVMClassifier(_BaseClassifier):
             for each_pic in each_label_pic_list:
                 logger.debug(f'loading {each_pic} ...')
                 each_pic_object = cv2.imread(each_pic.as_posix())
-                each_pic_object = toolbox.compress_frame(each_pic_object).flatten()
+                each_pic_object = toolbox.compress_frame(each_pic_object)
+                each_pic_object = toolbox.turn_hog_desc(each_pic_object)
                 train_data.append(each_pic_object)
                 train_label.append(each_label)
         logger.debug('data ready')
@@ -136,7 +141,8 @@ class SVMClassifier(_BaseClassifier):
         return self.predict_with_object(pic_object)
 
     def predict_with_object(self, pic_object: np.ndarray) -> str:
-        pic_object = toolbox.compress_frame(pic_object).reshape(1, -1)
+        pic_object = toolbox.compress_frame(pic_object)
+        pic_object = toolbox.turn_hog_desc(pic_object).reshape(1, -1)
         return self._model.predict(pic_object)[0]
 
     def classify(self, video_path: str) -> typing.List[ClassifierResult]:

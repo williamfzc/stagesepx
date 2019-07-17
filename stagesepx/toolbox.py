@@ -6,6 +6,7 @@ import typing
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim
+from skimage.feature import hog
 
 compare_ssim = compare_ssim
 
@@ -60,6 +61,25 @@ def turn_binary(old: np.ndarray) -> np.ndarray:
     return old > thresh
 
 
+def turn_hog_desc(old: np.ndarray) -> np.ndarray:
+    fd, _ = hog(
+        old,
+        orientations=8,
+        pixels_per_cell=(16, 16),
+        cells_per_block=(1, 1),
+        block_norm='L2-Hys',
+        visualize=True)
+    return fd
+
+
+def turn_surf_desc(old: np.ndarray, hessian: int = None) -> np.ndarray:
+    if not hessian:
+        hessian = 200
+    surf = cv2.xfeatures2d.SURF_create(hessian)
+    _, desc = surf.detectAndCompute(old, None)
+    return desc
+
+
 def compress_frame(old: np.ndarray, compress_rate: float = None, interpolation: int = None) -> np.ndarray:
     if not compress_rate:
         compress_rate = 0.2
@@ -74,3 +94,8 @@ def get_timestamp_str() -> str:
     time_str = time.strftime("%Y%m%d%H%M%S", time.localtime())
     salt = random.randint(10, 99)
     return f'{time_str}{salt}'
+
+
+if __name__ == '__main__':
+    t = cv2.imread('../1.png', cv2.IMREAD_GRAYSCALE)
+    turn_surf_desc(t)
