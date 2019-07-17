@@ -10,4 +10,6 @@ install:
 
 script:
   - curl -o test.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
-  - python demo.py
+  - cd example
+  - python cut.py
+  - python classify.py
