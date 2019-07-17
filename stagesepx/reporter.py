@@ -23,7 +23,6 @@ class Reporter(object):
                        is_symbol_show=True)
         line.set_global_opts(
             title_opts=opts.TitleOpts(title=cls.__TITLE__),
-
             toolbox_opts=opts.ToolboxOpts(is_show=True),
             tooltip_opts=opts.TooltipOpts(is_show=True, trigger='axis', axis_pointer_type='cross'),
         )
@@ -39,11 +38,15 @@ class Reporter(object):
         bar.add_yaxis('time cost', y_axis)
         bar.set_global_opts(
             title_opts=opts.TitleOpts(title="Time Cost"),
+            toolbox_opts=opts.ToolboxOpts(is_show=True),
         )
         logger.debug(f'time cost: {dict(zip(x_axis, y_axis))}')
 
         pie = Pie()
         pie.add('', [list(z) for z in zip(x_axis, y_axis)])
+        pie.set_global_opts(
+            toolbox_opts=opts.ToolboxOpts(is_show=True),
+        )
 
         page = Page(page_title=cls.__TITLE__)
         page.add(line)
