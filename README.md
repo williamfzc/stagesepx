@@ -4,7 +4,7 @@
 </p>
 
 ---
-
+[![PyPI version](https://badge.fury.io/py/stagesepx.svg)](https://badge.fury.io/py/stagesepx)
 [![Build Status](https://travis-ci.org/williamfzc/stagesepx.svg?branch=master)](https://travis-ci.org/williamfzc/stagesepx)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability)
 
@@ -52,10 +52,25 @@
 
 [![stage_time_cost.png](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)
 
-## 目标
+## 定位
 
-- 视频阶段划分
-- 视频帧级别的分类
+- 视频阶段划分与采样，作为数据采集者为其他工具（例如AI模型）提供自动化的数据支持。它应该提供友好的接口或其他形式为外部（包括分类器）提供支持。
+- 视频帧级别的分类，实现图片分类器，并能够利用采样结果。例如，你可以在前几次视频中用采样得到的数据训练你的AI模型，当它收敛之后在你未来的分析中你就可以直接利用训练好的模型进行分类，而不需要前置的采样过程了。
+
+## 使用
+
+### 安装
+
+Python >= 3.6
+
+```python
+pip install stagesepx 
+```
+
+### 例子
+
+- [切割器 cut.py](./example/cut.py)
+- [分类器 classify.py](./example/classify.py)
 
 ## 实现原理
 
