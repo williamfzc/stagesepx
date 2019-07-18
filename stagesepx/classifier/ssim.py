@@ -4,10 +4,14 @@ import cv2
 
 from stagesepx.classifier.base import BaseClassifier, ClassifierResult
 from stagesepx import toolbox
+from stagesepx.cutter import VideoCutRange
 
 
 class SSIMClassifier(BaseClassifier):
-    def classify(self, video_path: str, threshold: float = None) -> typing.List[ClassifierResult]:
+    def classify(self,
+                 video_path: str,
+                 limit_range: typing.List[VideoCutRange] = None,
+                 threshold: float = None) -> typing.List[ClassifierResult]:
         logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
 
@@ -20,6 +24,13 @@ class SSIMClassifier(BaseClassifier):
             while ret:
                 frame_id = toolbox.get_current_frame_id(cap)
                 frame_timestamp = toolbox.get_current_frame_time(cap)
+                if limit_range:
+                    if not any([each.contain(frame_id) for each in limit_range]):
+                        logger.debug(f'frame {frame_id} ({frame_timestamp}) not in target range, skip')
+                        final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, '-1'))
+                        ret, frame = cap.read()
+                        continue
+
                 frame = toolbox.compress_frame(frame)
 
                 result = list()

@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.svm import LinearSVC
 
 from stagesepx.classifier.base import BaseClassifier, ClassifierResult
+from stagesepx.cutter import VideoCutRange
 from stagesepx import toolbox
 
 
@@ -84,7 +85,9 @@ class SVMClassifier(BaseClassifier):
         pic_object = pic_object.reshape(1, -1)
         return self._model.predict(pic_object)[0]
 
-    def classify(self, video_path: str) -> typing.List[ClassifierResult]:
+    def classify(self,
+                 video_path: str,
+                 limit_range: typing.List[VideoCutRange] = None) -> typing.List[ClassifierResult]:
         logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
         assert self._model, 'should train before classify'
@@ -95,10 +98,15 @@ class SVMClassifier(BaseClassifier):
             while ret:
                 frame_id = toolbox.get_current_frame_id(cap)
                 frame_timestamp = toolbox.get_current_frame_time(cap)
+                if limit_range:
+                    if not any([each.contain(frame_id) for each in limit_range]):
+                        logger.debug(f'frame {frame_id} ({frame_timestamp}) not in target range, skip')
+                        final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, '-1'))
+                        ret, frame = cap.read()
+                        continue
+
                 result = self.predict_with_object(frame)
-
                 logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')
-
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
                 ret, frame = cap.read()
         return final_result

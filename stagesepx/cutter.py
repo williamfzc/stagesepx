@@ -28,6 +28,9 @@ class VideoCutRange(object):
             (self.ssim + another.ssim) / 2,
         )
 
+    def contain(self, frame_id: int) -> bool:
+        return frame_id in range(self.start, self.end + 1)
+
     def pick(self, frame_count: int, is_random: bool = None):
         result = list()
         if is_random:
@@ -192,6 +195,7 @@ class VideoCutter(object):
                 start = end
                 start_frame_id, end_frame_id = end_frame_id, end_frame_id + self.period
                 toolbox.video_jump(cap, end_frame_id)
+                # TODO last frame is lost!
                 ret, end = cap.read()
 
         return ssim_list
