@@ -1,7 +1,6 @@
 import os
 import typing
 import random
-import numpy as np
 import cv2
 import uuid
 from loguru import logger
@@ -141,7 +140,7 @@ class VideoCutResult(object):
             with toolbox.video_capture(self.video_path) as cap:
                 for each_frame_id in each_frame_list:
                     each_frame_path = os.path.join(each_stage_dir, f'{uuid.uuid4()}.png')
-                    each_frame = toolbox.get_frame(cap, each_frame_id)
+                    each_frame = toolbox.get_frame(cap, each_frame_id - 1)
                     cv2.imwrite(each_frame_path, each_frame)
                     logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
 
@@ -194,8 +193,7 @@ class VideoCutter(object):
                 # load the next one
                 start = end
                 start_frame_id, end_frame_id = end_frame_id, end_frame_id + self.period
-                toolbox.video_jump(cap, end_frame_id)
-                # TODO last frame is lost!
+                toolbox.video_jump(cap, end_frame_id - 1)
                 ret, end = cap.read()
 
         return ssim_list
