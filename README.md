@@ -76,6 +76,8 @@ sample code中提供了详细的注释。
 - 分类器
     - [常规分类器](./example/classify.py)
     - [SVM分类器](./example/classify_with_svm.py)
+- 完整例子
+    - [完整例子](./example/cut_and_classify.py)
 
 ## 实现原理
 

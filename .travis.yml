@@ -13,3 +13,4 @@ script:
   - cd example
   - python cut.py
   - python classify.py
+  - python cut_and_classify.py
