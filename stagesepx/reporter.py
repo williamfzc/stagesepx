@@ -31,9 +31,10 @@ class Reporter(object):
         x_axis = sorted(list(set([i.stage for i in data_list])))
         bar.add_xaxis(x_axis)
         y_axis = list()
+        offset = data_list[1].timestamp - data_list[0].timestamp
         for each_stage_name in x_axis:
             each_stage = sorted([i for i in data_list if i.stage == each_stage_name], key=lambda x: x.frame_id)
-            time_cost = each_stage[-1].timestamp - each_stage[0].timestamp
+            time_cost = each_stage[-1].timestamp - each_stage[0].timestamp + offset
             y_axis.append(time_cost)
         bar.add_yaxis('time cost', y_axis)
         bar.set_global_opts(
