@@ -1,90 +1,16 @@
-import pathlib
+from loguru import logger
 import typing
 import cv2
 import os
 import pickle
 import numpy as np
-from loguru import logger
 from sklearn.svm import LinearSVC
 
+from stagesepx.classifier.base import BaseClassifier, ClassifierResult
 from stagesepx import toolbox
 
 
-class StageData(object):
-    def __init__(self, name: str, pic_list: typing.List[str]):
-        self.name = name
-        self.pic_list = pic_list
-
-
-class ClassifierResult(object):
-    def __init__(self,
-                 video_path: str,
-                 frame_id: int,
-                 timestamp: float,
-                 stage: str):
-        self.video_path = video_path
-        self.frame_id = frame_id
-        self.timestamp = timestamp
-        self.stage = stage
-
-
-class _BaseClassifier(object):
-    def __init__(self):
-        self.data: typing.Dict[str, typing.List[pathlib.Path]] = dict()
-
-    def load(self, data_home: str):
-        p = pathlib.Path(data_home)
-        stage_dir_list = p.iterdir()
-        for each in stage_dir_list:
-            # load dir only
-            if each.is_file():
-                continue
-            stage_name = each.name
-            stage_pic_list = [i.absolute() for i in each.iterdir()]
-            self.data[stage_name] = stage_pic_list
-            logger.debug(f'stage [{stage_name}] found, and got {len(stage_pic_list)} pics')
-
-
-class SSIMClassifier(_BaseClassifier):
-    def classify(self, video_path: str, threshold: float = None) -> typing.List[ClassifierResult]:
-        logger.debug(f'classify with {self.__class__.__name__}')
-        assert self.data, 'should load data first'
-
-        if not threshold:
-            threshold = 0.85
-
-        final_result: typing.List[ClassifierResult] = list()
-        with toolbox.video_capture(video_path) as cap:
-            ret, frame = cap.read()
-            while ret:
-                frame_id = toolbox.get_current_frame_id(cap)
-                frame_timestamp = toolbox.get_current_frame_time(cap)
-                frame = toolbox.compress_frame(frame)
-
-                result = list()
-                for each_stage_name, each_stage_pic_list in self.data.items():
-                    each_result = list()
-                    for each in each_stage_pic_list:
-                        target_pic = cv2.imread(each.as_posix())
-                        target_pic = toolbox.compress_frame(target_pic)
-                        each_pic_ssim = toolbox.compare_ssim(frame, target_pic)
-                        each_result.append(each_pic_ssim)
-                    ssim = max(each_result)
-                    result.append((each_stage_name, ssim))
-                    logger.debug(f'stage [{each_stage_name}]: {ssim}')
-
-                result = max(result, key=lambda x: x[1])
-                if result[1] < threshold:
-                    logger.debug('not a known stage, set it -1')
-                    result = ('-1', result[1])
-                logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result[0]}')
-
-                final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result[0]))
-                ret, frame = cap.read()
-        return final_result
-
-
-class SVMClassifier(_BaseClassifier):
+class SVMClassifier(BaseClassifier):
     FEATURE_DICT = {
         'hog': toolbox.turn_hog_desc,
         # TODO not implemented
@@ -176,9 +102,3 @@ class SVMClassifier(_BaseClassifier):
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
                 ret, frame = cap.read()
         return final_result
-
-
-if __name__ == '__main__':
-    s = SSIMClassifier()
-    s.load('../1562999463')
-    res = s.classify('../video/demo_video.mp4')
