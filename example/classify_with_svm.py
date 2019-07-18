@@ -3,7 +3,7 @@ from stagesepx.reporter import Reporter
 
 
 # 默认情况下使用 HoG 进行特征提取
-# 你可以将其关闭从而直接对原始图片进行训练与测试：feature_type='none'
+# 你可以将其关闭从而直接对原始图片进行训练与测试：feature_type='raw'
 cl = SVMClassifier(feature_type='hog')
 
 # 基本与SSIM分类器的流程一致

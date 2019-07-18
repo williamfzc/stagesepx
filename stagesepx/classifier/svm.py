@@ -17,7 +17,7 @@ class SVMClassifier(BaseClassifier):
         # 'surf': toolbox.turn_surf_desc,
 
         # do not use feature transform
-        'none': lambda x: x,
+        'raw': lambda x: x,
     }
 
     def __init__(self, feature_type: str = None):
