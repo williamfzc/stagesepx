@@ -1,13 +1,11 @@
 from loguru import logger
-import typing
 import cv2
 import os
 import pickle
 import numpy as np
 from sklearn.svm import LinearSVC
 
-from stagesepx.classifier.base import BaseClassifier, ClassifierResult
-from stagesepx.cutter import VideoCutRange
+from stagesepx.classifier.base import BaseClassifier
 from stagesepx import toolbox
 
 
@@ -85,33 +83,7 @@ class SVMClassifier(BaseClassifier):
         pic_object = pic_object.reshape(1, -1)
         return self._model.predict(pic_object)[0]
 
-    def classify(self,
-                 video_path: str,
-                 limit_range: typing.List[VideoCutRange] = None,
-                 step: int = None) -> typing.List[ClassifierResult]:
-        logger.debug(f'classify with {self.__class__.__name__}')
-        assert self.data, 'should load data first'
-        assert self._model, 'should train before classify'
-
-        if not step:
-            step = 1
-
-        final_result: typing.List[ClassifierResult] = list()
-        with toolbox.video_capture(video_path) as cap:
-            ret, frame = cap.read()
-            while ret:
-                frame_id = toolbox.get_current_frame_id(cap)
-                frame_timestamp = toolbox.get_current_frame_time(cap)
-                if limit_range:
-                    if not any([each.contain(frame_id) for each in limit_range]):
-                        logger.debug(f'frame {frame_id} ({frame_timestamp}) not in target range, skip')
-                        final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, '-1'))
-                        ret, frame = cap.read()
-                        continue
-
-                result = self.predict_with_object(frame)
-                logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')
-                final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
-                toolbox.video_jump(cap, frame_id + step - 1)
-                ret, frame = cap.read()
-        return final_result
+    def _classify_frame(self,
+                        frame: np.ndarray,
+                        *_, **__) -> str:
+        return self.predict_with_object(frame)

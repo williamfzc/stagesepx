@@ -1,6 +1,10 @@
 import pathlib
 import typing
+import numpy as np
 from loguru import logger
+
+from stagesepx.cutter import VideoCutRange
+from stagesepx import toolbox
 
 
 class StageData(object):
@@ -36,3 +40,37 @@ class BaseClassifier(object):
             stage_pic_list = [i.absolute() for i in each.iterdir()]
             self.data[stage_name] = stage_pic_list
             logger.debug(f'stage [{stage_name}] found, and got {len(stage_pic_list)} pics')
+
+    def _classify_frame(self, frame: np.ndarray, *args, **kwargs) -> str:
+        raise NotImplementedError('must implement this function')
+
+    def classify(self,
+                 video_path: str,
+                 limit_range: typing.List[VideoCutRange] = None,
+                 step: int = None,
+                 *args, **kwargs) -> typing.List[ClassifierResult]:
+        logger.debug(f'classify with {self.__class__.__name__}')
+        assert self.data, 'should load data first'
+
+        if not step:
+            step = 1
+
+        final_result: typing.List[ClassifierResult] = list()
+        with toolbox.video_capture(video_path) as cap:
+            ret, frame = cap.read()
+            while ret:
+                frame_id = toolbox.get_current_frame_id(cap)
+                frame_timestamp = toolbox.get_current_frame_time(cap)
+                if limit_range:
+                    if not any([each.contain(frame_id) for each in limit_range]):
+                        logger.debug(f'frame {frame_id} ({frame_timestamp}) not in target range, skip')
+                        final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, '-1'))
+                        ret, frame = cap.read()
+                        continue
+
+                result = self._classify_frame(frame, *args, **kwargs)
+                logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')
+                final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
+                toolbox.video_jump(cap, frame_id + step - 1)
+                ret, frame = cap.read()
+        return final_result
