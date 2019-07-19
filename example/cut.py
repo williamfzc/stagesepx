@@ -26,7 +26,7 @@ unstable = res.get_unstable_range()
 # 你对同一个场景重复录制了几次视频，但可能由于拍摄效果与环境的影响，每个视频得到的阶段数量不一致
 # 基于findit，用户能够直接对阶段进行检测，以确保阶段对应的内容符合预期
 # 例如，你希望第二个稳定阶段中的帧必须包含某图像（路径为a.png），可以：
-assert stable[1].contain_image('../2.png')
+# assert stable[1].contain_image('a.png')
 
 # 对区间进行采样
 data_path = res.pick_and_save(
