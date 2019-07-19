@@ -11,7 +11,9 @@ class Reporter(object):
     __TITLE__ = 'stagesep-x report'
 
     @classmethod
-    def draw(cls, data_list: typing.List[ClassifierResult], report_path: str = None):
+    def draw(cls,
+             data_list: typing.List[ClassifierResult],
+             report_path: str = None):
         x_axis = [str(i.timestamp) for i in data_list]
         y_axis = [i.stage for i in data_list]
 

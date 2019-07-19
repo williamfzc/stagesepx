@@ -190,13 +190,13 @@ class VideoCutResult(object):
 
 
 class VideoCutter(object):
-    def __init__(self, period: int = None, compress_rate: float = None):
-        if not period:
-            period = 5
+    def __init__(self, step: int = None, compress_rate: float = None):
+        if not step:
+            step = 2
         if not compress_rate:
             compress_rate = 0.2
 
-        self.period = period
+        self.step = step
         self.compress_rate = compress_rate
 
     def convert_video_into_ssim_list(self, video_path: str) -> typing.List[VideoCutRange]:
@@ -211,7 +211,7 @@ class VideoCutter(object):
             _, start = cap.read()
             start_frame_id = toolbox.get_current_frame_id(cap)
 
-            toolbox.video_jump(cap, self.period)
+            toolbox.video_jump(cap, self.step)
             ret, end = cap.read()
             end_frame_id = toolbox.get_current_frame_id(cap)
 
@@ -234,7 +234,7 @@ class VideoCutter(object):
 
                 # load the next one
                 start = end
-                start_frame_id, end_frame_id = end_frame_id, end_frame_id + self.period
+                start_frame_id, end_frame_id = end_frame_id, end_frame_id + self.step
                 toolbox.video_jump(cap, end_frame_id - 1)
                 ret, end = cap.read()
 
