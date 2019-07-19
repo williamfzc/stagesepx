@@ -87,10 +87,14 @@ class SVMClassifier(BaseClassifier):
 
     def classify(self,
                  video_path: str,
-                 limit_range: typing.List[VideoCutRange] = None) -> typing.List[ClassifierResult]:
+                 limit_range: typing.List[VideoCutRange] = None,
+                 step: int = None) -> typing.List[ClassifierResult]:
         logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
         assert self._model, 'should train before classify'
+
+        if not step:
+            step = 1
 
         final_result: typing.List[ClassifierResult] = list()
         with toolbox.video_capture(video_path) as cap:
@@ -108,5 +112,6 @@ class SVMClassifier(BaseClassifier):
                 result = self.predict_with_object(frame)
                 logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
+                toolbox.video_jump(cap, frame_id + step - 1)
                 ret, frame = cap.read()
         return final_result

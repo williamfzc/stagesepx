@@ -12,7 +12,12 @@ cl = SSIMClassifier()
 # 如果你改动了，这里也要做相应修改
 cl.load('./cut_result')
 # 开始分析即可
-res = cl.classify('../test.mp4')
+res = cl.classify(
+    '../test.mp4',
+    # 步长，可以自行设置用于平衡效率与颗粒度
+    # 默认为1，即每帧都检测
+    step=1
+)
 
 # 分类出来的结果是一个 list，里面包含 ClassifierResult 对象
 # 你可以用它进行二次开发

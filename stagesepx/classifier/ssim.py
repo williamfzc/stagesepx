@@ -11,12 +11,15 @@ class SSIMClassifier(BaseClassifier):
     def classify(self,
                  video_path: str,
                  limit_range: typing.List[VideoCutRange] = None,
+                 step: int = None,
                  threshold: float = None) -> typing.List[ClassifierResult]:
         logger.debug(f'classify with {self.__class__.__name__}')
         assert self.data, 'should load data first'
 
         if not threshold:
             threshold = 0.85
+        if not step:
+            step = 1
 
         final_result: typing.List[ClassifierResult] = list()
         with toolbox.video_capture(video_path) as cap:
@@ -52,5 +55,6 @@ class SSIMClassifier(BaseClassifier):
                 logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result[0]}')
 
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result[0]))
+                toolbox.video_jump(cap, frame_id + step - 1)
                 ret, frame = cap.read()
         return final_result
