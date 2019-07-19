@@ -25,5 +25,6 @@ setup(
         'scikit-image',
         'scikit-learn',
         'pyecharts',
+        'findit',
     ]
 )

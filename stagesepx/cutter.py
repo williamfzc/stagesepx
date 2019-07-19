@@ -3,7 +3,9 @@ import typing
 import random
 import cv2
 import uuid
+import numpy as np
 from loguru import logger
+from findit import FindIt
 
 from stagesepx import toolbox
 
@@ -30,7 +32,47 @@ class VideoCutRange(object):
     def contain(self, frame_id: int) -> bool:
         return frame_id in range(self.start, self.end + 1)
 
-    def pick(self, frame_count: int, is_random: bool = None):
+    def contain_image(self,
+                      image_path: str = None,
+                      image_object: np.ndarray = None,
+                      threshold: float = None,
+                      *args, **kwargs):
+        assert image_path or image_object, 'should fill image_path or image_object'
+        if not threshold:
+            threshold = 0.99
+
+        if image_path:
+            logger.debug(f'found image path, use it first: {image_path}')
+            assert os.path.isfile(image_path), f'image {image_path} not existed'
+            image_object = cv2.imread(image_path)
+        image_object = toolbox.turn_grey(image_object)
+
+        # TODO use client or itself..?
+        fi = FindIt(
+            engine=['template']
+        )
+        fi_template_name = 'default'
+        fi.load_template(fi_template_name, pic_object=image_object)
+
+        with toolbox.video_capture(self.video_path) as cap:
+            target_id = self.pick(*args, **kwargs)[0]
+            frame = toolbox.get_frame(cap, target_id)
+            frame = toolbox.turn_grey(frame)
+
+            result = fi.find(str(target_id), target_pic_object=frame)
+        find_result = result['data'][fi_template_name]['TemplateEngine']
+        position = find_result['target_point']
+        sim = find_result['target_sim']
+        logger.debug(f'position: {position}, sim: {sim}')
+        return sim > threshold
+
+    def pick(self,
+             frame_count: int = None,
+             is_random: bool = None,
+             *_, **__) -> typing.List[int]:
+        if not frame_count:
+            frame_count = 1
+
         result = list()
         if is_random:
             return random.sample(range(self.start, self.end), frame_count)

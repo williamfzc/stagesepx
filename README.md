@@ -100,6 +100,8 @@ sample code中提供了详细的注释。
 - 完整例子
     - [完整例子](./example/cut_and_classify.py)
 
+例子中使用的视频可以[点此](https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4)下载。
+
 ## 实现原理
 
 ### 核心
