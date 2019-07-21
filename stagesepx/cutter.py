@@ -162,6 +162,7 @@ class VideoCutResult(object):
                       range_list: typing.List[VideoCutRange],
                       frame_count: int,
                       to_dir: str = None,
+                      compress_rate: float = None,
                       *args, **kwargs) -> str:
         stage_list = list()
         for index, each_range in enumerate(range_list):
@@ -183,6 +184,8 @@ class VideoCutResult(object):
                 for each_frame_id in each_frame_list:
                     each_frame_path = os.path.join(each_stage_dir, f'{uuid.uuid4()}.png')
                     each_frame = toolbox.get_frame(cap, each_frame_id - 1)
+                    if compress_rate:
+                        each_frame = toolbox.compress_frame(each_frame, compress_rate)
                     cv2.imwrite(each_frame_path, each_frame)
                     logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
 
