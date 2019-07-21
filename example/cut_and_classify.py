@@ -18,7 +18,13 @@ cl.train()
 # 注意，如果在classify方法指定了范围
 # 那么分析时只会分析处于范围内的帧！
 # 例如，这里只传入了stable的范围，那么非stable范围内的帧都会被忽略掉，标记为 -1
-res = cl.classify(video_path, stable, step=5)
+res = cl.classify(
+    video_path,
+    stable,
+    # 步长，可以自行设置用于平衡效率与颗粒度
+    # 默认为1，即每帧都检测
+    step=1
+)
 
 # draw
 Reporter.draw(

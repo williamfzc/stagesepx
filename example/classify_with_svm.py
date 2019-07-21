@@ -20,7 +20,12 @@ cl.train()
 # cl.load_model('model.pkl')
 
 # 开始分类
-res = cl.classify('../test.mp4', step=10)
+res = cl.classify(
+    '../test.mp4',
+    # 步长，可以自行设置用于平衡效率与颗粒度
+    # 默认为1，即每帧都检测
+    step=1
+)
 
 Reporter.draw(
     res,
