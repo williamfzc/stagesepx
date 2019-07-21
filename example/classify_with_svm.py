@@ -8,7 +8,8 @@ cl = SVMClassifier(feature_type='hog')
 
 # 基本与SSIM分类器的流程一致
 # 但它对数据的要求可能有所差别，具体参见 cut.py 中的描述
-cl.load('./cut_result')
+data_home = './cut_result'
+cl.load(data_home)
 
 # 在加载数据完成之后需要先训练
 cl.train()
@@ -19,9 +20,12 @@ cl.train()
 # cl.load_model('model.pkl')
 
 # 开始分类
-res = cl.classify('../test.mp4')
+res = cl.classify('../test.mp4', step=10)
 
 Reporter.draw(
     res,
-    report_path='report.html'
+    report_path='report.html',
+
+    # 在结果报告中展示stage对应的图片
+    data_path=data_home,
 )

@@ -13,4 +13,5 @@ script:
   - cd example
   - python cut.py
   - python classify.py
+  - python classify_with_svm.py
   - python cut_and_classify.py

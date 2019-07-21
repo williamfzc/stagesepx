@@ -1,7 +1,6 @@
 from stagesepx.classifier import SSIMClassifier
 from stagesepx.reporter import Reporter
 
-
 # 在运行这个例子前需要有前置数据
 # 你可以先从 cut.py 开始
 
@@ -10,7 +9,8 @@ from stagesepx.reporter import Reporter
 cl = SSIMClassifier()
 # cut.py会把数据生成在这个路径下
 # 如果你改动了，这里也要做相应修改
-cl.load('./cut_result')
+data_home = './cut_result'
+cl.load(data_home)
 # 开始分析即可
 res = cl.classify(
     '../test.mp4',
@@ -34,5 +34,7 @@ for each in res:
 # 你可以直接把分析结果绘制成图表
 Reporter.draw(
     res,
-    report_path='report.html'
+    report_path='report.html',
+    # 在结果报告中展示stage对应的图片
+    data_path=data_home,
 )
