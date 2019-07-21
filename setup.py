@@ -26,5 +26,6 @@ setup(
         'scikit-learn',
         'pyecharts',
         'findit',
+        'jinja2',
     ]
 )

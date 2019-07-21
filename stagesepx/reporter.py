@@ -1,4 +1,6 @@
 import typing
+import os
+from jinja2 import Markup, Template
 from pyecharts.charts import Line, Bar, Page, Pie
 from pyecharts import options as opts
 from loguru import logger
@@ -6,14 +8,47 @@ from loguru import logger
 from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
 
+TEMPLATE = r'''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>stagesep-x report :)</title>
+</head>
+<body>
+    <h1>stagesep-x report</h1>
+    {% if pic_list %}
+        <h2>Stage Pictures</h2>
+            <ul>
+                {% for each_pic_list in pic_list %}
+                    <ul>
+                        {% for each_pic in each_pic_list %}
+                            <li><a href="{{ each_pic }}">{{ each_pic }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </ul>
+    {% endif %}
+    
+    <h2>Charts</h2>
+    <div>
+        {{ chart }}
+    </div>
+</body>
+</html>
+<body>
+
+</body>
+</html>
+'''
+
 
 class Reporter(object):
-    __TITLE__ = 'stagesep-x report'
-
     @classmethod
     def draw(cls,
              data_list: typing.List[ClassifierResult],
-             report_path: str = None):
+             report_path: str = None,
+             data_path: str = None):
         x_axis = [str(i.timestamp) for i in data_list]
         y_axis = [i.stage for i in data_list]
 
@@ -24,7 +59,7 @@ class Reporter(object):
                        is_step=True,
                        is_symbol_show=True)
         line.set_global_opts(
-            title_opts=opts.TitleOpts(title=cls.__TITLE__),
+            title_opts=opts.TitleOpts(title='Trend'),
             toolbox_opts=opts.ToolboxOpts(is_show=True),
             tooltip_opts=opts.TooltipOpts(is_show=True, trigger='axis', axis_pointer_type='cross'),
         )
@@ -51,12 +86,28 @@ class Reporter(object):
             toolbox_opts=opts.ToolboxOpts(is_show=True),
         )
 
-        page = Page(page_title=cls.__TITLE__)
+        page = Page()
         page.add(line)
         page.add(bar)
         page.add(pie)
 
+        if data_path and os.path.isdir(data_path):
+            stage_list = [os.path.join(data_path, i) for i in os.listdir(data_path)]
+            stage_list = [
+                [os.path.join(i, j) for j in os.listdir(i)]
+                for i in stage_list]
+        else:
+            logger.warning(f'data path {data_path} not existed')
+            stage_list = []
+
         if not report_path:
             report_path = f'{toolbox.get_timestamp_str()}.html'
         logger.info(f'save report to {report_path}')
-        page.render(path=report_path)
+
+        template = Template(TEMPLATE)
+        template_content = template.render(
+            chart=Markup(page.render_embed()),
+            pic_list=stage_list,
+        )
+        with open(report_path, "w") as fh:
+            fh.write(template_content)
