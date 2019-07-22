@@ -20,12 +20,8 @@ TEMPLATE = r'''
     {% if pic_list %}
         <h2>Stage Pictures</h2>
             <ul>
-                {% for each_pic_list in pic_list %}
-                    <ul>
-                        {% for each_pic in each_pic_list %}
-                            <li><a href="{{ each_pic }}">{{ each_pic }}</a></li>
-                        {% endfor %}
-                    </ul>
+                {% for each_pic in pic_list %}
+                    <li><a href="{{ each_pic }}">{{ each_pic }}</a></li>
                 {% endfor %}
             </ul>
     {% endif %}
@@ -49,6 +45,7 @@ class Reporter(object):
              data_list: typing.List[ClassifierResult],
              report_path: str = None,
              data_path: str = None):
+        # draw line chart
         x_axis = [str(i.timestamp) for i in data_list]
         y_axis = [i.stage for i in data_list]
 
@@ -64,6 +61,7 @@ class Reporter(object):
             tooltip_opts=opts.TooltipOpts(is_show=True, trigger='axis', axis_pointer_type='cross'),
         )
 
+        # draw bar chart
         bar = Bar()
         x_axis = sorted(list(set([i.stage for i in data_list])))
         bar.add_xaxis(x_axis)
@@ -80,30 +78,30 @@ class Reporter(object):
         )
         logger.debug(f'time cost: {dict(zip(x_axis, y_axis))}')
 
+        # draw pie chart
         pie = Pie()
         pie.add('', [list(z) for z in zip(x_axis, y_axis)])
         pie.set_global_opts(
             toolbox_opts=opts.ToolboxOpts(is_show=True),
         )
 
+        # merge charts
         page = Page()
         page.add(line)
         page.add(bar)
         page.add(pie)
 
+        # insert sample pictures' path
         if data_path and os.path.isdir(data_path):
+            data_path = os.path.abspath(data_path)
             stage_list = [os.path.join(data_path, i) for i in os.listdir(data_path)]
-            stage_list = [
-                [os.path.join(i, j) for j in os.listdir(i)]
-                for i in stage_list]
         else:
             logger.warning(f'data path {data_path} not existed')
             stage_list = []
 
+        # save to file
         if not report_path:
             report_path = f'{toolbox.get_timestamp_str()}.html'
-        logger.info(f'save report to {report_path}')
-
         template = Template(TEMPLATE)
         template_content = template.render(
             chart=Markup(page.render_embed()),
@@ -111,3 +109,4 @@ class Reporter(object):
         )
         with open(report_path, "w") as fh:
             fh.write(template_content)
+        logger.info(f'save report to {report_path}')
