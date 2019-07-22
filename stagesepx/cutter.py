@@ -112,9 +112,9 @@ class VideoCutResult(object):
                 after.append(each)
         return after
 
-    def get_unstable_range(self, limit: int = None) -> typing.List[VideoCutRange]:
+    def get_unstable_range(self, limit: int = None, **kwargs) -> typing.List[VideoCutRange]:
         change_range_list = sorted(
-            [i for i in self.ssim_list if not i.is_stable()],
+            [i for i in self.ssim_list if not i.is_stable(**kwargs)],
             key=lambda x: x.start)
 
         # merge
@@ -137,9 +137,9 @@ class VideoCutResult(object):
         logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
         return merged_change_range_list
 
-    def get_stable_range(self, limit: int = None) -> typing.List[VideoCutRange]:
+    def get_stable_range(self, limit: int = None, **kwargs) -> typing.List[VideoCutRange]:
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
-        unstable_range_list = self.get_unstable_range(limit)
+        unstable_range_list = self.get_unstable_range(limit, **kwargs)
         range_list = [
             VideoCutRange(self.video_path, total_range[0], unstable_range_list[0].start, 0),
             VideoCutRange(self.video_path, unstable_range_list[-1].end, total_range[-1], 0),

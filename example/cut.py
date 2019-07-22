@@ -18,7 +18,12 @@ res = cutter.cut(video_path)
 # 你可以通过res获取切割结果
 # 例如稳定状态对应的区间
 # limit能够过滤掉一些过于短的阶段（例如你不希望一些持续时间过短的阶段被认为是一个稳态），默认不过滤
-stable = res.get_stable_range()
+stable = res.get_stable_range(
+    # 判定阶段是否稳定的阈值
+    # 越高则越严格（判定为稳定的区间更少）
+    # 默认为 0.95 （0-1）
+    threshold=0.95
+)
 # 不稳定状态（正在变化）
 unstable = res.get_unstable_range()
 
