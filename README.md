@@ -98,7 +98,8 @@ sample code中提供了详细的注释。
     - [常规分类器](./example/classify.py)
     - [SVM分类器](./example/classify_with_svm.py)
 - 完整例子
-    - [完整例子](./example/cut_and_classify.py)
+    - [单视频](./example/cut_and_classify.py)
+    - [多视频](./example/multi_video.py)
 
 例子中使用的视频可以[点此](https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4)下载。
 
