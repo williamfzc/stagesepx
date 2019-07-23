@@ -4,9 +4,10 @@ from stagesepx.cutter import VideoCutter
 video_path = '../test.mp4'
 
 cutter = VideoCutter(
-    # 步长，默认为2，通过它可以自行把握效率与颗粒度
+    # 步长，默认为1，通过它可以自行把握效率与颗粒度
     # 设定为2时，会以2帧为一个单位进行遍历
-    step=2,
+    # 即跳过一帧
+    step=1,
     # 默认为0.2，即将图片缩放为0.2倍
     # 主要为了提高计算效率
     compress_rate=0.2

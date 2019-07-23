@@ -21,7 +21,7 @@ def video_capture(video_path: str):
 
 
 def video_jump(video_cap: cv2.VideoCapture, frame_id: int):
-    video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id)
+    video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1)
 
 
 def get_current_frame_id(video_cap: cv2.VideoCapture) -> int:

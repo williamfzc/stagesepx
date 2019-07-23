@@ -195,7 +195,7 @@ class VideoCutResult(object):
 class VideoCutter(object):
     def __init__(self, step: int = None, compress_rate: float = None):
         if not step:
-            step = 2
+            step = 1
         if not compress_rate:
             compress_rate = 0.2
 
@@ -238,7 +238,7 @@ class VideoCutter(object):
                 # load the next one
                 start = end
                 start_frame_id, end_frame_id = end_frame_id, end_frame_id + self.step
-                toolbox.video_jump(cap, end_frame_id - 1)
+                toolbox.video_jump(cap, end_frame_id)
                 ret, end = cap.read()
 
         return ssim_list

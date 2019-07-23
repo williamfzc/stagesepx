@@ -69,7 +69,7 @@ class BaseClassifier(object):
 
     def read_from_list(self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__):
         cur_frame_id = toolbox.get_current_frame_id(video_cap)
-        data = (toolbox.get_frame(video_cap, each - 1) for each in data)
+        data = (toolbox.get_frame(video_cap, each) for each in data)
         toolbox.video_jump(video_cap, cur_frame_id)
         return data
 
@@ -106,6 +106,6 @@ class BaseClassifier(object):
                 result = self._classify_frame(frame, cap, *args, **kwargs)
                 logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
-                toolbox.video_jump(cap, frame_id + step - 1)
+                toolbox.video_jump(cap, frame_id + step)
                 ret, frame = cap.read()
         return final_result
