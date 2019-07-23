@@ -42,10 +42,14 @@ def get_frame_size(video_cap: cv2.VideoCapture) -> typing.Tuple[int, int]:
     return int(w), int(h)
 
 
-def get_frame(video_cap: cv2.VideoCapture, frame_id: int) -> np.ndarray:
+def get_frame(video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None) -> np.ndarray:
+    cur = get_current_frame_id(video_cap)
     video_jump(video_cap, frame_id)
     ret, frame = video_cap.read()
-    assert ret
+    assert ret, f'read frame failed, frame id: {frame_id}'
+
+    if recover:
+        video_jump(video_cap, cur)
     return frame
 
 

@@ -2,6 +2,7 @@ from loguru import logger
 import cv2
 import os
 import pickle
+import typing
 import numpy as np
 from sklearn.svm import LinearSVC
 
@@ -55,16 +56,17 @@ class SVMClassifier(BaseClassifier):
         with open(model_path, 'rb') as f:
             self._model = pickle.load(f)
 
+    def read_from_list(self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__):
+        raise NotImplementedError('svm classifier only support loading data from files')
+
     def train(self):
         if not self._model:
             self._model = LinearSVC()
 
         train_data = list()
         train_label = list()
-        for each_label, each_label_pic_list in self.data.items():
-            for each_pic in each_label_pic_list:
-                logger.debug(f'loading {each_pic} ...')
-                each_pic_object = cv2.imread(each_pic.as_posix())
+        for each_label, each_label_pic_list in self.read():
+            for each_pic_object in each_label_pic_list:
                 each_pic_object = toolbox.compress_frame(each_pic_object)
                 each_pic_object = self.feature_func(each_pic_object).flatten()
                 train_data.append(each_pic_object)

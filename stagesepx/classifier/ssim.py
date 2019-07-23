@@ -9,6 +9,7 @@ from stagesepx import toolbox
 class SSIMClassifier(BaseClassifier):
     def _classify_frame(self,
                         frame: np.ndarray,
+                        video_cap: cv2.VideoCapture,
                         threshold: float = None,
                         *_, **__) -> str:
         if not threshold:
@@ -17,10 +18,9 @@ class SSIMClassifier(BaseClassifier):
         frame = toolbox.compress_frame(frame)
 
         result = list()
-        for each_stage_name, each_stage_pic_list in self.data.items():
+        for each_stage_name, each_stage_pic_list in self.read(video_cap):
             each_result = list()
-            for each in each_stage_pic_list:
-                target_pic = cv2.imread(each.as_posix())
+            for target_pic in each_stage_pic_list:
                 target_pic = toolbox.compress_frame(target_pic)
                 each_pic_ssim = toolbox.compare_ssim(frame, target_pic)
                 each_result.append(each_pic_ssim)
