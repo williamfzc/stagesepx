@@ -16,3 +16,4 @@ script:
   - python classify_with_svm.py
   - python cut_and_classify.py
   - python multi_video.py
+  - python mini.py
