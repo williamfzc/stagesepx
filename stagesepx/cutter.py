@@ -158,6 +158,30 @@ class VideoCutResult(object):
         logger.debug(f'stable range of [{self.video_path}]: {range_list}')
         return sorted(range_list, key=lambda x: x.start)
 
+    def thumbnail(self,
+                  target_range: VideoCutRange,
+                  compress_rate: float = None,
+                  is_vertical: bool = None) -> np.ndarray:
+        if not compress_rate:
+            compress_rate = 0.2
+        if is_vertical:
+            stack_func = np.vstack
+        else:
+            stack_func = np.hstack
+
+        frame_list = list()
+        with toolbox.video_capture(self.video_path) as cap:
+            toolbox.video_jump(cap, target_range.start)
+            ret, frame = cap.read()
+            count = 1
+            length = target_range.get_length()
+            while ret and count != length:
+                frame = toolbox.compress_frame(frame, compress_rate)
+                frame_list.append(frame)
+                ret, frame = cap.read()
+                count += 1
+        return stack_func(frame_list)
+
     def pick_and_save(self,
                       range_list: typing.List[VideoCutRange],
                       frame_count: int,
