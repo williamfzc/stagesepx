@@ -137,7 +137,7 @@ class VideoCutResult(object):
         logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
         return merged_change_range_list
 
-    def get_stable_range(self, limit: int = None, **kwargs) -> typing.List[VideoCutRange]:
+    def get_range(self, limit: int = None, **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
         range_list = [
@@ -156,7 +156,11 @@ class VideoCutResult(object):
         if limit:
             range_list = self._length_filter(range_list, limit)
         logger.debug(f'stable range of [{self.video_path}]: {range_list}')
-        return sorted(range_list, key=lambda x: x.start)
+        stable_range_list = sorted(range_list, key=lambda x: x.start)
+        return stable_range_list, unstable_range_list
+
+    def get_stable_range(self, limit: int = None, **kwargs) -> typing.List[VideoCutRange]:
+        return self.get_range(limit, **kwargs)[0]
 
     def thumbnail(self,
                   target_range: VideoCutRange,
