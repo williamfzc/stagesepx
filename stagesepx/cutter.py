@@ -77,7 +77,7 @@ class VideoCutRange(object):
         if is_random:
             return random.sample(range(self.start, self.end), frame_count)
         length = self.get_length()
-        for _ in range(1, frame_count + 1):
+        for _ in range(frame_count):
             cur = int(self.start + length / frame_count * _)
             result.append(cur)
         return result
@@ -138,18 +138,19 @@ class VideoCutResult(object):
         return merged_change_range_list
 
     def get_range(self, limit: int = None, **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
+        """ return (stable_range_list, unstable_range_list) """
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
         range_list = [
-            VideoCutRange(self.video_path, total_range[0], unstable_range_list[0].start, 0),
-            VideoCutRange(self.video_path, unstable_range_list[-1].end, total_range[-1], 0),
+            VideoCutRange(self.video_path, total_range[0], unstable_range_list[0].start - 1, 0),
+            VideoCutRange(self.video_path, unstable_range_list[-1].end + 1, total_range[-1], 0),
         ]
         for i in range(len(unstable_range_list) - 1):
             range_list.append(
                 VideoCutRange(
                     self.video_path,
-                    unstable_range_list[i].end,
-                    unstable_range_list[i + 1].start,
+                    unstable_range_list[i].end + 1,
+                    unstable_range_list[i + 1].start - 1,
                     0,
                 )
             )
