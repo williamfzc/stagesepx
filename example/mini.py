@@ -18,4 +18,5 @@ res = cl.classify(
 )
 
 # draw
-Reporter.draw(res)
+r = Reporter()
+r.draw(res)

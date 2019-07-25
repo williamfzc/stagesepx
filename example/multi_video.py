@@ -30,8 +30,12 @@ for each_video_path in video_list:
         step=1
     )
 
-    # draw
-    Reporter.draw(
-        res,
-        data_path=data_home,
-    )
+    # 为了更方便的可读性，stagesepx已经内置了图表绘制功能
+    # 你可以直接把分析结果绘制成图表
+    report = Reporter()
+    # 你可以将把一些文件夹路径插入到报告中
+    # 这样你可以很方便地从报告中查看各项相关内容
+    # 当然，你需要想好这些路径与报告最后所在位置之间的相对位置，以确保他们能够被访问到
+    report.add_dir_link(data_home)
+
+    report.draw(res)

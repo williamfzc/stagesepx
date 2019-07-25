@@ -19,14 +19,17 @@ res = cutter.cut(video_path)
 # 你可以通过res获取切割结果
 # 例如稳定状态对应的区间
 # limit能够过滤掉一些过于短的阶段（例如你不希望一些持续时间过短的阶段被认为是一个稳态），默认不过滤
-stable = res.get_stable_range(
+stable, unstable = res.get_range(
     # 判定阶段是否稳定的阈值
     # 越高则越严格（判定为稳定的区间更少）
     # 默认为 0.95 （0-1）
     threshold=0.95
 )
-# 不稳定状态（正在变化）
-unstable = res.get_unstable_range()
+
+# 你可以通过 thumbnail 将阶段的变化过程转化成一张缩略图，这样可以很直观地看出阶段的变化过程！
+# 例如，你希望查看第一个unstable阶段发生了什么
+# 这样做能够将转化后的缩略图保存到当前目录下
+res.thumbnail(unstable[0], to_dir='.')
 
 # 由于所有的阶段都是自动侦测的，可能发生的一个状况是：
 # 你对同一个场景重复录制了几次视频，但可能由于拍摄效果与环境的影响，每个视频得到的阶段数量不一致
