@@ -3,7 +3,6 @@ import numpy as np
 from jinja2 import Markup, Template
 from base64 import b64encode
 import cv2
-import pathlib
 from pyecharts.charts import Line, Bar, Page
 from pyecharts import options as opts
 from loguru import logger
@@ -11,9 +10,86 @@ from loguru import logger
 from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
 
-REPORT_TEMPLATE_PATH = pathlib.Path(__file__).parent / 'static' / 'report_template.html'
-with open(REPORT_TEMPLATE_PATH, encoding='utf-8') as f:
-    TEMPLATE = f.read()
+TEMPLATE = r'''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>stagesep-x report :)</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+
+<style>
+    .container {
+        margin: 20px;
+    }
+</style>
+
+<body>
+<nav class="navbar navbar-dark bg-primary">
+    <a class="navbar-brand" href="#">stagesep x report</a>
+</nav>
+
+{% if dir_link_list %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h2>Raw Pictures</h2>
+            <ul>
+                {% for each_link in dir_link_list %}
+                <li>
+                    <a href="{{ each_link }}">{{ each_link }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if thumbnail_list %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h2>Thumbnail</h2>
+            <ul>
+                {% for name, each_thumbnail in thumbnail_list %}
+                <li>
+                    <h3> {{ name }} </h3>
+                    <img src="data:image/png;base64,{{ each_thumbnail }}"/>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h2>Charts</h2>
+            <div>
+                {{ chart }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer" style="text-align:center">
+    <div class="container">
+        <span class="text-muted">
+            Build with <a href="https://github.com/williamfzc/stagesepx">@stagesepx</a> :)
+        </span>
+    </div>
+</footer>
+
+</body>
+</html>
+'''
 
 
 class Reporter(object):
