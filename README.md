@@ -34,9 +34,9 @@ stagesepx能够**自动侦测**并提取视频中的稳定或不稳定的阶段�
 
 以此类推，我们能够对视频的每个阶段进行非常细致的评估。通过观察视频也可以发现，识别效果与实际完全一致。
 
-在运行过程中，stagesepx可以将对应阶段的图片保存下来，你可以很轻松地知道每个阶段到底发生了什么：
+在运行过程中，stagesepx强大的快照功能能够让你很轻松地知道每个阶段到底发生了什么：
 
-[![sample_pic_list.png](https://i.loli.net/2019/07/22/5d35b5e58904593354.png)](https://i.loli.net/2019/07/22/5d35b5e58904593354.png)
+[![thumbnail.png](https://i.loli.net/2019/07/25/5d3955365dff977571.png)](https://i.loli.net/2019/07/25/5d3955365dff977571.png)
 
 **而所有的一切只需要一个视频，无需前置模板、无需提前学习。**
 
@@ -123,15 +123,15 @@ stagesepx提供了两种不同类型的分类器，用于处理切割后的结�
 
 事实上，stagesepx在设计上更加鼓励开发者**根据自己的实际需要**设计并使用自己的分类器，以达到最好的效果。
 
-### 丰富的图表
+### 人性化的报告
 
-想得到耗时？stagesepx已经帮你计算好了：
+想得到每个阶段的耗时？stagesepx已经帮你计算好了：
 
 [![stage_time_cost.png](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)
 
-或者，每个阶段的占比？
+快照功能能够让你很直观地知道每个阶段的情况：
 
-[![pie.png](https://i.loli.net/2019/07/18/5d308bab8dd1b49028.png)](https://i.loli.net/2019/07/18/5d308bab8dd1b49028.png)
+[![thumbnail.png](https://i.loli.net/2019/07/25/5d3955365dff977571.png)](https://i.loli.net/2019/07/25/5d3955365dff977571.png)
 
 ...
 
