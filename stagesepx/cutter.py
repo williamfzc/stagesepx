@@ -83,7 +83,7 @@ class VideoCutRange(object):
         return result
 
     def get_length(self):
-        return self.end - self.start
+        return self.end - self.start + 1
 
     def is_stable(self, threshold: float = None):
         if not threshold:
@@ -160,10 +160,12 @@ class VideoCutResult(object):
 
     def thumbnail(self,
                   target_range: VideoCutRange,
+                  to_dir: str = None,
                   compress_rate: float = None,
                   is_vertical: bool = None) -> np.ndarray:
         if not compress_rate:
             compress_rate = 0.2
+        # direction
         if is_vertical:
             stack_func = np.vstack
         else:
@@ -175,12 +177,19 @@ class VideoCutResult(object):
             ret, frame = cap.read()
             count = 1
             length = target_range.get_length()
-            while ret and count != length:
+            while ret and count <= length:
                 frame = toolbox.compress_frame(frame, compress_rate)
                 frame_list.append(frame)
                 ret, frame = cap.read()
                 count += 1
-        return stack_func(frame_list)
+        merged = stack_func(frame_list)
+
+        # create parent dir
+        if to_dir:
+            target_path = os.path.join(to_dir, f'thumbnail_{target_range.start}-{target_range.end}.png')
+            cv2.imwrite(target_path, merged)
+            logger.debug(f'save thumbnail to {target_path}')
+        return merged
 
     def pick_and_save(self,
                       range_list: typing.List[VideoCutRange],
