@@ -3,6 +3,7 @@ import numpy as np
 from jinja2 import Markup, Template
 from base64 import b64encode
 import cv2
+import pathlib
 from pyecharts.charts import Line, Bar, Page
 from pyecharts import options as opts
 from loguru import logger
@@ -10,50 +11,9 @@ from loguru import logger
 from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
 
-TEMPLATE = r'''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>stagesep-x report :)</title>
-</head>
-<body>
-    <h1>stagesep-x report</h1>
-    
-    {% if dir_link_list %}
-        <h2>Raw Pictures</h2>
-            <ul>
-                {% for each_link in dir_link_list %}
-                    <li>
-                        <a href="{{ each_link }}">{{ each_link }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-    {% endif %}
-    
-    {% if thumbnail_list %}
-        <h2>Thumbnail</h2>
-            <ul>
-                {% for name, each_thumbnail in thumbnail_list %}
-                    <li>
-                        <h3> {{ name }} </h3>
-                        <img src="data:image/png;base64,{{ each_thumbnail }}"/>
-                    </li>
-                {% endfor %}
-            </ul>
-    {% endif %}
-    
-    <h2>Charts</h2>
-    <div>
-        {{ chart }}
-    </div>
-</body>
-</html>
-<body>
-
-</body>
-</html>
-'''
+REPORT_TEMPLATE_PATH = pathlib.Path(__file__).parent / 'static' / 'report_template.html'
+with open(REPORT_TEMPLATE_PATH, encoding='utf-8') as f:
+    TEMPLATE = f.read()
 
 
 class Reporter(object):
