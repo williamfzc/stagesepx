@@ -175,7 +175,7 @@ class VideoCutResult(object):
                   compress_rate: float = None,
                   is_vertical: bool = None) -> np.ndarray:
         if not compress_rate:
-            compress_rate = 0.2
+            compress_rate = 0.1
         # direction
         if is_vertical:
             stack_func = np.vstack

@@ -15,7 +15,7 @@ TEMPLATE = r'''
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>stagesep-x report :)</title>
+    <title>stagesep-x report</title>
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
@@ -26,16 +26,19 @@ TEMPLATE = r'''
     .container {
         margin: 20px;
     }
+    .footer {
+        margin-bottom: 20px;
+    }
 </style>
 
 <body>
-<nav class="navbar navbar-dark bg-primary">
-    <a class="navbar-brand" href="#">stagesep x report</a>
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="https://github.com/williamfzc/stagesepx">stagesep x report</a>
 </nav>
 
 {% if dir_link_list %}
 <div class="container">
-    <div class="card">
+    <div class="card border-light">
         <div class="card-body">
             <h2>Raw Pictures</h2>
             <ul>
@@ -52,7 +55,7 @@ TEMPLATE = r'''
 
 {% if thumbnail_list %}
 <div class="container">
-    <div class="card">
+    <div class="card border-light">
         <div class="card-body">
             <h2>Thumbnail</h2>
             <ul>
@@ -69,7 +72,7 @@ TEMPLATE = r'''
 {% endif %}
 
 <div class="container">
-    <div class="card">
+    <div class="card border-light">
         <div class="card-body">
             <h2>Charts</h2>
             <div>
@@ -80,7 +83,8 @@ TEMPLATE = r'''
 </div>
 
 <footer class="footer" style="text-align:center">
-    <div class="container">
+    <div class="container-fluid">
+        <HR>
         <span class="text-muted">
             Build with <a href="https://github.com/williamfzc/stagesepx">@stagesepx</a> :)
         </span>
