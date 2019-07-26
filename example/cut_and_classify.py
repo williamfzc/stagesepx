@@ -3,7 +3,7 @@ from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
 
 # cut
-video_path = '../test.mp4'
+video_path = '../file4.mp4'
 cutter = VideoCutter()
 res = cutter.cut(video_path)
 stable, unstable = res.get_range()
@@ -30,7 +30,7 @@ r = Reporter()
 r.add_dir_link(data_home)
 
 # 你可以将 thumbnail 直接嵌入到report中
-for index, each in enumerate(unstable):
-    r.add_thumbnail(f'unstable stage {index}', res.thumbnail(each))
+for each in unstable:
+    r.add_thumbnail(f'{each.start}-{each.end}', res.thumbnail(each))
 
 r.draw(classify_result)
