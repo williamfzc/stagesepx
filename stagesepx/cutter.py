@@ -17,6 +17,11 @@ class VideoCutRange(object):
         self.end = end
         self.ssim = ssim
 
+        # if length is 1
+        # https://github.com/williamfzc/stagesepx/issues/9
+        if start > end:
+            self.start, self.end = self.end, self.start
+
     def can_merge(self, another: 'VideoCutRange'):
         return (self.end == another.start) and self.video_path == another.video_path
 
