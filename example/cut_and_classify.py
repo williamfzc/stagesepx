@@ -3,7 +3,7 @@ from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
 
 # cut
-video_path = '../file4.mp4'
+video_path = '../test.mp4'
 cutter = VideoCutter()
 res = cutter.cut(video_path)
 stable, unstable = res.get_range()
