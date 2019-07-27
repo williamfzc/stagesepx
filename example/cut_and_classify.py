@@ -4,10 +4,10 @@ from stagesepx.reporter import Reporter
 
 # cut
 video_path = '../test.mp4'
-cutter = VideoCutter()
+cutter = VideoCutter(step=10)
 res = cutter.cut(video_path)
 stable, unstable = res.get_range()
-data_home = res.pick_and_save(stable, 5)
+data_home = res.pick_and_save(stable, 3)
 
 # classify
 cl = SVMClassifier()
@@ -22,7 +22,7 @@ classify_result = cl.classify(
     stable,
     # 步长，可以自行设置用于平衡效率与颗粒度
     # 默认为1，即每帧都检测
-    step=1
+    step=10
 )
 
 # draw
@@ -33,4 +33,6 @@ r.add_dir_link(data_home)
 for each in unstable:
     r.add_thumbnail(f'{each.start}-{each.end}', res.thumbnail(each))
 
+# 在0.3.2及之后的版本，你可以在报告中加入一些自定义内容 （https://github.com/williamfzc/stagesepx/issues/13）
+# r.add_extra('here is title', 'here is content')
 r.draw(classify_result)

@@ -71,6 +71,20 @@ TEMPLATE = r'''
 </div>
 {% endif %}
 
+{% if extras %}
+<div class="container">
+    <div class="card border-light">
+        <div class="card-body">
+            <h2>Extras</h2>
+            {% for name, value in extras.items() %}
+            <h3> {{ name }} </h3>
+            <p> {{ value }} </p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class="container">
     <div class="card border-light">
         <div class="card-body">
@@ -100,6 +114,7 @@ class Reporter(object):
     def __init__(self):
         self.dir_link_list: typing.List[str] = list()
         self.thumbnail_list: typing.List[typing.Tuple[str, str]] = list()
+        self.extra_dict: typing.Dict[str, str] = dict()
 
     def add_dir_link(self, data_path: str):
         self.dir_link_list.append(data_path)
@@ -108,6 +123,9 @@ class Reporter(object):
         buffer = cv2.imencode(".png", pic_object)[1].tostring()
         b64_str = b64encode(buffer).decode()
         self.thumbnail_list.append((name, b64_str))
+
+    def add_extra(self, name: str, value: str):
+        self.extra_dict[name] = value
 
     @staticmethod
     def _draw_line(data_list: typing.List[ClassifierResult]) -> Line:
@@ -167,6 +185,7 @@ class Reporter(object):
             chart=Markup(page.render_embed()),
             dir_link_list=self.dir_link_list,
             thumbnail_list=self.thumbnail_list,
+            extras=self.extra_dict,
         )
 
         # save to file
