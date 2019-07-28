@@ -6,7 +6,7 @@ import typing
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim
-from skimage.feature import hog
+from skimage.feature import hog, local_binary_pattern
 
 compare_ssim = compare_ssim
 
@@ -82,6 +82,16 @@ def turn_surf_desc(old: np.ndarray, hessian: int = None) -> np.ndarray:
     surf = cv2.xfeatures2d.SURF_create(hessian)
     _, desc = surf.detectAndCompute(old, None)
     return desc
+
+
+def turn_lbp_desc(old: np.ndarray, radius: int = None) -> np.ndarray:
+    if not radius:
+        radius = 3
+    n_points = 8 * radius
+
+    grey = turn_grey(old)
+    lbp = local_binary_pattern(grey, n_points, radius, method='default')
+    return lbp
 
 
 def compress_frame(old: np.ndarray, compress_rate: float = None, interpolation: int = None) -> np.ndarray:

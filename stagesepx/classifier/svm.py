@@ -13,8 +13,7 @@ from stagesepx import toolbox
 class SVMClassifier(BaseClassifier):
     FEATURE_DICT = {
         'hog': toolbox.turn_hog_desc,
-        # TODO not implemented
-        # 'surf': toolbox.turn_surf_desc,
+        'lbp': toolbox.turn_lbp_desc,
 
         # do not use feature transform
         'raw': lambda x: x,
