@@ -4,7 +4,7 @@ from stagesepx.reporter import Reporter
 
 # cut
 video_path = '../test.mp4'
-cutter = VideoCutter(step=10)
+cutter = VideoCutter()
 res = cutter.cut(video_path)
 stable, unstable = res.get_range()
 data_home = res.pick_and_save(stable, 3)
@@ -22,7 +22,7 @@ classify_result = cl.classify(
     stable,
     # 步长，可以自行设置用于平衡效率与颗粒度
     # 默认为1，即每帧都检测
-    step=10
+    step=1
 )
 
 # draw
