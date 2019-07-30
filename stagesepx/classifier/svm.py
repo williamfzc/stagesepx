@@ -20,6 +20,13 @@ class SVMClassifier(BaseClassifier):
     }
 
     def __init__(self, feature_type: str = None):
+        """
+        init classifier
+
+        :param feature_type:
+            before training, classifier will convert pictures into feature, for better classification.
+            eg: 'hog', 'lbp' or 'raw'
+        """
         super().__init__()
 
         if not feature_type:
@@ -34,6 +41,13 @@ class SVMClassifier(BaseClassifier):
         self._model = None
 
     def save_model(self, model_path: str, overwrite: bool = None):
+        """
+        save trained model
+
+        :param model_path:
+        :param overwrite:
+        :return:
+        """
         logger.debug(f'save model to {model_path}')
         # assert model file
         if os.path.isfile(model_path) and not overwrite:
@@ -44,6 +58,13 @@ class SVMClassifier(BaseClassifier):
             pickle.dump(self._model, f)
 
     def load_model(self, model_path: str, overwrite: bool = None):
+        """
+        load trained model
+
+        :param model_path:
+        :param overwrite:
+        :return:
+        """
         logger.debug(f'load model from {model_path}')
         # assert model file
         assert os.path.isfile(model_path), f'model file {model_path} not existed'
@@ -59,6 +80,11 @@ class SVMClassifier(BaseClassifier):
         raise NotImplementedError('svm classifier only support loading data from files')
 
     def train(self):
+        """
+        train your classifier with data. must be called before prediction
+
+        :return:
+        """
         if not self._model:
             self._model = LinearSVC()
 
@@ -75,10 +101,22 @@ class SVMClassifier(BaseClassifier):
         logger.debug('train finished')
 
     def predict(self, pic_path: str) -> str:
+        """
+        predict a single picture
+
+        :param pic_path:
+        :return:
+        """
         pic_object = cv2.imread(pic_path)
         return self.predict_with_object(pic_object)
 
     def predict_with_object(self, pic_object: np.ndarray) -> str:
+        """
+        predict a single object
+
+        :param pic_object:
+        :return:
+        """
         pic_object = toolbox.compress_frame(pic_object, self.compress_rate, self.target_size)
         pic_object = self.feature_func(pic_object)
         pic_object = pic_object.reshape(1, -1)

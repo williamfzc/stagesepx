@@ -99,6 +99,26 @@ def compress_frame(old: np.ndarray,
                    target_size: typing.Tuple[int, int] = None,
                    not_grey: bool = None,
                    interpolation: int = None) -> np.ndarray:
+    """
+    Compress frame
+
+    :param old:
+        origin frame
+
+    :param compress_rate:
+        before_pic * compress_rate = after_pic. default to 1 (no compression)
+        eg: 0.2 means 1/5 size of before_pic
+
+    :param target_size:
+        tuple. (100, 200) means compressing before_pic to 100x200
+
+    :param not_grey:
+        convert into grey if True
+
+    :param interpolation:
+    :return:
+    """
+
     target = turn_grey(old) if not not_grey else old
     if not interpolation:
         interpolation = cv2.INTER_AREA

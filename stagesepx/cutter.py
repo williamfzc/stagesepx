@@ -247,6 +247,12 @@ class VideoCutter(object):
                  step: int = None,
                  # TODO removed in the future
                  compress_rate: float = None):
+        """
+        init video cutter
+
+        :param step: step between frames, default to 1
+        :param compress_rate: (moved to `cut`) before * compress_rate = after
+        """
         if not step:
             step = 1
         self.step = step
@@ -296,6 +302,14 @@ class VideoCutter(object):
         return ssim_list
 
     def cut(self, video_path: str, **kwargs) -> VideoCutResult:
+        """
+        convert video file, into a VideoCutResult
+
+        :param video_path: video file path
+        :param kwargs: parameters of toolbox.compress_frame can be used here
+        :return:
+        """
+
         logger.info(f'start cutting: {video_path}')
         assert os.path.isfile(video_path), f'video [{video_path}] not existed'
         ssim_list = self.convert_video_into_ssim_list(video_path, **kwargs)

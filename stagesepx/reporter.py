@@ -117,14 +117,34 @@ class Reporter(object):
         self.extra_dict: typing.Dict[str, str] = dict()
 
     def add_dir_link(self, data_path: str):
+        """
+        add relative dir (or file) link to your report
+
+        :param data_path:
+        :return:
+        """
         self.dir_link_list.append(data_path)
 
     def add_thumbnail(self, name: str, pic_object: np.ndarray):
+        """
+        add picture object (cv2) to your report
+
+        :param name:
+        :param pic_object:
+        :return:
+        """
         buffer = cv2.imencode(".png", pic_object)[1].tostring()
         b64_str = b64encode(buffer).decode()
         self.thumbnail_list.append((name, b64_str))
 
     def add_extra(self, name: str, value: str):
+        """
+        add some extra info ( key-value part) to your report
+
+        :param name:
+        :param value:
+        :return:
+        """
         self.extra_dict[name] = value
 
     @staticmethod
@@ -170,6 +190,14 @@ class Reporter(object):
     def draw(self,
              data_list: typing.List[ClassifierResult],
              report_path: str = None):
+        """
+        draw report file
+
+        :param data_list: classifierResult list, output of classifier
+        :param report_path: your report will be there
+        :return:
+        """
+
         # draw
         line = self._draw_line(data_list)
         bar = self._draw_bar(data_list)
