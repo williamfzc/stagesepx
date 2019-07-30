@@ -208,7 +208,12 @@ class VideoCutResult(object):
                       range_list: typing.List[VideoCutRange],
                       frame_count: int,
                       to_dir: str = None,
-                      compress_rate: float = None,
+
+                      # in kwargs
+                      # compress_rate: float = None,
+                      # target_size: typing.Tuple[int, int] = None,
+                      # to_grey: bool = None,
+
                       *args, **kwargs) -> str:
         stage_list = list()
         for index, each_range in enumerate(range_list):
@@ -230,8 +235,7 @@ class VideoCutResult(object):
                 for each_frame_id in each_frame_list:
                     each_frame_path = os.path.join(each_stage_dir, f'{uuid.uuid4()}.png')
                     each_frame = toolbox.get_frame(cap, each_frame_id - 1)
-                    if compress_rate:
-                        each_frame = toolbox.compress_frame(each_frame, compress_rate)
+                    each_frame = toolbox.compress_frame(each_frame, **kwargs)
                     cv2.imwrite(each_frame_path, each_frame)
                     logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
 
@@ -239,16 +243,18 @@ class VideoCutResult(object):
 
 
 class VideoCutter(object):
-    def __init__(self, step: int = None, compress_rate: float = None):
+    def __init__(self,
+                 step: int = None,
+                 # TODO removed in the future
+                 compress_rate: float = None):
         if not step:
             step = 1
-        if not compress_rate:
-            compress_rate = 0.2
-
         self.step = step
-        self.compress_rate = compress_rate
 
-    def convert_video_into_ssim_list(self, video_path: str) -> typing.List[VideoCutRange]:
+        if compress_rate:
+            logger.warning('compress_rate has been moved to func `cut`')
+
+    def convert_video_into_ssim_list(self, video_path: str, **kwargs) -> typing.List[VideoCutRange]:
         ssim_list = list()
         with toolbox.video_capture(video_path) as cap:
             # get video info
@@ -265,10 +271,10 @@ class VideoCutter(object):
             end_frame_id = toolbox.get_current_frame_id(cap)
 
             # compress
-            start = toolbox.compress_frame(start, compress_rate=self.compress_rate)
+            start = toolbox.compress_frame(start, **kwargs)
 
             while ret:
-                end = toolbox.compress_frame(end, compress_rate=self.compress_rate)
+                end = toolbox.compress_frame(end, **kwargs)
                 ssim = toolbox.compare_ssim(start, end)
                 logger.debug(f'ssim between {start_frame_id} & {end_frame_id}: {ssim}')
 
@@ -289,10 +295,10 @@ class VideoCutter(object):
 
         return ssim_list
 
-    def cut(self, video_path: str) -> VideoCutResult:
+    def cut(self, video_path: str, **kwargs) -> VideoCutResult:
         logger.info(f'start cutting: {video_path}')
         assert os.path.isfile(video_path), f'video [{video_path}] not existed'
-        ssim_list = self.convert_video_into_ssim_list(video_path)
+        ssim_list = self.convert_video_into_ssim_list(video_path, **kwargs)
         logger.info(f'cut finished: {video_path}')
         return VideoCutResult(
             video_path,

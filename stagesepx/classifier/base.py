@@ -21,7 +21,12 @@ class ClassifierResult(object):
 
 
 class BaseClassifier(object):
-    def __init__(self):
+    def __init__(self,
+                 compress_rate: float = None,
+                 target_size: typing.Tuple[int, int] = None):
+        self.compress_rate = compress_rate
+        self.target_size = target_size
+
         self._data: typing.Dict[
             str,
             typing.Union[

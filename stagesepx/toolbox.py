@@ -94,14 +94,22 @@ def turn_lbp_desc(old: np.ndarray, radius: int = None) -> np.ndarray:
     return lbp
 
 
-def compress_frame(old: np.ndarray, compress_rate: float = None, interpolation: int = None) -> np.ndarray:
-    if not compress_rate:
-        compress_rate = 0.2
+def compress_frame(old: np.ndarray,
+                   compress_rate: float = None,
+                   target_size: typing.Tuple[int, int] = None,
+                   not_grey: bool = None,
+                   interpolation: int = None) -> np.ndarray:
+    target = turn_grey(old) if not not_grey else old
     if not interpolation:
         interpolation = cv2.INTER_AREA
-
-    grey = turn_grey(old)
-    return cv2.resize(grey, (0, 0), fx=compress_rate, fy=compress_rate, interpolation=interpolation)
+    # target size first
+    if target_size:
+        return cv2.resize(target, target_size, interpolation=interpolation)
+    # else, use compress rate
+    # default rate is 1 (no compression)
+    if not compress_rate:
+        return target
+    return cv2.resize(target, (0, 0), fx=compress_rate, fy=compress_rate, interpolation=interpolation)
 
 
 def get_timestamp_str() -> str:
