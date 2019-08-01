@@ -36,6 +36,15 @@ class BaseClassifier(object):
         ] = dict()
 
     def load(self, data: typing.Union[str, typing.List[VideoCutRange]], *args, **kwargs):
+        """
+        at most of time, you MUST load data (from cutter) before classification
+        otherwise you need a trained model
+
+        :param data: path to your cutter's result (mainly from pick_and_save)
+        :param args:
+        :param kwargs:
+        :return:
+        """
         if isinstance(data, str):
             return self.load_from_dir(data, *args, **kwargs)
         if isinstance(data, list):
@@ -89,6 +98,16 @@ class BaseClassifier(object):
                  limit_range: typing.List[VideoCutRange] = None,
                  step: int = None,
                  *args, **kwargs) -> typing.List[ClassifierResult]:
+        """
+        start classification
+
+        :param video_path: path to target video
+        :param limit_range: frames in these range will be ignored
+        :param step: step between frames, default to 1
+        :param args:
+        :param kwargs:
+        :return:
+        """
         logger.debug(f'classify with {self.__class__.__name__}')
         assert self._data, 'should load data first'
 

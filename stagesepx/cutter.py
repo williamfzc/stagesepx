@@ -146,7 +146,7 @@ class VideoCutResult(object):
         return merged_change_range_list
 
     def get_range(self, limit: int = None, **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
-        """ return (stable_range_list, unstable_range_list) """
+        """ return stable_range_list and unstable_range_list """
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
         range_list = [
@@ -169,6 +169,7 @@ class VideoCutResult(object):
         return stable_range_list, unstable_range_list
 
     def get_stable_range(self, limit: int = None, **kwargs) -> typing.List[VideoCutRange]:
+        """ return stable range only """
         return self.get_range(limit, **kwargs)[0]
 
     def thumbnail(self,
@@ -176,6 +177,15 @@ class VideoCutResult(object):
                   to_dir: str = None,
                   compress_rate: float = None,
                   is_vertical: bool = None) -> np.ndarray:
+        """
+        build a thumbnail, for easier debug or something else
+
+        :param target_range: VideoCutRange
+        :param to_dir: your thumbnail will be saved to this path
+        :param compress_rate: float, 0 - 1, about thumbnail's size
+        :param is_vertical: direction
+        :return:
+        """
         if not compress_rate:
             compress_rate = 0.1
         # direction
@@ -215,6 +225,16 @@ class VideoCutResult(object):
                       # to_grey: bool = None,
 
                       *args, **kwargs) -> str:
+        """
+        pick some frames from range, and save them as files
+
+        :param range_list: VideoCutRange list
+        :param frame_count: default to 3, and finally you will get 3 frames for each range
+        :param to_dir: will saved to this path
+        :param args:
+        :param kwargs:
+        :return:
+        """
         stage_list = list()
         for index, each_range in enumerate(range_list):
             picked = each_range.pick(frame_count, *args, **kwargs)
@@ -314,6 +334,8 @@ class VideoCutter(object):
         assert os.path.isfile(video_path), f'video [{video_path}] not existed'
         ssim_list = self.convert_video_into_ssim_list(video_path, **kwargs)
         logger.info(f'cut finished: {video_path}')
+
+        # TODO other analysis results can be added to VideoCutResult, such as AI cutter?
         return VideoCutResult(
             video_path,
             ssim_list,
