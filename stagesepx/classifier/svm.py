@@ -19,7 +19,9 @@ class SVMClassifier(BaseClassifier):
         'raw': lambda x: x,
     }
 
-    def __init__(self, feature_type: str = None):
+    def __init__(self,
+                 feature_type: str = None,
+                 *args, **kwargs):
         """
         init classifier
 
@@ -27,7 +29,7 @@ class SVMClassifier(BaseClassifier):
             before training, classifier will convert pictures into feature, for better classification.
             eg: 'hog', 'lbp' or 'raw'
         """
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         if not feature_type:
             feature_type = 'hog'

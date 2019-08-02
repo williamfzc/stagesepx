@@ -23,7 +23,8 @@ class ClassifierResult(object):
 class BaseClassifier(object):
     def __init__(self,
                  compress_rate: float = None,
-                 target_size: typing.Tuple[int, int] = None):
+                 target_size: typing.Tuple[int, int] = None,
+                 *args, **kwargs):
         self.compress_rate = compress_rate
         self.target_size = target_size
 
