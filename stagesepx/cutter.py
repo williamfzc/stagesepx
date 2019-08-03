@@ -127,7 +127,10 @@ class VideoCutResult(object):
                 after.append(each)
         return after
 
-    def get_unstable_range(self, limit: int = None, **kwargs) -> typing.List[VideoCutRange]:
+    def get_unstable_range(self,
+                           limit: int = None,
+                           range_threshold: float = None,
+                           **kwargs) -> typing.List[VideoCutRange]:
         """ return unstable range only """
         change_range_list = sorted(
             [i for i in self.ssim_list if not i.is_stable(**kwargs)],
@@ -153,13 +156,25 @@ class VideoCutResult(object):
 
         if limit:
             merged_change_range_list = self._length_filter(merged_change_range_list, limit)
+        # merged range check
+        merged_change_range_list = [i for i in merged_change_range_list if not i.is_stable(range_threshold)]
         logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
         return merged_change_range_list
 
     def get_range(self,
                   limit: int = None,
                   **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
-        """ return stable_range_list and unstable_range_list """
+        """
+        return stable_range_list and unstable_range_list
+
+        :param limit: ignore some ranges which are too short, 5 means ignore unstable ranges which length < 5
+        :param kwargs:
+            threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
+            range_threshold:
+                same as threshold, but it decided whether a merged range is stable.
+                see https://github.com/williamfzc/stagesepx/issues/17 for details
+        :return:
+        """
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
 
         # it is not a real frame (not existed)
