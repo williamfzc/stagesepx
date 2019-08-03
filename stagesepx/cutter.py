@@ -11,16 +11,25 @@ from stagesepx import toolbox
 
 
 class VideoCutRange(object):
-    def __init__(self, video_path: str, start: int, end: int, ssim: float):
+    def __init__(self,
+                 video_path: str,
+                 start: int,
+                 end: int,
+                 ssim: float,
+                 start_time: float,
+                 end_time: float):
         self.video_path = video_path
         self.start = start
         self.end = end
         self.ssim = ssim
+        self.start_time = start_time
+        self.end_time = end_time
 
         # if length is 1
         # https://github.com/williamfzc/stagesepx/issues/9
         if start > end:
             self.start, self.end = self.end, self.start
+            self.start_time, self.end_time = self.end_time, self.start_time
 
     def can_merge(self, another: 'VideoCutRange'):
         return (self.end == another.start) and self.video_path == another.video_path
@@ -32,6 +41,8 @@ class VideoCutRange(object):
             self.start,
             another.end,
             (self.ssim + another.ssim) / 2,
+            self.start_time,
+            another.end_time,
         )
 
     def contain(self, frame_id: int) -> bool:
@@ -118,6 +129,7 @@ class VideoCutResult(object):
         return after
 
     def get_unstable_range(self, limit: int = None, **kwargs) -> typing.List[VideoCutRange]:
+        """ return unstable range only """
         change_range_list = sorted(
             [i for i in self.ssim_list if not i.is_stable(**kwargs)],
             key=lambda x: x.start)
@@ -145,23 +157,55 @@ class VideoCutResult(object):
         logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
         return merged_change_range_list
 
-    def get_range(self, limit: int = None, **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
+    def get_range(self,
+                  limit: int = None,
+                  **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
         """ return stable_range_list and unstable_range_list """
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
-        range_list = [
-            VideoCutRange(self.video_path, total_range[0], unstable_range_list[0].start - 1, 0),
-            VideoCutRange(self.video_path, unstable_range_list[-1].end + 1, total_range[-1], 0),
-        ]
-        for i in range(len(unstable_range_list) - 1):
-            range_list.append(
+
+        with toolbox.video_capture(self.video_path) as cap:
+            video_start_timestamp = 0.
+            video_end_timestamp = toolbox.get_frame_time(cap, len(self.ssim_list))
+
+            first_stable_range_end_id = unstable_range_list[0].start - 1
+            end_stable_range_start_id = unstable_range_list[-1].end + 1
+            range_list = [
+                # first stable range
                 VideoCutRange(
                     self.video_path,
-                    unstable_range_list[i].end + 1,
-                    unstable_range_list[i + 1].start - 1,
+                    total_range[0],
+                    first_stable_range_end_id,
                     0,
+                    video_start_timestamp,
+                    toolbox.get_frame_time(cap, first_stable_range_end_id),
+                ),
+                # last stable range
+                VideoCutRange(
+                    self.video_path,
+                    end_stable_range_start_id,
+                    total_range[-1],
+                    0,
+                    toolbox.get_frame_time(cap, end_stable_range_start_id),
+                    video_end_timestamp,
+                ),
+            ]
+            # diff range
+            for i in range(len(unstable_range_list) - 1):
+                range_start_id = unstable_range_list[i].end + 1
+                range_end_id = unstable_range_list[i + 1].start - 1
+                range_list.append(
+                    VideoCutRange(
+                        self.video_path,
+                        range_start_id,
+                        range_end_id,
+                        0,
+                        toolbox.get_frame_time(cap, range_start_id),
+                        toolbox.get_frame_time(cap, range_end_id),
+                    )
                 )
-            )
+
+        # remove some ranges, which is limit
         if limit:
             range_list = self._length_filter(range_list, limit)
         logger.debug(f'stable range of [{self.video_path}]: {range_list}')
@@ -291,10 +335,12 @@ class VideoCutter(object):
             # load the first two frames
             _, start = cap.read()
             start_frame_id = toolbox.get_current_frame_id(cap)
+            start_frame_time = toolbox.get_current_frame_time(cap)
 
             toolbox.video_jump(cap, self.step)
             ret, end = cap.read()
             end_frame_id = toolbox.get_current_frame_id(cap)
+            end_frame_time = toolbox.get_current_frame_time(cap)
 
             # compress
             start = toolbox.compress_frame(start, **kwargs)
@@ -310,14 +356,18 @@ class VideoCutter(object):
                         start=start_frame_id,
                         end=end_frame_id,
                         ssim=ssim,
+                        start_time=start_frame_time,
+                        end_time=end_frame_time,
                     )
                 )
 
                 # load the next one
                 start = end
                 start_frame_id, end_frame_id = end_frame_id, end_frame_id + self.step
+                start_frame_time = end_frame_time
                 toolbox.video_jump(cap, end_frame_id)
                 ret, end = cap.read()
+                end_frame_time = toolbox.get_current_frame_time(cap)
 
         return ssim_list
 

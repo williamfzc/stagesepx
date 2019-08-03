@@ -32,6 +32,16 @@ def get_current_frame_time(video_cap: cv2.VideoCapture) -> float:
     return video_cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
 
 
+def get_frame_time(video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None) -> float:
+    cur = get_current_frame_id(video_cap)
+    video_jump(video_cap, frame_id)
+    result = get_current_frame_time(video_cap)
+
+    if recover:
+        video_jump(video_cap, cur)
+    return result
+
+
 def get_frame_count(video_cap: cv2.VideoCapture) -> int:
     return int(video_cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
