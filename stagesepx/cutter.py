@@ -31,11 +31,15 @@ class VideoCutRange(object):
             self.start, self.end = self.end, self.start
             self.start_time, self.end_time = self.end_time, self.start_time
 
-    def can_merge(self, another: 'VideoCutRange'):
-        return (self.end == another.start) and self.video_path == another.video_path
+    def can_merge(self, another: 'VideoCutRange', offset: int = None, **_):
+        if not offset:
+            is_continuous = self.end == another.start
+        else:
+            is_continuous = self.end + offset >= another.start
+        return is_continuous and self.video_path == another.video_path
 
-    def merge(self, another: 'VideoCutRange') -> 'VideoCutRange':
-        assert self.can_merge(another)
+    def merge(self, another: 'VideoCutRange', **kwargs) -> 'VideoCutRange':
+        assert self.can_merge(another, **kwargs)
         return __class__(
             self.video_path,
             self.start,
@@ -101,10 +105,19 @@ class VideoCutRange(object):
     def get_length(self):
         return self.end - self.start + 1
 
-    def is_stable(self, threshold: float = None):
+    def is_stable(self, threshold: float = None, **_) -> bool:
         if not threshold:
             threshold = 0.95
         return np.mean(self.ssim) > threshold
+
+    def is_loop(self, threshold: float = None, **_) -> bool:
+        if not threshold:
+            threshold = 0.95
+        with toolbox.video_capture(video_path=self.video_path) as cap:
+            start_frame = toolbox.get_frame(cap, self.start)
+            end_frame = toolbox.get_frame(cap, self.end)
+            start_frame, end_frame = map(toolbox.compress_frame, (start_frame, end_frame))
+            return toolbox.compare_ssim(start_frame, end_frame) > threshold
 
     def __str__(self):
         return f'<VideoCutRange [{self.start}-{self.end}] ssim={self.ssim}>'
@@ -113,6 +126,7 @@ class VideoCutRange(object):
 
 
 class VideoCutResult(object):
+    # TODO compare with another VideoCutResult
     def __init__(self,
                  video_path: str,
                  ssim_list: typing.List[VideoCutRange]):
@@ -141,10 +155,10 @@ class VideoCutResult(object):
         merged_change_range_list = list()
         while i < len(change_range_list) - 1:
             cur = change_range_list[i]
-            while cur.can_merge(change_range_list[i + 1]):
+            while cur.can_merge(change_range_list[i + 1], **kwargs):
                 # can be merged
                 i += 1
-                cur = cur.merge(change_range_list[i])
+                cur = cur.merge(change_range_list[i], **kwargs)
 
                 # out of range
                 if i + 1 >= len(change_range_list):
@@ -158,7 +172,7 @@ class VideoCutResult(object):
             merged_change_range_list = self._length_filter(merged_change_range_list, limit)
         # merged range check
         if range_threshold:
-            merged_change_range_list = [i for i in merged_change_range_list if not i.is_stable(range_threshold)]
+            merged_change_range_list = [i for i in merged_change_range_list if not i.is_loop(range_threshold)]
         logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
         return merged_change_range_list
 
@@ -174,6 +188,10 @@ class VideoCutResult(object):
             range_threshold:
                 same as threshold, but it decided whether a merged range is stable.
                 see https://github.com/williamfzc/stagesepx/issues/17 for details
+            offset:
+                it will change the way to decided whether two ranges can be merged
+                before: first_range.end == second_range.start
+                after: first_range.end + offset >= secord_range.start
         :return:
         """
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
