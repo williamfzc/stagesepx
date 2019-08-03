@@ -21,7 +21,10 @@ class VideoCutRange(object):
         self.video_path = video_path
         self.start = start
         self.end = end
+
+        # -1 means unknown
         self.ssim = ssim
+
         self.start_time = start_time
         self.end_time = end_time
 
@@ -161,31 +164,38 @@ class VideoCutResult(object):
                   limit: int = None,
                   **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
         """ return stable_range_list and unstable_range_list """
-        total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
 
+        # it is not a real frame (not existed)
+        # just take it as a beginning
+        # real frame id is started with 1, with non-zero timestamp
+        video_start_frame_id = 0
         video_start_timestamp = 0.
+
+        video_end_frame_id = self.ssim_list[-1].end
         video_end_timestamp = self.ssim_list[-1].end_time
 
         first_stable_range_end_id = unstable_range_list[0].start - 1
-        end_stable_range_start_id = unstable_range_list[-1].end + 1
+        end_stable_range_start_id = unstable_range_list[-1].end
+
+        # IMPORTANT: len(ssim_list) + 1 == video_end_frame_id
         range_list = [
             # first stable range
             VideoCutRange(
                 self.video_path,
-                total_range[0],
+                video_start_frame_id,
                 first_stable_range_end_id,
-                0,
+                -1,
                 video_start_timestamp,
-                self.ssim_list[first_stable_range_end_id].start_time,
+                self.ssim_list[first_stable_range_end_id - 1].start_time,
             ),
             # last stable range
             VideoCutRange(
                 self.video_path,
                 end_stable_range_start_id,
-                total_range[-1],
-                0,
-                self.ssim_list[end_stable_range_start_id].end_time,
+                video_end_frame_id,
+                -1,
+                self.ssim_list[end_stable_range_start_id - 1].end_time,
                 video_end_timestamp,
             ),
         ]
@@ -198,9 +208,9 @@ class VideoCutResult(object):
                     self.video_path,
                     range_start_id,
                     range_end_id,
-                    0,
-                    self.ssim_list[range_start_id].start_time,
-                    self.ssim_list[range_end_id].end_time,
+                    -1,
+                    self.ssim_list[range_start_id - 1].start_time,
+                    self.ssim_list[range_end_id - 1].end_time,
                 )
             )
 
@@ -336,7 +346,7 @@ class VideoCutter(object):
             start_frame_id = toolbox.get_current_frame_id(cap)
             start_frame_time = toolbox.get_current_frame_time(cap)
 
-            toolbox.video_jump(cap, self.step)
+            toolbox.video_jump(cap, self.step + 1)
             ret, end = cap.read()
             end_frame_id = toolbox.get_current_frame_id(cap)
             end_frame_time = toolbox.get_current_frame_time(cap)
@@ -381,6 +391,10 @@ class VideoCutter(object):
 
         logger.info(f'start cutting: {video_path}')
         assert os.path.isfile(video_path), f'video [{video_path}] not existed'
+
+        # if video contains 100 frames
+        # it starts from 1, and length of list is 99, not 100
+        # [SSIM(1-2), SSIM(2-3), SSIM(3-4) ... SSIM(99-100)]
         ssim_list = self.convert_video_into_ssim_list(video_path, **kwargs)
         logger.info(f'cut finished: {video_path}')
 
