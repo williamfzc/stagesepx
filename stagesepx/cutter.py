@@ -157,7 +157,8 @@ class VideoCutResult(object):
         if limit:
             merged_change_range_list = self._length_filter(merged_change_range_list, limit)
         # merged range check
-        merged_change_range_list = [i for i in merged_change_range_list if not i.is_stable(range_threshold)]
+        if range_threshold:
+            merged_change_range_list = [i for i in merged_change_range_list if not i.is_stable(range_threshold)]
         logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
         return merged_change_range_list
 
