@@ -69,6 +69,32 @@ class BaseClassifier(object):
             self._data[stage_name] = stage_pic_list
             logger.debug(f'stage [{stage_name}] found, and got {len(stage_pic_list)} pics')
 
+    def diff(self, another: 'BaseClassifier') -> typing.Dict[str, typing.Dict[str, float]]:
+        assert another._data, 'must load data first'
+        result_dict = dict()
+
+        self_data = dict(self.read())
+        for each_self_stage, each_self_data in self_data.items():
+            another_data = dict(another.read())
+            each_self_data_pic = next(each_self_data)
+
+            each_stage_dict = dict()
+            # compare with all the stages
+            for each_another_stage, each_another_data in another_data.items():
+                # compare with all the pictures in same stage, and pick the max one
+                max_ssim = -1
+                for each_pic in each_another_data:
+                    ssim = toolbox.compare_ssim(
+                        each_pic,
+                        each_self_data_pic,
+                    )
+                    if ssim > max_ssim:
+                        max_ssim = ssim
+                each_stage_dict[each_another_stage] = max_ssim
+
+            result_dict[each_self_stage] = each_stage_dict
+        return result_dict
+
     def read(self, *args, **kwargs):
         for stage_name, stage_data in self._data.items():
             if isinstance(stage_data[0], pathlib.Path):

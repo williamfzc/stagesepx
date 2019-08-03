@@ -5,10 +5,8 @@ import random
 import typing
 import numpy as np
 from skimage.filters import threshold_otsu
-from skimage.measure import compare_ssim
+from skimage.measure import compare_ssim as origin_compare_ssim
 from skimage.feature import hog, local_binary_pattern
-
-compare_ssim = compare_ssim
 
 
 @contextlib.contextmanager
@@ -22,6 +20,11 @@ def video_capture(video_path: str):
 
 def video_jump(video_cap: cv2.VideoCapture, frame_id: int):
     video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1)
+
+
+def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
+    pic1, pic2 = [turn_grey(i) for i in [pic1, pic2]]
+    return origin_compare_ssim(pic1, pic2)
 
 
 def get_current_frame_id(video_cap: cv2.VideoCapture) -> int:
