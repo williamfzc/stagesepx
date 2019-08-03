@@ -43,6 +43,8 @@ def get_frame_time(video_cap: cv2.VideoCapture, frame_id: int, recover: bool = N
 
 
 def get_frame_count(video_cap: cv2.VideoCapture) -> int:
+    # NOT always accurate, see:
+    # https://stackoverflow.com/questions/31472155/python-opencv-cv2-cv-cv-cap-prop-frame-count-get-wrong-numbers
     return int(video_cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 

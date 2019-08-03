@@ -164,46 +164,45 @@ class VideoCutResult(object):
         total_range = [self.ssim_list[0].start, self.ssim_list[-1].end]
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
 
-        with toolbox.video_capture(self.video_path) as cap:
-            video_start_timestamp = 0.
-            video_end_timestamp = toolbox.get_frame_time(cap, len(self.ssim_list))
+        video_start_timestamp = 0.
+        video_end_timestamp = self.ssim_list[-1].end_time
 
-            first_stable_range_end_id = unstable_range_list[0].start - 1
-            end_stable_range_start_id = unstable_range_list[-1].end + 1
-            range_list = [
-                # first stable range
+        first_stable_range_end_id = unstable_range_list[0].start - 1
+        end_stable_range_start_id = unstable_range_list[-1].end + 1
+        range_list = [
+            # first stable range
+            VideoCutRange(
+                self.video_path,
+                total_range[0],
+                first_stable_range_end_id,
+                0,
+                video_start_timestamp,
+                self.ssim_list[first_stable_range_end_id].start_time,
+            ),
+            # last stable range
+            VideoCutRange(
+                self.video_path,
+                end_stable_range_start_id,
+                total_range[-1],
+                0,
+                self.ssim_list[end_stable_range_start_id].end_time,
+                video_end_timestamp,
+            ),
+        ]
+        # diff range
+        for i in range(len(unstable_range_list) - 1):
+            range_start_id = unstable_range_list[i].end + 1
+            range_end_id = unstable_range_list[i + 1].start - 1
+            range_list.append(
                 VideoCutRange(
                     self.video_path,
-                    total_range[0],
-                    first_stable_range_end_id,
+                    range_start_id,
+                    range_end_id,
                     0,
-                    video_start_timestamp,
-                    toolbox.get_frame_time(cap, first_stable_range_end_id),
-                ),
-                # last stable range
-                VideoCutRange(
-                    self.video_path,
-                    end_stable_range_start_id,
-                    total_range[-1],
-                    0,
-                    toolbox.get_frame_time(cap, end_stable_range_start_id),
-                    video_end_timestamp,
-                ),
-            ]
-            # diff range
-            for i in range(len(unstable_range_list) - 1):
-                range_start_id = unstable_range_list[i].end + 1
-                range_end_id = unstable_range_list[i + 1].start - 1
-                range_list.append(
-                    VideoCutRange(
-                        self.video_path,
-                        range_start_id,
-                        range_end_id,
-                        0,
-                        toolbox.get_frame_time(cap, range_start_id),
-                        toolbox.get_frame_time(cap, range_end_id),
-                    )
+                    self.ssim_list[range_start_id].start_time,
+                    self.ssim_list[range_end_id].end_time,
                 )
+            )
 
         # remove some ranges, which is limit
         if limit:
@@ -226,7 +225,7 @@ class VideoCutResult(object):
 
         :param target_range: VideoCutRange
         :param to_dir: your thumbnail will be saved to this path
-        :param compress_rate: float, 0 - 1, about thumbnail's size
+        :param compress_rate: float, 0 - 1, about thumbnail's size, default to 0.1 (1/10)
         :param is_vertical: direction
         :return:
         """
