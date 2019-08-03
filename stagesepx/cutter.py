@@ -15,16 +15,13 @@ class VideoCutRange(object):
                  video_path: str,
                  start: int,
                  end: int,
-                 ssim: float,
+                 ssim: typing.List,
                  start_time: float,
                  end_time: float):
         self.video_path = video_path
         self.start = start
         self.end = end
-
-        # -1 means unknown
         self.ssim = ssim
-
         self.start_time = start_time
         self.end_time = end_time
 
@@ -43,7 +40,7 @@ class VideoCutRange(object):
             self.video_path,
             self.start,
             another.end,
-            (self.ssim + another.ssim) / 2,
+            self.ssim + another.ssim,
             self.start_time,
             another.end_time,
         )
@@ -107,8 +104,7 @@ class VideoCutRange(object):
     def is_stable(self, threshold: float = None):
         if not threshold:
             threshold = 0.95
-        # TODO if range is too large? ( > 10)
-        return self.ssim > threshold
+        return np.mean(self.ssim) > threshold
 
     def __str__(self):
         return f'<VideoCutRange [{self.start}-{self.end}] ssim={self.ssim}>'
@@ -185,7 +181,7 @@ class VideoCutResult(object):
                 self.video_path,
                 video_start_frame_id,
                 first_stable_range_end_id,
-                -1,
+                [1.],
                 video_start_timestamp,
                 self.ssim_list[first_stable_range_end_id - 1].start_time,
             ),
@@ -194,7 +190,7 @@ class VideoCutResult(object):
                 self.video_path,
                 end_stable_range_start_id,
                 video_end_frame_id,
-                -1,
+                [1.],
                 self.ssim_list[end_stable_range_start_id - 1].end_time,
                 video_end_timestamp,
             ),
@@ -208,7 +204,7 @@ class VideoCutResult(object):
                     self.video_path,
                     range_start_id,
                     range_end_id,
-                    -1,
+                    [1.],
                     self.ssim_list[range_start_id - 1].start_time,
                     self.ssim_list[range_end_id - 1].end_time,
                 )
@@ -364,7 +360,7 @@ class VideoCutter(object):
                         video_path,
                         start=start_frame_id,
                         end=end_frame_id,
-                        ssim=ssim,
+                        ssim=[ssim],
                         start_time=start_frame_time,
                         end_time=end_frame_time,
                     )
