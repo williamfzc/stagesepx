@@ -31,7 +31,9 @@ r.add_dir_link(data_home)
 
 # 你可以将 thumbnail 直接嵌入到report中
 for each in unstable:
-    r.add_thumbnail(f'{each.start}-{each.end}', res.thumbnail(each))
+    r.add_thumbnail(
+        f'{each.start}({each.start_time}) - {each.end}({each.end_time})',
+        res.thumbnail(each))
 
 # 在0.3.2及之后的版本，你可以在报告中加入一些自定义内容 （https://github.com/williamfzc/stagesepx/issues/13）
 # r.add_extra('here is title', 'here is content')

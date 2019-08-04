@@ -79,14 +79,20 @@ pip install stagesepx
 
 sample code中提供了详细的注释。
 
-- 切割器
-    - [常规分类器](./example/cut.py)
-- 分类器
-    - [常规分类器](./example/classify.py)
-    - [SVM分类器](./example/classify_with_svm.py)
-- 完整例子
-    - [单视频](./example/cut_and_classify.py)
-    - [多视频](./example/multi_video.py)
+#### 快速开始
+
+完整例子包括了三个部分：拆分阶段、分析视频、生成报告。你可以用它快速开始试用 stagesepx：
+
+- [单视频](./example/cut_and_classify.py)
+- [多视频](./example/multi_video.py)
+
+#### 更多
+
+完整例子中由于篇幅原因忽略了一些使用细节。以下的短例子可能能让你更好地自定义它的表现：
+
+- [将视频拆分成阶段](./example/cut.py)
+- [利用拆分好的阶段分析视频](./example/classify_with_svm.py)
+- [比较两个视频的相似度（实验功能）](./example/compare_videos.py)
 
 例子中使用的视频可以[点此](https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4)下载。
 
