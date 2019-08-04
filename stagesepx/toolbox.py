@@ -52,6 +52,7 @@ def get_frame_count(video_cap: cv2.VideoCapture) -> int:
 
 
 def get_frame_size(video_cap: cv2.VideoCapture) -> typing.Tuple[int, int]:
+    """ return size of frame: (width, height) """
     h = video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
     w = video_cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     return int(w), int(h)
