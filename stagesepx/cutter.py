@@ -363,9 +363,17 @@ class VideoCutter(object):
         if compress_rate:
             logger.warning('compress_rate has been moved to func `cut`')
 
+    @staticmethod
+    def pic_split(origin: np.ndarray, column: int) -> typing.List[np.ndarray]:
+        res = [
+            np.hsplit(np.vsplit(origin, column)[i], column)
+            for i in range(column)
+        ]
+        return [j for i in res for j in i]
+
     def convert_video_into_ssim_list(self, video_path: str, block: int = None, **kwargs) -> typing.List[VideoCutRange]:
         if not block:
-            block = 1
+            block = 2
 
         ssim_list = list()
         with toolbox.video_capture(video_path) as cap:
@@ -398,14 +406,15 @@ class VideoCutter(object):
             while ret:
                 end = toolbox.compress_frame(end, **kwargs)
 
-                ssim = 0
-                start_part_list = split_func(start, block)
-                end_part_list = split_func(end, block)
+                start_part_list = self.pic_split(start, block)
+                end_part_list = self.pic_split(end, block)
+
+                ssim = 1.
                 for part_index, (each_start, each_end) in enumerate(zip(start_part_list, end_part_list)):
                     part_ssim = toolbox.compare_ssim(each_start, each_end)
-                    ssim += part_ssim
+                    if part_ssim < ssim:
+                        ssim = part_ssim
                     logger.debug(f'part {part_index}: {part_ssim}')
-                ssim = ssim / block
                 logger.debug(f'ssim between {start_frame_id} & {end_frame_id}: {ssim}')
 
                 ssim_list.append(
