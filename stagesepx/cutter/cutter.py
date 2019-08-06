@@ -58,14 +58,6 @@ class VideoCutter(object):
             # compress
             start = toolbox.compress_frame(start, **kwargs)
 
-            # split func
-            # width > height
-            if frame_size[0] > frame_size[1]:
-                split_func = np.hsplit
-            else:
-                split_func = np.vsplit
-            logger.debug(f'split function: {split_func.__name__}')
-
             while ret:
                 end = toolbox.compress_frame(end, **kwargs)
 

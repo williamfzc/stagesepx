@@ -39,6 +39,11 @@ class VideoCutResult(object):
             [i for i in self.ssim_list if not i.is_stable(**kwargs)],
             key=lambda x: x.start)
 
+        # video can be totally stable ( nothing changed )
+        # or only one unstable range
+        if len(change_range_list) <= 1:
+            return change_range_list
+
         # merge
         i = 0
         merged_change_range_list = list()
