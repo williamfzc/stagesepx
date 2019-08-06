@@ -126,12 +126,17 @@ class VideoCutRange(object):
 
 
 class VideoCutResult(object):
-    # TODO compare with another VideoCutResult
     def __init__(self,
                  video_path: str,
                  ssim_list: typing.List[VideoCutRange]):
         self.video_path = video_path
         self.ssim_list = ssim_list
+
+    def get_target_range_by_id(self, frame_id: int) -> VideoCutRange:
+        for each in self.ssim_list:
+            if each.contain(frame_id):
+                return each
+        raise RuntimeError(f'frame {frame_id} not found in video')
 
     @staticmethod
     def _length_filter(range_list: typing.List[VideoCutRange], limit: int) -> typing.List[VideoCutRange]:
@@ -217,7 +222,7 @@ class VideoCutResult(object):
                 first_stable_range_end_id,
                 [1.],
                 video_start_timestamp,
-                self.ssim_list[first_stable_range_end_id - 1].start_time,
+                self.get_target_range_by_id(first_stable_range_end_id - 1).start_time,
             ),
             # last stable range
             VideoCutRange(
@@ -225,7 +230,7 @@ class VideoCutResult(object):
                 end_stable_range_start_id,
                 video_end_frame_id,
                 [1.],
-                self.ssim_list[end_stable_range_start_id - 1].end_time,
+                self.get_target_range_by_id(end_stable_range_start_id - 1).end_time,
                 video_end_timestamp,
             ),
         ]
@@ -239,8 +244,8 @@ class VideoCutResult(object):
                     range_start_id,
                     range_end_id,
                     [1.],
-                    self.ssim_list[range_start_id - 1].start_time,
-                    self.ssim_list[range_end_id - 1].end_time,
+                    self.get_target_range_by_id(range_start_id - 1).start_time,
+                    self.get_target_range_by_id(range_end_id - 1).end_time,
                 )
             )
 

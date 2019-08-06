@@ -27,6 +27,8 @@ class BaseClassifier(object):
                  *args, **kwargs):
         self.compress_rate = compress_rate
         self.target_size = target_size
+        logger.debug(f'compress rate: {self.compress_rate}')
+        logger.debug(f'target size: {self.target_size}')
 
         self._data: typing.Dict[
             str,
