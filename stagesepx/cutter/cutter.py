@@ -27,14 +27,29 @@ class VideoCutter(object):
             logger.warning('compress_rate has been moved to func `cut`')
 
     @staticmethod
-    def pic_split(origin: np.ndarray, column: int) -> typing.List[np.ndarray]:
+    def pic_split(origin: np.ndarray, block: int) -> typing.List[np.ndarray]:
         res = [
-            np.hsplit(np.vsplit(origin, column)[i], column)
-            for i in range(column)
+            np.hsplit(np.vsplit(origin, block)[i], block)
+            for i in range(block)
         ]
         return [j for i in res for j in i]
 
-    def convert_video_into_ssim_list(self, video_path: str, block: int = None, **kwargs) -> typing.List[VideoCutRange]:
+    @staticmethod
+    def is_block_valid(origin: np.ndarray, block: int) -> bool:
+        try:
+            _ = [
+                np.hsplit(np.vsplit(origin, block)[i], block)
+                for i in range(block)
+            ]
+        except ValueError:
+            return False
+        else:
+            return True
+
+    def convert_video_into_ssim_list(self,
+                                     video_path: str,
+                                     block: int = None,
+                                     **kwargs) -> typing.List[VideoCutRange]:
         if not block:
             block = 2
 
@@ -58,12 +73,18 @@ class VideoCutter(object):
             # compress
             start = toolbox.compress_frame(start, **kwargs)
 
+            # check block
+            if not self.is_block_valid(start, block):
+                logger.warning('array split does not result in an equal division, set block to 1')
+                block = 1
+
             while ret:
                 end = toolbox.compress_frame(end, **kwargs)
 
                 start_part_list = self.pic_split(start, block)
                 end_part_list = self.pic_split(end, block)
 
+                # find the min ssim
                 ssim = 1.
                 for part_index, (each_start, each_end) in enumerate(zip(start_part_list, end_part_list)):
                     part_ssim = toolbox.compare_ssim(each_start, each_end)
