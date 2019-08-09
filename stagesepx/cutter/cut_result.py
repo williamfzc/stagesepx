@@ -13,13 +13,13 @@ from stagesepx.cutter.cut_range import VideoCutRange
 class VideoCutResult(object):
     def __init__(self,
                  video: VideoObject,
-                 ssim_list: typing.List[VideoCutRange]):
+                 range_list: typing.List[VideoCutRange]):
         self.video = video
-        self.ssim_list = ssim_list
+        self.range_list = range_list
 
     def get_target_range_by_id(self, frame_id: int) -> VideoCutRange:
         """ get target VideoCutRange by id (which belongs to) """
-        for each in self.ssim_list:
+        for each in self.range_list:
             if each.contain(frame_id):
                 return each
         raise RuntimeError(f'frame {frame_id} not found in video')
@@ -38,7 +38,7 @@ class VideoCutResult(object):
                            **kwargs) -> typing.List[VideoCutRange]:
         """ return unstable range only """
         change_range_list = sorted(
-            [i for i in self.ssim_list if not i.is_stable(**kwargs)],
+            [i for i in self.range_list if not i.is_stable(**kwargs)],
             key=lambda x: x.start)
 
         # video can be totally stable ( nothing changed )
@@ -114,8 +114,8 @@ class VideoCutResult(object):
         video_start_frame_id = 0
         video_start_timestamp = 0.
 
-        video_end_frame_id = self.ssim_list[-1].end
-        video_end_timestamp = self.ssim_list[-1].end_time
+        video_end_frame_id = self.range_list[-1].end
+        video_end_timestamp = self.range_list[-1].end_time
 
         # ATTENTION: +1 and -1 easily cause error
         # end of first stable range == start of first unstable range
