@@ -7,17 +7,18 @@ from loguru import logger
 from findit import FindIt
 
 from stagesepx import toolbox
+from stagesepx.video import VideoObject
 
 
 class VideoCutRange(object):
     def __init__(self,
-                 video_path: str,
+                 video: VideoObject,
                  start: int,
                  end: int,
                  ssim: typing.List,
                  start_time: float,
                  end_time: float):
-        self.video_path = video_path
+        self.video = video
         self.start = start
         self.end = end
         self.ssim = ssim
@@ -35,12 +36,12 @@ class VideoCutRange(object):
             is_continuous = self.end == another.start
         else:
             is_continuous = self.end + offset >= another.start
-        return is_continuous and self.video_path == another.video_path
+        return is_continuous and self.video.path == another.video.path
 
     def merge(self, another: 'VideoCutRange', **kwargs) -> 'VideoCutRange':
         assert self.can_merge(another, **kwargs)
         return __class__(
-            self.video_path,
+            self.video,
             self.start,
             another.end,
             self.ssim + another.ssim,
@@ -49,6 +50,9 @@ class VideoCutRange(object):
         )
 
     def contain(self, frame_id: int) -> bool:
+        # in python:
+        # range(0, 10) => [0, 10)
+        # range(0, 10 + 1) => [0, 10]
         return frame_id in range(self.start, self.end + 1)
 
     def contain_image(self,
@@ -73,7 +77,7 @@ class VideoCutRange(object):
         fi_template_name = 'default'
         fi.load_template(fi_template_name, pic_object=image_object)
 
-        with toolbox.video_capture(self.video_path) as cap:
+        with toolbox.video_capture(self.video.path) as cap:
             target_id = self.pick(*args, **kwargs)[0]
             frame = toolbox.get_frame(cap, target_id)
             frame = toolbox.turn_grey(frame)
@@ -112,7 +116,7 @@ class VideoCutRange(object):
     def is_loop(self, threshold: float = None, **_) -> bool:
         if not threshold:
             threshold = 0.95
-        with toolbox.video_capture(video_path=self.video_path) as cap:
+        with toolbox.video_capture(video_path=self.video.path) as cap:
             start_frame = toolbox.get_frame(cap, self.start)
             end_frame = toolbox.get_frame(cap, self.end)
             start_frame, end_frame = map(toolbox.compress_frame, (start_frame, end_frame))

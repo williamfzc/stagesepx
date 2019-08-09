@@ -6,17 +6,19 @@ import numpy as np
 from loguru import logger
 
 from stagesepx import toolbox
+from stagesepx.video import VideoObject
 from stagesepx.cutter.cut_range import VideoCutRange
 
 
 class VideoCutResult(object):
     def __init__(self,
-                 video_path: str,
+                 video: VideoObject,
                  ssim_list: typing.List[VideoCutRange]):
-        self.video_path = video_path
+        self.video = video
         self.ssim_list = ssim_list
 
     def get_target_range_by_id(self, frame_id: int) -> VideoCutRange:
+        """ get target VideoCutRange by id (which belongs to) """
         for each in self.ssim_list:
             if each.contain(frame_id):
                 return each
@@ -67,7 +69,7 @@ class VideoCutResult(object):
         # merged range check
         if range_threshold:
             merged_change_range_list = [i for i in merged_change_range_list if not i.is_loop(range_threshold)]
-        logger.debug(f'unstable range of [{self.video_path}]: {merged_change_range_list}')
+        logger.debug(f'unstable range of [{self.video.path}]: {merged_change_range_list}')
         return merged_change_range_list
 
     def get_range(self,
@@ -129,7 +131,7 @@ class VideoCutResult(object):
             range_end_id = unstable_range_list[i + 1].start - 1
             range_list.append(
                 VideoCutRange(
-                    self.video_path,
+                    self.video,
                     range_start_id,
                     range_end_id,
                     [1.],
@@ -141,7 +143,7 @@ class VideoCutResult(object):
         # remove some ranges, which is limit
         if limit:
             range_list = self._length_filter(range_list, limit)
-        logger.debug(f'stable range of [{self.video_path}]: {range_list}')
+        logger.debug(f'stable range of [{self.video.path}]: {range_list}')
         stable_range_list = sorted(range_list, key=lambda x: x.start)
         return stable_range_list, unstable_range_list
 
@@ -172,7 +174,7 @@ class VideoCutResult(object):
             stack_func = np.hstack
 
         frame_list = list()
-        with toolbox.video_capture(self.video_path) as cap:
+        with toolbox.video_capture(self.video.path) as cap:
             toolbox.video_jump(cap, target_range.start)
             ret, frame = cap.read()
             count = 1
@@ -228,7 +230,7 @@ class VideoCutResult(object):
             each_stage_dir = os.path.join(to_dir, str(each_stage_id))
             os.makedirs(each_stage_dir, exist_ok=True)
 
-            with toolbox.video_capture(self.video_path) as cap:
+            with toolbox.video_capture(self.video.path) as cap:
                 for each_frame_id in each_frame_list:
                     each_frame_path = os.path.join(each_stage_dir, f'{uuid.uuid4()}.png')
                     each_frame = toolbox.get_frame(cap, each_frame_id - 1)
@@ -237,5 +239,3 @@ class VideoCutResult(object):
                     logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
 
         return to_dir
-
-

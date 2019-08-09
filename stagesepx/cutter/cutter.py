@@ -1,4 +1,3 @@
-import os
 import typing
 import numpy as np
 from loguru import logger
@@ -6,6 +5,7 @@ from loguru import logger
 from stagesepx import toolbox
 from stagesepx.cutter.cut_range import VideoCutRange
 from stagesepx.cutter.cut_result import VideoCutResult
+from stagesepx.video import VideoObject
 
 
 class VideoCutter(object):
@@ -46,19 +46,16 @@ class VideoCutter(object):
         else:
             return True
 
-    def convert_video_into_ssim_list(self,
-                                     video_path: str,
-                                     block: int = None,
-                                     **kwargs) -> typing.List[VideoCutRange]:
+    def _convert_video_into_ssim_list(self,
+                                      video: VideoObject,
+                                      block: int = None,
+                                      **kwargs) -> typing.List[VideoCutRange]:
         if not block:
             block = 2
 
         ssim_list = list()
-        with toolbox.video_capture(video_path) as cap:
-            # get video info
-            frame_count = toolbox.get_frame_count(cap)
-            frame_size = toolbox.get_frame_size(cap)
-            logger.debug(f'total frame count: {frame_count}, size: {frame_size}')
+        with toolbox.video_capture(video.path) as cap:
+            logger.debug(f'total frame count: {video.frame_count}, size: {video.frame_size}')
 
             # load the first two frames
             _, start = cap.read()
@@ -80,7 +77,7 @@ class VideoCutter(object):
 
             while ret:
                 end = toolbox.compress_frame(end, **kwargs)
-
+                logger.debug(f'computing {start_frame_id} & {end_frame_id} ...')
                 start_part_list = self.pic_split(start, block)
                 end_part_list = self.pic_split(end, block)
 
@@ -95,7 +92,7 @@ class VideoCutter(object):
 
                 ssim_list.append(
                     VideoCutRange(
-                        video_path,
+                        video,
                         start=start_frame_id,
                         end=end_frame_id,
                         ssim=[ssim],
@@ -124,16 +121,18 @@ class VideoCutter(object):
         """
 
         logger.info(f'start cutting: {video_path}')
-        assert os.path.isfile(video_path), f'video [{video_path}] not existed'
+        video = VideoObject(video_path)
 
         # if video contains 100 frames
         # it starts from 1, and length of list is 99, not 100
         # [SSIM(1-2), SSIM(2-3), SSIM(3-4) ... SSIM(99-100)]
-        ssim_list = self.convert_video_into_ssim_list(video_path, **kwargs)
+        ssim_list = self._convert_video_into_ssim_list(
+            video,
+            **kwargs)
         logger.info(f'cut finished: {video_path}')
 
         # TODO other analysis results can be added to VideoCutResult, such as AI cutter?
         return VideoCutResult(
-            video_path,
+            video,
             ssim_list,
         )
