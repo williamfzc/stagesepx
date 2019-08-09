@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='stagesepx',
-    version='0.4.0',
+    version='0.4.1',
     description='detect stages in video automatically',
     author='williamfzc',
     author_email='fengzc@vip.qq.com',
