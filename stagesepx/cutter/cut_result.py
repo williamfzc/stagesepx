@@ -90,6 +90,22 @@ class VideoCutResult(object):
                 after: first_range.end + offset >= secord_range.start
         :return:
         """
+
+        """
+        videos have 4 kinds of status:
+        
+            - stable start + stable end (usually)
+            - stable start + unstable end
+            - unstable start + stable end
+            - unstable start + unstable end
+            
+        so, unstable range list can be:
+        
+            - start > 0, end < frame_count
+            - start = 0, end < frame_count
+            - start > 0, end = frame_count
+            - start = 0, end = frame_count
+        """
         unstable_range_list = self.get_unstable_range(limit, **kwargs)
 
         # it is not a real frame (not existed)
@@ -101,30 +117,48 @@ class VideoCutResult(object):
         video_end_frame_id = self.ssim_list[-1].end
         video_end_timestamp = self.ssim_list[-1].end_time
 
+        # ATTENTION: +1 and -1 easily cause error
+        # end of first stable range == start of first unstable range
         first_stable_range_end_id = unstable_range_list[0].start - 1
-        end_stable_range_start_id = unstable_range_list[-1].end
+        # start of last stable range == end of last unstable range
+        end_stable_range_start_id = unstable_range_list[-1].end + 1
 
         # IMPORTANT: len(ssim_list) + 1 == video_end_frame_id
-        range_list = [
-            # first stable range
-            VideoCutRange(
-                self.video_path,
-                video_start_frame_id,
-                first_stable_range_end_id,
-                [1.],
-                video_start_timestamp,
-                self.get_target_range_by_id(first_stable_range_end_id - 1).start_time,
-            ),
-            # last stable range
-            VideoCutRange(
-                self.video_path,
-                end_stable_range_start_id,
-                video_end_frame_id,
-                [1.],
-                self.get_target_range_by_id(end_stable_range_start_id - 1).end_time,
-                video_end_timestamp,
-            ),
-        ]
+        range_list: typing.List[VideoCutRange] = list()
+        # stable start
+        if first_stable_range_end_id >= 1:
+            logger.debug(f'stable start')
+            range_list.append(
+                VideoCutRange(
+                    self.video,
+                    video_start_frame_id,
+                    first_stable_range_end_id,
+                    [1.],
+                    video_start_timestamp,
+                    self.get_target_range_by_id(first_stable_range_end_id).start_time,
+                )
+            )
+        # unstable start
+        else:
+            logger.debug('unstable start')
+
+        # stable end
+        if end_stable_range_start_id <= video_end_frame_id:
+            logger.debug('stable end')
+            range_list.append(
+                VideoCutRange(
+                    self.video,
+                    end_stable_range_start_id,
+                    video_end_frame_id,
+                    [1.],
+                    self.get_target_range_by_id(end_stable_range_start_id).end_time,
+                    video_end_timestamp,
+                )
+            )
+        # unstable end
+        else:
+            logger.debug('unstable end')
+
         # diff range
         for i in range(len(unstable_range_list) - 1):
             range_start_id = unstable_range_list[i].end + 1
@@ -135,8 +169,8 @@ class VideoCutResult(object):
                     range_start_id,
                     range_end_id,
                     [1.],
-                    self.get_target_range_by_id(range_start_id - 1).start_time,
-                    self.get_target_range_by_id(range_end_id - 1).end_time,
+                    self.get_target_range_by_id(range_start_id).start_time,
+                    self.get_target_range_by_id(range_end_id).end_time,
                 )
             )
 
