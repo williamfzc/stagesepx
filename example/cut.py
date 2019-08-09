@@ -1,7 +1,7 @@
 from stagesepx.cutter import VideoCutter
 
 # 改为你的视频路径
-video_path = '../test.mp4'
+video_path = '../demo.mp4'
 
 cutter = VideoCutter(
     # 步长，默认为1，通过它可以自行把握效率与颗粒度
@@ -49,12 +49,6 @@ res.thumbnail(unstable[0], to_dir='.')
 data_path = res.pick_and_save(
     # 这里的例子是对稳定区间进行采样
     stable,
-
-    # 目前的 SVM分类器 不会提供默认类别（即 不像SSIM分类器一样 会将匹配不到的图像置为-1分类）
-    # 所以所有的帧都会被强行分类到某一个类别中去，即便它可能不是很像
-    # 如果你希望使用 SVM 分类，你最好将不稳定的部分也加入以减少误判发生（将stable替换为下面的）
-    # sorted(stable + unstable, key=lambda x: x.start),
-
     # 每段区间的采样数，3即每个阶段等距离截取3张图片
     # 如果涉及机器学习，建议将此值提高
     3,

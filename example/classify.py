@@ -13,7 +13,7 @@ data_home = './cut_result'
 cl.load(data_home)
 # 开始分析即可
 res = cl.classify(
-    '../test.mp4',
+    '../demo.mp4',
     # 步长，可以自行设置用于平衡效率与颗粒度
     # 默认为1，即每帧都检测
     step=1

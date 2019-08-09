@@ -3,7 +3,7 @@ from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
 
 video_list = [
-    '../test.mp4',
+    '../demo.mp4',
     # 把别的视频也配置在这里即可
 ]
 
