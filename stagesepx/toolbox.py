@@ -114,7 +114,8 @@ def compress_frame(old: np.ndarray,
                    compress_rate: float = None,
                    target_size: typing.Tuple[int, int] = None,
                    not_grey: bool = None,
-                   interpolation: int = None) -> np.ndarray:
+                   interpolation: int = None,
+                   *_, **__) -> np.ndarray:
     """
     Compress frame
 

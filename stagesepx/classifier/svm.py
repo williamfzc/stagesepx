@@ -125,6 +125,7 @@ class SVMClassifier(BaseClassifier):
         return self._model.predict(pic_object)[0]
 
     def _classify_frame(self,
+                        frame_id: int,
                         frame: np.ndarray,
                         *_, **__) -> str:
         return self.predict_with_object(frame)

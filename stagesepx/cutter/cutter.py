@@ -6,6 +6,7 @@ from stagesepx import toolbox
 from stagesepx.cutter.cut_range import VideoCutRange
 from stagesepx.cutter.cut_result import VideoCutResult
 from stagesepx.video import VideoObject
+from stagesepx.hook import BaseHook
 
 
 class VideoCutter(object):
@@ -25,6 +26,18 @@ class VideoCutter(object):
 
         if compress_rate:
             logger.warning('compress_rate has been moved to func `cut`')
+
+        self._hook_list: typing.List[BaseHook] = list()
+
+    def add_hook(self, new_hook: BaseHook):
+        """
+        add a hook
+
+        :param new_hook:
+        :return:
+        """
+        self._hook_list.append(new_hook)
+        logger.debug(f'add hook: {new_hook.__class__.__name__}')
 
     @staticmethod
     def pic_split(origin: np.ndarray, block: int) -> typing.List[np.ndarray]:
@@ -46,9 +59,14 @@ class VideoCutter(object):
         else:
             return True
 
+    def _apply_hook(self, frame_id: int, frame: np.ndarray, *args, **kwargs):
+        for each_hook in self._hook_list:
+            each_hook.do(frame_id, frame, *args, **kwargs)
+
     def _convert_video_into_ssim_list(self,
                                       video: VideoObject,
                                       block: int = None,
+                                      *args,
                                       **kwargs) -> typing.List[VideoCutRange]:
         if not block:
             block = 2
@@ -67,6 +85,9 @@ class VideoCutter(object):
             end_frame_id = toolbox.get_current_frame_id(cap)
             end_frame_time = toolbox.get_current_frame_time(cap)
 
+            # hook
+            self._apply_hook(start_frame_id, start)
+
             # compress
             start = toolbox.compress_frame(start, **kwargs)
 
@@ -76,6 +97,9 @@ class VideoCutter(object):
                 block = 1
 
             while ret:
+                # hook
+                self._apply_hook(end_frame_id, end, *args, **kwargs)
+
                 end = toolbox.compress_frame(end, **kwargs)
                 logger.debug(f'computing {start_frame_id} & {end_frame_id} ...')
                 start_part_list = self.pic_split(start, block)
@@ -105,13 +129,14 @@ class VideoCutter(object):
                 start = end
                 start_frame_id, end_frame_id = end_frame_id, end_frame_id + self.step
                 start_frame_time = end_frame_time
+
                 toolbox.video_jump(cap, end_frame_id)
                 ret, end = cap.read()
                 end_frame_time = toolbox.get_current_frame_time(cap)
 
         return ssim_list
 
-    def cut(self, video_path: str, **kwargs) -> VideoCutResult:
+    def cut(self, video_path: str, *args, **kwargs) -> VideoCutResult:
         """
         convert video file, into a VideoCutResult
 
@@ -128,6 +153,7 @@ class VideoCutter(object):
         # [SSIM(1-2), SSIM(2-3), SSIM(3-4) ... SSIM(99-100)]
         ssim_list = self._convert_video_into_ssim_list(
             video,
+            *args,
             **kwargs)
         logger.info(f'cut finished: {video_path}')
 

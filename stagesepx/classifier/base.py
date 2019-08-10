@@ -6,6 +6,7 @@ from loguru import logger
 
 from stagesepx.cutter import VideoCutRange
 from stagesepx import toolbox
+from stagesepx.hook import BaseHook
 
 
 class ClassifierResult(object):
@@ -37,6 +38,18 @@ class BaseClassifier(object):
                 typing.List[int],
             ]
         ] = dict()
+
+        self._hook_list: typing.List[BaseHook] = list()
+
+    def add_hook(self, new_hook: BaseHook):
+        """
+        add a hook
+
+        :param new_hook:
+        :return:
+        """
+        self._hook_list.append(new_hook)
+        logger.debug(f'add hook: {new_hook.__class__.__name__}')
 
     def load(self, data: typing.Union[str, typing.List[VideoCutRange]], *args, **kwargs):
         """
@@ -117,10 +130,15 @@ class BaseClassifier(object):
         return data
 
     def _classify_frame(self,
+                        frame_id: int,
                         frame: np.ndarray,
                         video_cap: cv2.VideoCapture,
                         *args, **kwargs) -> str:
         raise NotImplementedError('must implement this function')
+
+    def _apply_hook(self, frame_id: int, frame: np.ndarray, *args, **kwargs):
+        for each_hook in self._hook_list:
+            each_hook.do(frame_id, frame, *args, **kwargs)
 
     def classify(self,
                  video_path: str,
@@ -156,8 +174,12 @@ class BaseClassifier(object):
                         ret, frame = cap.read()
                         continue
 
-                result = self._classify_frame(frame, cap, *args, **kwargs)
+                # hook
+                self._apply_hook(frame_id, frame, *args, **kwargs)
+
+                result = self._classify_frame(frame_id, frame, cap, *args, **kwargs)
                 logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')
+
                 final_result.append(ClassifierResult(video_path, frame_id, frame_timestamp, result))
                 toolbox.video_jump(cap, frame_id + step)
                 ret, frame = cap.read()

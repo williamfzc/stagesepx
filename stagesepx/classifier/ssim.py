@@ -8,6 +8,7 @@ from stagesepx import toolbox
 
 class SSIMClassifier(BaseClassifier):
     def _classify_frame(self,
+                        frame_id: int,
                         frame: np.ndarray,
                         video_cap: cv2.VideoCapture,
                         threshold: float = None,
