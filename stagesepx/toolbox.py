@@ -137,6 +137,8 @@ def compress_frame(old: np.ndarray,
     """
 
     target = turn_grey(old) if not not_grey else old
+    target = cv2.bilateralFilter(target, 9, 75, 75)
+
     if not interpolation:
         interpolation = cv2.INTER_AREA
     # target size first

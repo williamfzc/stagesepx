@@ -117,6 +117,23 @@ class VideoCutResult(object):
         video_end_frame_id = self.range_list[-1].end
         video_end_timestamp = self.range_list[-1].end_time
 
+        # stable all the time
+        if len(unstable_range_list) == 0:
+            logger.warning('no unstable stage detected, seems nothing happened in your video')
+            return (
+                # stable
+                [VideoCutRange(
+                    self.video,
+                    video_start_frame_id,
+                    video_end_frame_id,
+                    [1.],
+                    video_start_timestamp,
+                    video_end_timestamp
+                )],
+                # unstable
+                [],
+            )
+
         # ATTENTION: +1 and -1 easily cause error
         # end of first stable range == start of first unstable range
         first_stable_range_end_id = unstable_range_list[0].start - 1
