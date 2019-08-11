@@ -45,7 +45,7 @@ stable, unstable = res.get_range(
 # 你可以通过 thumbnail 将阶段的变化过程转化成一张缩略图，这样可以很直观地看出阶段的变化过程！
 # 例如，你希望查看第一个unstable阶段发生了什么
 # 这样做能够将转化后的缩略图保存到当前目录下
-res.thumbnail(unstable[0], to_dir='.')
+# res.thumbnail(unstable[0], to_dir='.')
 
 # 对区间进行采样
 data_home = res.pick_and_save(
@@ -115,7 +115,7 @@ for each in unstable:
 # 你可以将把一些文件夹路径插入到报告中
 # 这样你可以很方便地从报告中查看各项相关内容
 # 当然，你需要想好这些路径与报告最后所在位置之间的相对位置，以确保他们能够被访问到
-r.add_dir_link(data_home)
+# r.add_dir_link(data_home)
 
 # 在0.3.2及之后的版本，你可以在报告中加入一些自定义内容 （https://github.com/williamfzc/stagesepx/issues/13）
 # r.add_extra('here is title', 'here is content')
