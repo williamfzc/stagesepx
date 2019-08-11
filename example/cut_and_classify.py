@@ -1,6 +1,7 @@
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
+from stagesepx.hook import ExampleHook
 
 
 video_path = '../demo.mp4'
@@ -12,6 +13,15 @@ cutter = VideoCutter(
     # 即跳过一帧
     step=1,
 )
+
+# 在 0.4.2 之后，hook特性正式被加入：https://github.com/williamfzc/stagesepx/issues/22
+# 使用极其简单，你只需要初始化 hook
+hook = ExampleHook()
+# 再将 hook 添加到 cutter 或者 classifier 中去
+cutter.add_hook(hook)
+# 支持多个hook，他们会按顺序执行
+hook1 = ExampleHook()
+cutter.add_hook(hook1)
 
 # 开始切割
 res = cutter.cut(
@@ -25,6 +35,14 @@ res = cutter.cut(
     # 值得注意，如果无法整除，block是会报错的
     block=2,
 )
+
+# 在切割过程中，hook的内容会同步进行
+# 在切割完成后，你就可以从hook中获取结果了！
+print(hook.result)
+print(hook1.result)
+# ExampleHook 是将每帧的size记录下来，并没有起到实际作用
+# hook.py 中还提供了非常实用的 InvalidFrameDetectHook（异常帧检测）、FrameSaveHook（将每一帧保存到指定文件夹）
+# 你可以借此了解 hook 的运作原理，自行为你的业务定制 hook
 
 # 你可以通过res获取切割结果，获取稳定状态与活动状态分别对应的区间
 stable, unstable = res.get_range(
