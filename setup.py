@@ -18,14 +18,14 @@ setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        'opencv-python',
+        'opencv-python>=4.1.0.25',
         'opencv-contrib-python==3.4.2.17',
-        'numpy',
-        'loguru',
-        'scikit-image',
-        'scikit-learn',
-        'pyecharts',
-        'findit',
-        'jinja2',
+        'numpy>=0.16.2',
+        'loguru>=0.2.5',
+        'scikit-image>=0.14.2',
+        'scikit-learn>=0.21.0',
+        'pyecharts>=1.3.1',
+        'findit>=0.5.6',
+        'Jinja2>=2.10.1',
     ]
 )
