@@ -269,8 +269,9 @@ class VideoCutResult(object):
         stage_list = list()
         for index, each_range in enumerate(range_list):
             picked = each_range.pick(frame_count, *args, **kwargs)
+            picked_frames = each_range.get_frames(picked)
             logger.info(f'pick {picked} in range {each_range}')
-            stage_list.append((index, picked))
+            stage_list.append((index, picked_frames))
 
         # create parent dir
         if not to_dir:
@@ -282,13 +283,11 @@ class VideoCutResult(object):
             each_stage_dir = os.path.join(to_dir, str(each_stage_id))
             os.makedirs(each_stage_dir, exist_ok=True)
 
-            with toolbox.video_capture(self.video.path) as cap:
-                for each_frame_id in each_frame_list:
-                    each_frame_path = os.path.join(each_stage_dir, f'{uuid.uuid4()}.png')
-                    each_frame = toolbox.get_frame(cap, each_frame_id - 1)
-                    each_frame = toolbox.compress_frame(each_frame, **kwargs)
-                    cv2.imwrite(each_frame_path, each_frame)
-                    logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
+            for each_frame_object in each_frame_list:
+                each_frame_path = os.path.join(each_stage_dir, f'{uuid.uuid4()}.png')
+                compressed = toolbox.compress_frame(each_frame_object.frame, **kwargs)
+                cv2.imwrite(each_frame_path, compressed)
+                logger.debug(f'frame [{each_frame_object.frame_id}] saved to {each_frame_path}')
 
         return to_dir
 
