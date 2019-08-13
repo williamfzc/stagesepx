@@ -314,6 +314,15 @@ class VideoCutResult(object):
         with open(json_path, **kwargs) as f:
             return cls.loads(f.read())
 
-    def diff(self, another: 'VideoCutResult'):
+    def diff(self, another: 'VideoCutResult', *args, **kwargs):
+        self_stable, _ = self.get_range(*args, **kwargs)
+        another_stable, _ = another.get_range(*args, **kwargs)
+
+        # 1. stage length compare
+        self_stable_range_count = len(self_stable)
+        another_stable_range_count = len(another_stable)
+        if self_stable_range_count != another_stable_range_count:
+            logger.warning(f'stage counts not equal: {self_stable_range_count} & {another_stable_range_count}')
+
+        # 2. stage content compare
         # TODO
-        pass

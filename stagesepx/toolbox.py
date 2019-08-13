@@ -27,6 +27,10 @@ def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
     return origin_compare_ssim(pic1, pic2)
 
 
+def multi_compare_ssim(pic1_list: typing.List[np.ndarray], pic2_list: typing.List[np.ndarray]) -> typing.List[float]:
+    return [compare_ssim(a, b) for a, b in zip(pic1_list, pic2_list)]
+
+
 def get_current_frame_id(video_cap: cv2.VideoCapture) -> int:
     return int(video_cap.get(cv2.CAP_PROP_POS_FRAMES))
 
