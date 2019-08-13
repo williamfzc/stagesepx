@@ -12,13 +12,17 @@ from stagesepx.video import VideoObject
 
 class VideoCutRange(object):
     def __init__(self,
-                 video: VideoObject,
+                 video: typing.Union[VideoObject, typing.Dict],
                  start: int,
                  end: int,
-                 ssim: typing.List,
+                 ssim: typing.List[float],
                  start_time: float,
                  end_time: float):
-        self.video = video
+        if isinstance(video, dict):
+            self.video = VideoObject(**video)
+        else:
+            self.video = video
+
         self.start = start
         self.end = end
         self.ssim = ssim

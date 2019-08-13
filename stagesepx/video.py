@@ -4,11 +4,13 @@ from stagesepx import toolbox
 
 
 class VideoObject(object):
-    def __init__(self, video_path: str):
-        assert os.path.isfile(video_path), f'video [{video_path}] not existed'
-        self.path = video_path
+    def __init__(self,
+                 path: str = None,
+                 *_, **__):
+        assert os.path.isfile(path), f'video [{path}] not existed'
+        self.path = path
 
-        with toolbox.video_capture(video_path) as cap:
+        with toolbox.video_capture(path) as cap:
             self.frame_count = toolbox.get_frame_count(cap)
             self.frame_size = toolbox.get_frame_size(cap)
 

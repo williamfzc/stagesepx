@@ -2,6 +2,7 @@ import os
 import typing
 import cv2
 import uuid
+import json
 import numpy as np
 from loguru import logger
 
@@ -290,3 +291,30 @@ class VideoCutResult(object):
                     logger.debug(f'frame [{each_frame_id}] saved to {each_frame_path}')
 
         return to_dir
+
+    def dumps(self) -> str:
+        return json.dumps(self, sort_keys=True, default=lambda o: o.__dict__)
+
+    def dump(self, json_path: str, **kwargs):
+        logger.debug(f'dump result to {json_path}')
+        assert not os.path.exists(json_path), f'{json_path} already existed'
+        with open(json_path, 'w+', **kwargs) as f:
+            f.write(self.dumps())
+
+    @classmethod
+    def loads(cls, content: str) -> 'VideoCutResult':
+        json_dict: dict = json.loads(content)
+        return cls(
+            VideoObject(**json_dict['video']),
+            [VideoCutRange(**each) for each in json_dict['range_list']]
+        )
+
+    @classmethod
+    def load(cls, json_path: str, **kwargs) -> 'VideoCutResult':
+        logger.debug(f'load result from {json_path}')
+        with open(json_path, **kwargs) as f:
+            return cls.loads(f.read())
+
+    def diff(self, another: 'VideoCutResult'):
+        # TODO
+        pass
