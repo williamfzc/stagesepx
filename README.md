@@ -1,4 +1,7 @@
-<img align="center" src="./docs/pics/brand.svg" />
+<h1 align="center">
+  <img src="./docs/pics/brand.svg">
+</h1>
+
 <h3 align="center">stage sep(aration) x</h3>
 <p align="center">
     <em>detect stages in video automatically</em>
