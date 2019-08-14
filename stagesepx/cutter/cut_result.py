@@ -314,8 +314,27 @@ class VideoCutResult(object):
         with open(json_path, **kwargs) as f:
             return cls.loads(f.read())
 
-    def diff(self, another: 'VideoCutResult', *args, **kwargs) -> typing.Dict:
-        """ compare cut result with another one """
+    def diff(self, another: 'VideoCutResult', auto_merge: bool = None, *args, **kwargs) -> typing.Dict:
+        """
+        compare cut result with another one
+
+        :param another: another VideoCutResult object
+        :param auto_merge: bool, will auto merge diff result and make it simple
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        raw = self._diff(another, *args, **kwargs)
+        if not auto_merge:
+            return raw
+        after = dict()
+        for self_stage_name, each_result in raw.items():
+            max_one = sorted(each_result.items(), key=lambda x: max(x[1]))[-1]
+            max_one = (max_one[0], max(max_one[1]))
+            after[self_stage_name] = max_one
+        return after
+
+    def _diff(self, another: 'VideoCutResult', *args, **kwargs) -> typing.Dict:
         self_stable, _ = self.get_range(*args, **kwargs)
         another_stable, _ = another.get_range(*args, **kwargs)
 
