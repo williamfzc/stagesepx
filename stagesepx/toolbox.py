@@ -9,6 +9,15 @@ from skimage.measure import compare_ssim as origin_compare_ssim
 from skimage.feature import hog, local_binary_pattern
 
 
+class VideoFrame(object):
+    """ loaded frame """
+
+    def __init__(self, frame_id: int, frame_timestamp: float, frame: np.ndarray):
+        self.frame_id = frame_id
+        self.frame_timestamp = frame_timestamp
+        self.frame = frame
+
+
 @contextlib.contextmanager
 def video_capture(video_path: str):
     video_cap = cv2.VideoCapture(video_path)
@@ -27,8 +36,8 @@ def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
     return origin_compare_ssim(pic1, pic2)
 
 
-def multi_compare_ssim(pic1_list: typing.List[np.ndarray], pic2_list: typing.List[np.ndarray]) -> typing.List[float]:
-    return [compare_ssim(a, b) for a, b in zip(pic1_list, pic2_list)]
+def multi_compare_ssim(pic1_list: typing.List[VideoFrame], pic2_list: typing.List[VideoFrame]) -> typing.List[float]:
+    return [compare_ssim(a.frame, b.frame) for a, b in zip(pic1_list, pic2_list)]
 
 
 def get_current_frame_id(video_cap: cv2.VideoCapture) -> int:

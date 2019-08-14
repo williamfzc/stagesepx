@@ -314,7 +314,8 @@ class VideoCutResult(object):
         with open(json_path, **kwargs) as f:
             return cls.loads(f.read())
 
-    def diff(self, another: 'VideoCutResult', *args, **kwargs):
+    def diff(self, another: 'VideoCutResult', *args, **kwargs) -> typing.Dict:
+        """ compare cut result with another one """
         self_stable, _ = self.get_range(*args, **kwargs)
         another_stable, _ = another.get_range(*args, **kwargs)
 
@@ -325,4 +326,24 @@ class VideoCutResult(object):
             logger.warning(f'stage counts not equal: {self_stable_range_count} & {another_stable_range_count}')
 
         # 2. stage content compare
-        # TODO
+        # TODO will load these pictures in memory at the same time
+        content = dict()
+        for each_id, each in enumerate(self_stable):
+            picked_frames = each.pick_and_get(*args, **kwargs)
+            content[each_id] = picked_frames
+
+        another_content = dict()
+        for each_id, each in enumerate(another_stable):
+            picked_frames = each.pick_and_get(*args, **kwargs)
+            another_content[each_id] = picked_frames
+
+        result = dict()
+        for self_stage_name, frames in content.items():
+            temp = dict()
+            for another_stage_name, another_frames in another_content.items():
+                logger.debug(f'compare: self_{self_stage_name} and another_{another_stage_name}')
+                ssim_list = toolbox.multi_compare_ssim(frames, another_frames)
+                logger.debug(f'compare result: {ssim_list}')
+                temp[another_stage_name] = ssim_list
+            result[self_stage_name] = temp
+        return result

@@ -10,14 +10,6 @@ from stagesepx import toolbox
 from stagesepx.video import VideoObject
 
 
-class VideoFrame(object):
-    """ loaded frame """
-    def __init__(self, frame_id: int, frame_timestamp: float, frame: np.ndarray):
-        self.frame_id = frame_id
-        self.frame_timestamp = frame_timestamp
-        self.frame = frame
-
-
 class VideoCutRange(object):
     def __init__(self,
                  video: typing.Union[VideoObject, typing.Dict],
@@ -107,6 +99,7 @@ class VideoCutRange(object):
              *_, **__) -> typing.List[int]:
         if not frame_count:
             frame_count = 1
+        logger.debug(f'pick {frame_count} frames')
 
         result = list()
         if is_random:
@@ -117,15 +110,21 @@ class VideoCutRange(object):
             result.append(cur)
         return result
 
-    def get_frames(self, frame_id_list: typing.List[int]) -> typing.List[VideoFrame]:
+    def get_frames(self,
+                   frame_id_list: typing.List[int],
+                   *_, **__) -> typing.List[toolbox.VideoFrame]:
         """ return a list of VideoFrame, usually works with pick """
         out = list()
         with toolbox.video_capture(self.video.path) as cap:
             for each_id in frame_id_list:
                 timestamp = toolbox.get_frame_time(cap, each_id)
                 frame = toolbox.get_frame(cap, each_id)
-                out.append(VideoFrame(each_id, timestamp, frame))
+                out.append(toolbox.VideoFrame(each_id, timestamp, frame))
         return out
+
+    def pick_and_get(self, *args, **kwargs) -> typing.List[toolbox.VideoFrame]:
+        picked = self.pick(*args, **kwargs)
+        return self.get_frames(picked, *args, **kwargs)
 
     def get_length(self):
         return self.end - self.start + 1
