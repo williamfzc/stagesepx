@@ -2,6 +2,8 @@ import numpy as np
 import os
 from loguru import logger
 import cv2
+import typing
+from findit import FindIt
 
 from stagesepx import toolbox
 
@@ -86,3 +88,29 @@ class InvalidFrameDetectHook(BaseHook):
             'black': black_ssim,
             'white': white_ssim,
         }
+
+
+class TemplateCompareHook(BaseHook):
+    def __init__(self,
+                 template_dict: typing.Dict[str, str],
+                 *args, **kwargs):
+        """
+        args and kwargs will be sent to findit.__init__
+
+        :param template_dict:
+            # k: template name
+            # v: template picture path
+        :param args:
+        :param kwargs:
+        """
+        super().__init__(*args, **kwargs)
+        self.fi = FindIt(*args, **kwargs)
+        self.template_dict = template_dict
+
+    def do(self,
+           frame_id: int,
+           frame: np.ndarray,
+           *_, **__):
+        for each_template_name, each_template_path in self.template_dict.items():
+            self.fi.load_template(each_template_name, each_template_path)
+        self.result[frame_id] = self.fi.find(str(frame_id), target_pic_object=frame)
