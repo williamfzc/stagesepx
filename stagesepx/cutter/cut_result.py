@@ -245,8 +245,8 @@ class VideoCutResult(object):
             logger.debug(f'save thumbnail to {target_path}')
         return merged
 
-    def pick_and_save(self,
-                      range_list: typing.List[VideoCutRange],
+    @staticmethod
+    def pick_and_save(range_list: typing.List[VideoCutRange],
                       frame_count: int,
                       to_dir: str = None,
 
@@ -267,11 +267,23 @@ class VideoCutResult(object):
         :return:
         """
         stage_list = list()
+        # build tag and get frames
         for index, each_range in enumerate(range_list):
             picked = each_range.pick(frame_count, *args, **kwargs)
             picked_frames = each_range.get_frames(picked)
             logger.info(f'pick {picked} in range {each_range}')
             stage_list.append((index, picked_frames))
+
+        # TODO #7
+        # # merge
+        # for i in range(len(stage_list) - 1):
+        #     index, frames = stage_list[i]
+        #     for j in range(i, len(stage_list) - 1):
+        #         next_index, next_frames = stage_list[j]
+        #         ssim_list = toolbox.multi_compare_ssim(frames, next_frames)
+        #         min_ssim = min(ssim_list)
+        #         logger.debug(f'compare {index} with {next_index}: {ssim_list}')
+        #
 
         # create parent dir
         if not to_dir:
@@ -346,23 +358,11 @@ class VideoCutResult(object):
 
         # 2. stage content compare
         # TODO will load these pictures in memory at the same time
-        content = dict()
-        for each_id, each in enumerate(self_stable):
-            picked_frames = each.pick_and_get(*args, **kwargs)
-            content[each_id] = picked_frames
-
-        another_content = dict()
-        for each_id, each in enumerate(another_stable):
-            picked_frames = each.pick_and_get(*args, **kwargs)
-            another_content[each_id] = picked_frames
-
         result = dict()
-        for self_stage_name, frames in content.items():
+        for self_id, each_self_range in enumerate(self_stable):
             temp = dict()
-            for another_stage_name, another_frames in another_content.items():
-                logger.debug(f'compare: self_{self_stage_name} and another_{another_stage_name}')
-                ssim_list = toolbox.multi_compare_ssim(frames, another_frames)
-                logger.debug(f'compare result: {ssim_list}')
-                temp[another_stage_name] = ssim_list
-            result[self_stage_name] = temp
+            for another_id, another_self_range in enumerate(another_stable):
+                temp[another_id] = each_self_range.diff(another_self_range)
+            result[self_id] = temp
+
         return result

@@ -85,6 +85,7 @@ class BaseClassifier(object):
             logger.debug(f'stage [{stage_name}] found, and got {len(stage_pic_list)} pics')
 
     def diff(self, another: 'BaseClassifier') -> typing.Dict[str, typing.Dict[str, float]]:
+        """ would be better to use 'diff' in VideoCutResult """
         assert another._data, 'must load data first'
         result_dict = dict()
 

@@ -98,8 +98,11 @@ class VideoCutRange(object):
              is_random: bool = None,
              *_, **__) -> typing.List[int]:
         if not frame_count:
-            frame_count = 1
-        logger.debug(f'pick {frame_count} frames')
+            frame_count = 3
+        logger.debug(f'pick {frame_count} frames '
+                     f'from {self.start}({self.start_time}) '
+                     f'to {self.end}({self.end_time}) '
+                     f'on video {self.video.path}')
 
         result = list()
         if is_random:
@@ -142,6 +145,11 @@ class VideoCutRange(object):
             end_frame = toolbox.get_frame(cap, self.end)
             start_frame, end_frame = map(toolbox.compress_frame, (start_frame, end_frame))
             return toolbox.compare_ssim(start_frame, end_frame) > threshold
+
+    def diff(self, another: 'VideoCutRange', *args, **kwargs) -> typing.List[float]:
+        self_picked = self.pick_and_get(*args, **kwargs)
+        another_picked = another.pick_and_get(*args, **kwargs)
+        return toolbox.multi_compare_ssim(self_picked, another_picked)
 
     def __str__(self):
         return f'<VideoCutRange [{self.start}-{self.end}] ssim={self.ssim}>'
