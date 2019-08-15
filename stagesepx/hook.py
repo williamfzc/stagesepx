@@ -15,7 +15,7 @@ class BaseHook(object):
         self.result = dict()
 
     def do(self, frame_id: int, frame: np.ndarray, *_, **__):
-        raise NotImplementedError('MUST IMPLEMENT THIS FIRST')
+        logger.debug(f'hook: {self.__class__.__name__}, frame id: {frame_id}')
 
 
 class ExampleHook(BaseHook):
@@ -26,6 +26,7 @@ class ExampleHook(BaseHook):
         self.result = dict()
 
     def do(self, frame_id: int, frame: np.ndarray, *_, **__):
+        super().do(frame_id, frame, *_, **__)
         frame = toolbox.turn_grey(frame)
         self.result[frame_id] = frame.shape
 
@@ -50,9 +51,11 @@ class FrameSaveHook(BaseHook):
            frame_id: int,
            frame: np.ndarray,
            *_, **__):
+        super().do(frame_id, frame, *_, **__)
         compressed = toolbox.compress_frame(frame, compress_rate=self.compress_rate)
         target_path = os.path.join(self.target_dir, f'{frame_id}.png')
         cv2.imwrite(target_path, compressed)
+        logger.debug(f'frame saved to {target_path}')
 
 
 class InvalidFrameDetectHook(BaseHook):
@@ -78,11 +81,13 @@ class InvalidFrameDetectHook(BaseHook):
            frame_id: int,
            frame: np.ndarray,
            *_, **__):
+        super().do(frame_id, frame, *_, **__)
         compressed = toolbox.compress_frame(frame, compress_rate=self.compress_rate)
         black = np.zeros([*compressed.shape, 3], np.uint8)
         white = black + 255
         black_ssim = toolbox.compare_ssim(black, compressed)
         white_ssim = toolbox.compare_ssim(white, compressed)
+        logger.debug(f'black: {black_ssim}; white: {white_ssim}')
 
         self.result[frame_id] = {
             'black': black_ssim,
@@ -111,6 +116,9 @@ class TemplateCompareHook(BaseHook):
            frame_id: int,
            frame: np.ndarray,
            *_, **__):
+        super().do(frame_id, frame, *_, **__)
         for each_template_name, each_template_path in self.template_dict.items():
             self.fi.load_template(each_template_name, each_template_path)
-        self.result[frame_id] = self.fi.find(str(frame_id), target_pic_object=frame)
+        res = self.fi.find(str(frame_id), target_pic_object=frame)
+        logger.debug(f'compare with template {each_template_name}: {res}')
+        self.result[frame_id] = res
