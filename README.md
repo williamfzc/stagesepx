@@ -75,7 +75,7 @@ Stagesepx also was designed as a tool for preparation of AI processing. It can e
 
 ![ai_flow.png](https://i.loli.net/2019/08/15/yMbnQNx5E2Jg6S3.png)
 
-It offer a 'bridge' between videos and image processing directly. And you do not need to handle videos by yourself.
+It offered a 'bridge' between videos and image processing directly. And you do not need to handle videos by yourself.
 
 ## 使用
 

@@ -245,10 +245,11 @@ class VideoCutResult(object):
             logger.debug(f'save thumbnail to {target_path}')
         return merged
 
-    @staticmethod
-    def pick_and_save(range_list: typing.List[VideoCutRange],
+    def pick_and_save(self,
+                      range_list: typing.List[VideoCutRange],
                       frame_count: int,
                       to_dir: str = None,
+                      prune: float = None,
 
                       # in kwargs
                       # compress_rate: float = None,
@@ -262,6 +263,7 @@ class VideoCutResult(object):
         :param range_list: VideoCutRange list
         :param frame_count: default to 3, and finally you will get 3 frames for each range
         :param to_dir: will saved to this path
+        :param prune: float, 0-1. if set it 0.9, some stages which are too similar (ssim > 0.9) will be removed
         :param args:
         :param kwargs:
         :return:
@@ -272,18 +274,11 @@ class VideoCutResult(object):
             picked = each_range.pick(frame_count, *args, **kwargs)
             picked_frames = each_range.get_frames(picked)
             logger.info(f'pick {picked} in range {each_range}')
-            stage_list.append((index, picked_frames))
+            stage_list.append((str(index), picked_frames))
 
-        # TODO #7
-        # # merge
-        # for i in range(len(stage_list) - 1):
-        #     index, frames = stage_list[i]
-        #     for j in range(i, len(stage_list) - 1):
-        #         next_index, next_frames = stage_list[j]
-        #         ssim_list = toolbox.multi_compare_ssim(frames, next_frames)
-        #         min_ssim = min(ssim_list)
-        #         logger.debug(f'compare {index} with {next_index}: {ssim_list}')
-        #
+        # prune
+        if prune:
+            stage_list = self._prune(prune, stage_list)
 
         # create parent dir
         if not to_dir:
@@ -302,6 +297,26 @@ class VideoCutResult(object):
                 logger.debug(f'frame [{each_frame_object.frame_id}] saved to {each_frame_path}')
 
         return to_dir
+
+    @staticmethod
+    def _prune(threshold: float,
+               stages: typing.List[typing.Tuple[str, typing.List[toolbox.VideoFrame]]]
+               ) -> typing.List[typing.Tuple[str, typing.List[toolbox.VideoFrame]]]:
+        logger.debug(f'start pruning ranges, origin length is {len(stages)}, threshold is {threshold}')
+        after = list()
+        for i in range(len(stages) - 1):
+            index, frames = stages[i]
+            for j in range(i + 1, len(stages) - 1):
+                next_index, next_frames = stages[j]
+                ssim_list = toolbox.multi_compare_ssim(frames, next_frames)
+                min_ssim = min(ssim_list)
+                logger.debug(f'compare {index} with {next_index}: {ssim_list}')
+                if min_ssim > threshold:
+                    logger.debug(f'stage {index} has been pruned')
+                    break
+            else:
+                after.append(stages[i])
+        return after
 
     def dumps(self) -> str:
         return json.dumps(self, sort_keys=True, default=lambda o: o.__dict__)
