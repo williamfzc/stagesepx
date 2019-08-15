@@ -69,6 +69,14 @@ stagesepx能够**自动侦测**并提取视频中的稳定或不稳定的阶段�
 
 Do whatever you want:)
 
+### As AI frontend
+
+Stagesepx also was designed as a tool for preparation of AI processing. It can easily collect resources from videos for further image processing. Here is an example flow:
+
+![ai_flow.png](https://i.loli.net/2019/08/15/yMbnQNx5E2Jg6S3.png)
+
+It offer a 'bridge' between videos and image processing directly. And you do not need to handle videos by yourself.
+
 ## 使用
 
 ### 安装
