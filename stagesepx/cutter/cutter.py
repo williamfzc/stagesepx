@@ -101,7 +101,7 @@ class VideoCutter(object):
                 self._apply_hook(end_frame_id, end, *args, **kwargs)
 
                 end = toolbox.compress_frame(end, **kwargs)
-                logger.debug(f'computing {start_frame_id} & {end_frame_id} ...')
+                logger.debug(f'computing {start_frame_id}({start_frame_time}) & {end_frame_id}({end_frame_time}) ...')
                 start_part_list = self.pic_split(start, block)
                 end_part_list = self.pic_split(end, block)
 
