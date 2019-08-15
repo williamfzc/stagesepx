@@ -153,7 +153,7 @@ class VideoCutResult(object):
                     first_stable_range_end_id,
                     [1.],
                     video_start_timestamp,
-                    self.get_target_range_by_id(first_stable_range_end_id).start_time,
+                    self.get_target_range_by_id(first_stable_range_end_id).end_time,
                 )
             )
         # unstable start
@@ -181,13 +181,21 @@ class VideoCutResult(object):
         for i in range(len(unstable_range_list) - 1):
             range_start_id = unstable_range_list[i].end + 1
             range_end_id = unstable_range_list[i + 1].start - 1
+
+            # stable range's length is 1
+            if range_start_id > range_end_id:
+                range_start_id, range_end_id = range_end_id, range_start_id
+
             range_list.append(
+                # ATTENTION: frame's timestamp => end time of this frame
+                # because frame 0's timestamp is 0.0
+                # frame {range_start_id} end time - frame {range_end_id} end time
                 VideoCutRange(
                     self.video,
                     range_start_id,
                     range_end_id,
                     [1.],
-                    self.get_target_range_by_id(range_start_id).start_time,
+                    self.get_target_range_by_id(range_start_id).end_time,
                     self.get_target_range_by_id(range_end_id).end_time,
                 )
             )
