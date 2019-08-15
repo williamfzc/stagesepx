@@ -157,7 +157,6 @@ class BaseClassifier(object):
         :return:
         """
         logger.debug(f'classify with {self.__class__.__name__}')
-        assert self._data, 'should load data first'
 
         if not step:
             step = 1
