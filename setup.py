@@ -8,6 +8,7 @@ setup(
     author_email='fengzc@vip.qq.com',
     url='https://github.com/williamfzc/stagesepx',
     packages=find_packages(),
+    include_package_data=True,
     license='MIT',
     classifiers=[
         'License :: OSI Approved :: MIT License',
