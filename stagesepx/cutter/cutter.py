@@ -10,22 +10,15 @@ from stagesepx.hook import BaseHook
 
 
 class VideoCutter(object):
-    def __init__(self,
-                 step: int = None,
-                 # TODO removed in the future
-                 compress_rate: float = None):
+    def __init__(self, step: int = None):
         """
         init video cutter
 
         :param step: step between frames, default to 1
-        :param compress_rate: (moved to `cut`) before * compress_rate = after
         """
         if not step:
             step = 1
         self.step = step
-
-        if compress_rate:
-            logger.warning('compress_rate has been moved to func `cut`')
 
         self._hook_list: typing.List[BaseHook] = list()
 
