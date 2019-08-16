@@ -312,9 +312,9 @@ class VideoCutResult(object):
                ) -> typing.List[typing.Tuple[str, typing.List[toolbox.VideoFrame]]]:
         logger.debug(f'start pruning ranges, origin length is {len(stages)}, threshold is {threshold}')
         after = list()
-        for i in range(len(stages) - 1):
+        for i in range(len(stages)):
             index, frames = stages[i]
-            for j in range(i + 1, len(stages) - 1):
+            for j in range(i + 1, len(stages)):
                 next_index, next_frames = stages[j]
                 ssim_list = toolbox.multi_compare_ssim(frames, next_frames)
                 min_ssim = min(ssim_list)
