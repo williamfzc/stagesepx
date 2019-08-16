@@ -1,4 +1,4 @@
-from stagesepx.cutter import VideoCutter
+from stagesepx.cutter import VideoCutter, VideoCutResult
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
 from stagesepx.hook import ExampleHook
@@ -35,6 +35,15 @@ res = cutter.cut(
     # 值得注意，如果无法整除，block是会报错的
     block=2,
 )
+
+# 你可以将你的cutter结果保存起来，供其他时刻使用（>=0.4.4）
+cut_result = res.dumps()
+# 或直接保存成json文件
+# res.dump('./YOUR_RES.json')
+# 在你想要使用时，使用loads读取即可
+res = VideoCutResult.loads(cut_result)
+# 或直接从文件读取
+# res = VideoCutResult.load('./YOUR_RES.json')
 
 # 在切割过程中，hook的内容会同步进行
 # 在切割完成后，你就可以从hook中获取结果了！
@@ -75,6 +84,10 @@ data_home = res.pick_and_save(
     # 采样结果保存的位置
     # 不指定的话则会在当前位置生成文件夹并返回它的路径
     # './cut_result',
+
+    # prune被用于去除重复阶段（>=0.4.4）
+    # float（0-1.0），设置为0.9时，如果两个stage相似度超过0.9，他们会合并成一个类别
+    prune=None,
 )
 
 # --- classify ---
