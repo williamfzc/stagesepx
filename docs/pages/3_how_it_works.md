@@ -35,7 +35,7 @@ hook是在 0.4.2 版本之后被加入的概念，它被用于支撑**帧级别*
 
 如此做，我们能够非常灵活地定制预处理步骤的行为。hook 不仅仅只能影响分析流程，你完全可以通过定制 hook 进行个性化的帧操作。例如 FrameSaveHook 能够在迭代过程中将每一帧单独保存到指定位置。你可以参考他们的实现来完成属于自己的hook，从而实现你的功能。
 
-!> hook的执行是严格按照添加的顺序的，hook之间可能会存在干扰。overwrite参数被用于控制hook是否会修改原始的帧，具体使用可参考 [例子](/pages/how_to_use_it)。
+!> hook的执行是严格按照添加的顺序的，hook之间可能会存在干扰。overwrite参数被用于控制hook是否会修改原始的帧，具体使用可参考 [完整例子](https://github.com/williamfzc/stagesepx/blob/master/example/cut_and_classify.py)。
 
 ## 设计理念 与 定位
 

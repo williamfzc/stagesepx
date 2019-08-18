@@ -27,4 +27,4 @@
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/williamfzc/stagesepx/blob/master/LICENSE)
