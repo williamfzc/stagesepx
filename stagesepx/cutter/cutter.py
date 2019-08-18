@@ -6,11 +6,15 @@ from stagesepx import toolbox
 from stagesepx.cutter.cut_range import VideoCutRange
 from stagesepx.cutter.cut_result import VideoCutResult
 from stagesepx.video import VideoObject
-from stagesepx.hook import BaseHook
+from stagesepx.hook import BaseHook, GreyHook, CompressHook
 
 
 class VideoCutter(object):
-    def __init__(self, step: int = None):
+    def __init__(self,
+                 step: int = None,
+                 compress_rate: float = None,
+                 target_size: typing.Tuple[int, int] = None,
+                 ):
         """
         init video cutter
 
@@ -20,7 +24,12 @@ class VideoCutter(object):
             step = 1
         self.step = step
 
+        # init inner hook
         self._hook_list: typing.List[BaseHook] = list()
+        compress_hook = CompressHook(overwrite=True, compress_rate=compress_rate, target_size=target_size)
+        grey_hook = GreyHook(overwrite=True)
+        self.add_hook(compress_hook)
+        self.add_hook(grey_hook)
 
     def add_hook(self, new_hook: BaseHook):
         """
@@ -57,11 +66,11 @@ class VideoCutter(object):
             frame = each_hook.do(frame_id, frame, *args, **kwargs)
         return frame
 
-    def _convert_video_into_ssim_list(self,
-                                      video: VideoObject,
-                                      block: int = None,
-                                      *args,
-                                      **kwargs) -> typing.List[VideoCutRange]:
+    def _convert_video_into_range_list(self,
+                                       video: VideoObject,
+                                       block: int = None,
+                                       *args,
+                                       **kwargs) -> typing.List[VideoCutRange]:
         if not block:
             block = 2
 
@@ -82,9 +91,6 @@ class VideoCutter(object):
             # hook
             start = self._apply_hook(start_frame_id, start)
 
-            # compress
-            start = toolbox.compress_frame(start, **kwargs)
-
             # check block
             if not self.is_block_valid(start, block):
                 logger.warning('array split does not result in an equal division, set block to 1')
@@ -94,7 +100,6 @@ class VideoCutter(object):
                 # hook
                 end = self._apply_hook(end_frame_id, end, *args, **kwargs)
 
-                end = toolbox.compress_frame(end, **kwargs)
                 logger.debug(f'computing {start_frame_id}({start_frame_time}) & {end_frame_id}({end_frame_time}) ...')
                 start_part_list = self.pic_split(start, block)
                 end_part_list = self.pic_split(end, block)
@@ -144,8 +149,8 @@ class VideoCutter(object):
 
         # if video contains 100 frames
         # it starts from 1, and length of list is 99, not 100
-        # [SSIM(1-2), SSIM(2-3), SSIM(3-4) ... SSIM(99-100)]
-        ssim_list = self._convert_video_into_ssim_list(
+        # [Range(1-2), Range(2-3), Range(3-4) ... Range(99-100)]
+        range_list = self._convert_video_into_range_list(
             video,
             *args,
             **kwargs)
@@ -154,5 +159,5 @@ class VideoCutter(object):
         # TODO other analysis results can be added to VideoCutResult, such as AI cutter?
         return VideoCutResult(
             video,
-            ssim_list,
+            range_list,
         )

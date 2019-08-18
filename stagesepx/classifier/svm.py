@@ -94,7 +94,10 @@ class SVMClassifier(BaseClassifier):
         train_label = list()
         for each_label, each_label_pic_list in self.read():
             for each_pic_object in each_label_pic_list:
-                each_pic_object = toolbox.compress_frame(each_pic_object, self.compress_rate, self.target_size)
+                logger.debug(f'training label: {each_label}')
+                # apply hook
+                each_pic_object = self._apply_hook(-1, each_pic_object)
+
                 each_pic_object = self.feature_func(each_pic_object).flatten()
                 train_data.append(each_pic_object)
                 train_label.append(each_label)
@@ -119,7 +122,6 @@ class SVMClassifier(BaseClassifier):
         :param pic_object:
         :return:
         """
-        pic_object = toolbox.compress_frame(pic_object, self.compress_rate, self.target_size)
         pic_object = self.feature_func(pic_object)
         pic_object = pic_object.reshape(1, -1)
         return self._model.predict(pic_object)[0]

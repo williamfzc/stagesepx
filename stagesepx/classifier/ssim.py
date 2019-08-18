@@ -16,17 +16,13 @@ class SSIMClassifier(BaseClassifier):
         if not threshold:
             threshold = 0.85
 
-        frame = toolbox.compress_frame(
-            frame,
-            self.compress_rate,
-            self.target_size,
-        )
-
         result = list()
         for each_stage_name, each_stage_pic_list in self.read(video_cap):
             each_result = list()
             for target_pic in each_stage_pic_list:
-                target_pic = toolbox.compress_frame(target_pic, self.compress_rate, self.target_size)
+                # apply hooks
+                target_pic = self._apply_hook(-1, target_pic)
+
                 each_pic_ssim = toolbox.compare_ssim(frame, target_pic)
                 each_result.append(each_pic_ssim)
             ssim = max(each_result)

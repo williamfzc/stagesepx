@@ -6,7 +6,7 @@ from loguru import logger
 
 from stagesepx.cutter import VideoCutRange
 from stagesepx import toolbox
-from stagesepx.hook import BaseHook
+from stagesepx.hook import BaseHook, GreyHook, CompressHook
 
 
 class ClassifierResult(object):
@@ -39,7 +39,12 @@ class BaseClassifier(object):
             ]
         ] = dict()
 
+        # init inner hooks
         self._hook_list: typing.List[BaseHook] = list()
+        compress_hook = CompressHook(overwrite=True, compress_rate=compress_rate, target_size=target_size)
+        grey_hook = GreyHook(overwrite=True)
+        self.add_hook(compress_hook)
+        self.add_hook(grey_hook)
 
     def add_hook(self, new_hook: BaseHook):
         """

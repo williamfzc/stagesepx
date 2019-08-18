@@ -10,13 +10,22 @@ from stagesepx import toolbox
 
 class BaseHook(object):
     def __init__(self, overwrite: bool = None, *_, **__):
-        # default: dict
         logger.debug(f'start initialing: {self.__class__.__name__} ...')
+
+        # default: dict
         self.result = dict()
+
+        # overwrite label
+        # decide whether the origin frame will be changed
         self.overwrite = bool(overwrite)
+        logger.debug(f'overwrite: {self.overwrite}')
 
     def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
-        logger.debug(f'hook: {self.__class__.__name__}, frame id: {frame_id}')
+        info = f'execute hook: {self.__class__.__name__}'
+
+        # when frame id == -1, it means handling some pictures outside the video
+        if frame_id != -1:
+            logger.debug(f'{info}, frame id: {frame_id}')
         return
 
 
@@ -36,6 +45,7 @@ def change_origin(_func):
 
 class ExampleHook(BaseHook):
     """ this hook will help you write your own hook class """
+
     def __init__(self, *_, **__):
         """
         hook has two ways to affect the result of analysis
@@ -46,6 +56,7 @@ class ExampleHook(BaseHook):
         super().__init__(*_, **__)
 
         # add your code here
+        # ...
 
     @change_origin
     def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
@@ -53,7 +64,9 @@ class ExampleHook(BaseHook):
 
         # you can get frame_id and frame data here
         # and use them to custom your own function
+
         # add your code here
+        # ...
 
         # for example, i want to turn grey, and save size of each frames
         frame = toolbox.turn_grey(frame)
@@ -69,21 +82,42 @@ class ExampleHook(BaseHook):
         # and nothing will happen even if setting 'overwrite' to 'True'
 
 
+# --- inner hook start ---
+
+class CompressHook(BaseHook):
+    def __init__(self, compress_rate: float, target_size: typing.Tuple[int, int], *_, **__):
+        super().__init__(*_, **__)
+        self.compress_rate = compress_rate
+        self.target_size = target_size
+        logger.debug(f'compress rate: {compress_rate}')
+        logger.debug(f'target size: {target_size}')
+
+    @change_origin
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+        super().do(frame_id, frame, *_, **__)
+        return toolbox.compress_frame(frame, compress_rate=self.compress_rate, target_size=self.target_size)
+
+
+class GreyHook(BaseHook):
+    @change_origin
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+        super().do(frame_id, frame, *_, **__)
+        return toolbox.turn_grey(frame)
+
+
+# --- inner hook end ---
+
 class FrameSaveHook(BaseHook):
     """ add this hook, and save all the frames you want to specific dir """
 
-    def __init__(self, target_dir: str, compress_rate: float = None, *_, **__):
+    def __init__(self, target_dir: str, *_, **__):
         super().__init__(*_, **__)
 
         # init target dir
         self.target_dir = target_dir
         os.makedirs(target_dir, exist_ok=True)
 
-        # compress rate
-        self.compress_rate = compress_rate or 0.2
-
         logger.debug(f'target dir: {target_dir}')
-        logger.debug(f'compress rate: {compress_rate}')
 
     @change_origin
     def do(self,
@@ -91,29 +125,23 @@ class FrameSaveHook(BaseHook):
            frame: np.ndarray,
            *_, **__) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
-        compressed = toolbox.compress_frame(frame, compress_rate=self.compress_rate)
         target_path = os.path.join(self.target_dir, f'{frame_id}.png')
-        cv2.imwrite(target_path, compressed)
+        cv2.imwrite(target_path, frame)
         logger.debug(f'frame saved to {target_path}')
         return
 
 
 class InvalidFrameDetectHook(BaseHook):
     def __init__(self,
-                 compress_rate: float = None,
                  black_threshold: float = None,
                  white_threshold: float = None,
                  *_, **__):
         super().__init__(*_, **__)
 
-        # compress rate
-        self.compress_rate = compress_rate or 0.2
-
         # threshold
         self.black_threshold = black_threshold or 0.95
         self.white_threshold = white_threshold or 0.9
 
-        logger.debug(f'compress rate: {compress_rate}')
         logger.debug(f'black threshold: {black_threshold}')
         logger.debug(f'white threshold: {white_threshold}')
 
@@ -123,11 +151,10 @@ class InvalidFrameDetectHook(BaseHook):
            frame: np.ndarray,
            *_, **__) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
-        compressed = toolbox.compress_frame(frame, compress_rate=self.compress_rate)
-        black = np.zeros([*compressed.shape, 3], np.uint8)
+        black = np.zeros([*frame.shape, 3], np.uint8)
         white = black + 255
-        black_ssim = toolbox.compare_ssim(black, compressed)
-        white_ssim = toolbox.compare_ssim(white, compressed)
+        black_ssim = toolbox.compare_ssim(black, frame)
+        white_ssim = toolbox.compare_ssim(white, frame)
         logger.debug(f'black: {black_ssim}; white: {white_ssim}')
 
         self.result[frame_id] = {
