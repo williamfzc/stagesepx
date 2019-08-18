@@ -52,9 +52,10 @@ class VideoCutter(object):
         else:
             return True
 
-    def _apply_hook(self, frame_id: int, frame: np.ndarray, *args, **kwargs):
+    def _apply_hook(self, frame_id: int, frame: np.ndarray, *args, **kwargs) -> np.ndarray:
         for each_hook in self._hook_list:
-            each_hook.do(frame_id, frame, *args, **kwargs)
+            frame = each_hook.do(frame_id, frame, *args, **kwargs)
+        return frame
 
     def _convert_video_into_ssim_list(self,
                                       video: VideoObject,
@@ -79,7 +80,7 @@ class VideoCutter(object):
             end_frame_time = toolbox.get_current_frame_time(cap)
 
             # hook
-            self._apply_hook(start_frame_id, start)
+            start = self._apply_hook(start_frame_id, start)
 
             # compress
             start = toolbox.compress_frame(start, **kwargs)
@@ -91,7 +92,7 @@ class VideoCutter(object):
 
             while ret:
                 # hook
-                self._apply_hook(end_frame_id, end, *args, **kwargs)
+                end = self._apply_hook(end_frame_id, end, *args, **kwargs)
 
                 end = toolbox.compress_frame(end, **kwargs)
                 logger.debug(f'computing {start_frame_id}({start_frame_time}) & {end_frame_id}({end_frame_time}) ...')

@@ -137,9 +137,10 @@ class BaseClassifier(object):
                         *args, **kwargs) -> str:
         raise NotImplementedError('must implement this function')
 
-    def _apply_hook(self, frame_id: int, frame: np.ndarray, *args, **kwargs):
+    def _apply_hook(self, frame_id: int, frame: np.ndarray, *args, **kwargs) -> np.ndarray:
         for each_hook in self._hook_list:
-            each_hook.do(frame_id, frame, *args, **kwargs)
+            frame = each_hook.do(frame_id, frame, *args, **kwargs)
+        return frame
 
     def classify(self,
                  video_path: str,
@@ -175,7 +176,7 @@ class BaseClassifier(object):
                         continue
 
                 # hook
-                self._apply_hook(frame_id, frame, *args, **kwargs)
+                frame = self._apply_hook(frame_id, frame, *args, **kwargs)
 
                 result = self._classify_frame(frame_id, frame, cap, *args, **kwargs)
                 logger.debug(f'frame {frame_id} ({frame_timestamp}) belongs to {result}')

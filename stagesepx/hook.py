@@ -9,26 +9,64 @@ from stagesepx import toolbox
 
 
 class BaseHook(object):
-    def __init__(self, *_, **__):
+    def __init__(self, overwrite: bool = None, *_, **__):
         # default: dict
         logger.debug(f'start initialing: {self.__class__.__name__} ...')
         self.result = dict()
+        self.overwrite = bool(overwrite)
 
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__):
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
         logger.debug(f'hook: {self.__class__.__name__}, frame id: {frame_id}')
+        return
+
+
+def change_origin(_func):
+    def _wrap(self: BaseHook, frame_id: int, frame: np.ndarray, *args, **kwargs):
+        res = _func(self, frame_id, frame, *args, **kwargs)
+        if not self.overwrite:
+            return frame
+        if res is not None:
+            logger.debug(f'origin frame has been changed by {self.__class__.__name__}')
+            return res
+        else:
+            return frame
+
+    return _wrap
 
 
 class ExampleHook(BaseHook):
-    def __init__(self):
-        # you can handle result by yourself
-        # change the type, or anything you want
-        super().__init__()
-        self.result = dict()
+    """ this hook will help you write your own hook class """
+    def __init__(self, *_, **__):
+        """
+        hook has two ways to affect the result of analysis
 
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__):
+        1. add your result to self.result (or somewhere else), and get it by yourself after cut or classify
+        2. use label 'overwrite'. by enabling this, hook will changing the origin frame
+        """
+        super().__init__(*_, **__)
+
+        # add your code here
+
+    @change_origin
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
+
+        # you can get frame_id and frame data here
+        # and use them to custom your own function
+        # add your code here
+
+        # for example, i want to turn grey, and save size of each frames
         frame = toolbox.turn_grey(frame)
         self.result[frame_id] = frame.shape
+
+        # if you are going to change the origin frame
+        # just return the changed frame
+        # and set 'overwrite' to 'True' when you are calling __init__
+        return frame
+
+        # for safety, if you do not want to modify the origin frame
+        # you can return a 'None' instead of frame
+        # and nothing will happen even if setting 'overwrite' to 'True'
 
 
 class FrameSaveHook(BaseHook):
@@ -47,15 +85,17 @@ class FrameSaveHook(BaseHook):
         logger.debug(f'target dir: {target_dir}')
         logger.debug(f'compress rate: {compress_rate}')
 
+    @change_origin
     def do(self,
            frame_id: int,
            frame: np.ndarray,
-           *_, **__):
+           *_, **__) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
         compressed = toolbox.compress_frame(frame, compress_rate=self.compress_rate)
         target_path = os.path.join(self.target_dir, f'{frame_id}.png')
         cv2.imwrite(target_path, compressed)
         logger.debug(f'frame saved to {target_path}')
+        return
 
 
 class InvalidFrameDetectHook(BaseHook):
@@ -77,10 +117,11 @@ class InvalidFrameDetectHook(BaseHook):
         logger.debug(f'black threshold: {black_threshold}')
         logger.debug(f'white threshold: {white_threshold}')
 
+    @change_origin
     def do(self,
            frame_id: int,
            frame: np.ndarray,
-           *_, **__):
+           *_, **__) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
         compressed = toolbox.compress_frame(frame, compress_rate=self.compress_rate)
         black = np.zeros([*compressed.shape, 3], np.uint8)
@@ -93,6 +134,7 @@ class InvalidFrameDetectHook(BaseHook):
             'black': black_ssim,
             'white': white_ssim,
         }
+        return
 
 
 class TemplateCompareHook(BaseHook):
@@ -112,13 +154,23 @@ class TemplateCompareHook(BaseHook):
         self.fi = FindIt(*args, **kwargs)
         self.template_dict = template_dict
 
+    @change_origin
     def do(self,
            frame_id: int,
            frame: np.ndarray,
-           *_, **__):
+           *_, **__) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
         for each_template_name, each_template_path in self.template_dict.items():
             self.fi.load_template(each_template_name, each_template_path)
         res = self.fi.find(str(frame_id), target_pic_object=frame)
-        logger.debug(f'compare with template {each_template_name}: {res}')
+        logger.debug(f'compare with template {self.template_dict}: {res}')
         self.result[frame_id] = res
+        return
+
+
+class BinaryHook(BaseHook):
+    @change_origin
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+        # TODO not always work
+        super().do(frame_id, frame, *_, **__)
+        return toolbox.turn_binary(frame)

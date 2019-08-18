@@ -97,8 +97,10 @@ def turn_grey(old: np.ndarray) -> np.ndarray:
 
 
 def turn_binary(old: np.ndarray) -> np.ndarray:
-    thresh = threshold_otsu(old)
-    return old > thresh
+    # TODO not always work
+    grey = turn_grey(old)
+    thresh = threshold_otsu(grey)
+    return (grey > thresh).astype(np.uint8)
 
 
 def turn_hog_desc(old: np.ndarray) -> np.ndarray:
