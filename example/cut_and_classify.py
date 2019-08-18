@@ -12,6 +12,12 @@ cutter = VideoCutter(
     # 设定为2时，会以2帧为一个单位进行遍历
     # 即跳过一帧
     step=1,
+    # 默认为0.2，即将图片缩放为0.2倍
+    # 主要为了提高计算效率
+    # 如果你担心影响分析效果，可以将其提高
+    compress_rate=0.2,
+    # 或者直接指定尺寸
+    target_size=(200, 400),
 )
 
 # 在 0.4.2 之后，hook特性正式被加入：https://github.com/williamfzc/stagesepx/issues/22
@@ -26,10 +32,6 @@ cutter.add_hook(hook1)
 # 开始切割
 res = cutter.cut(
     video_path,
-    # 默认为0.2，即将图片缩放为0.2倍
-    # 主要为了提高计算效率
-    # 如果你担心影响分析效果，可以将其提高
-    compress_rate=0.2,
     # block 能够对每帧进行切割并分别进行比较，计算出更加敏感的ssim值
     # 默认为2，即切为4宫格；若为4，即切为16宫格，以此类推；为1即不做切割，全图比较
     # 值得注意，如果无法整除，block是会报错的
