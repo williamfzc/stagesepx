@@ -1,18 +1,6 @@
-<h1 align="center">
-  <img src="./docs/pics/brand.svg">
-</h1>
+## stagesepx 是什么
 
-<h3 align="center">stage sep(aration) x</h3>
-<p align="center">
-    <em>detect stages in video automatically</em>
-</p>
-
----
-[![PyPI version](https://badge.fury.io/py/stagesepx.svg)](https://badge.fury.io/py/stagesepx)
-[![Build Status](https://travis-ci.org/williamfzc/stagesepx.svg?branch=master)](https://travis-ci.org/williamfzc/stagesepx)
-[![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability)
-
----
+轻量化的、基于图像处理与机器学习的、全自动的视频分析工具。它提供了丰富的可定制性，能够根据你的实际需求分析视频并将其拆分为一系列阶段。在此之后，你可以清晰地得知视频包含了几个阶段、以及每个阶段发生了什么。而这一切都是自动完成的。
 
 ## stagesepx 能做什么
 
@@ -43,11 +31,3 @@ stagesepx能够**自动侦测**并提取视频中的稳定或不稳定的阶段�
 [![thumbnail.png](https://i.loli.net/2019/07/25/5d3955365dff977571.png)](https://i.loli.net/2019/07/25/5d3955365dff977571.png)
 
 **而所有的一切只需要一个视频，无需前置模板、无需提前学习。**
-
-## 使用及原理
-
-请移步 [官方文档](https://williamfzc.github.io/stagesepx/) 
-
-## License
-
-[MIT](LICENSE)
