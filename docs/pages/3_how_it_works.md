@@ -37,7 +37,7 @@ hook是在 0.4.2 版本之后被加入的概念，它被用于支撑**帧级别*
 
 !> hook的执行是严格按照添加的顺序的，hook之间可能会存在干扰。overwrite参数被用于控制hook是否会修改原始的帧，具体使用可参考 [完整例子](https://github.com/williamfzc/stagesepx/blob/master/example/cut_and_classify.py)。
 
-## 设计理念 与 定位
+## 设计理念与定位
 
 ?> stagesepx的定位是，轻量化的、基于图像处理与机器学习的、全自动的视频分析工具。
 
