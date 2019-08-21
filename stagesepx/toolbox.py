@@ -132,6 +132,24 @@ def turn_lbp_desc(old: np.ndarray, radius: int = None) -> np.ndarray:
     return lbp
 
 
+def sharpen_frame(old: np.ndarray) -> np.ndarray:
+    """
+    refine the edges of an image
+
+    - https://answers.opencv.org/question/121205/how-to-refine-the-edges-of-an-image/
+    - https://stackoverflow.com/questions/4993082/how-to-sharpen-an-image-in-opencv
+
+    :param old:
+    :return:
+    """
+
+    # TODO these args is locked and can not be changed
+    blur = cv2.GaussianBlur(old, (5, 5), 0)
+    smooth = cv2.addWeighted(blur, 1.5, old, -0.5, 0)
+    canny = cv2.Canny(smooth, 50, 150)
+    return canny
+
+
 def compress_frame(old: np.ndarray,
                    compress_rate: float = None,
                    target_size: typing.Tuple[int, int] = None,
@@ -159,7 +177,6 @@ def compress_frame(old: np.ndarray,
     """
 
     target = turn_grey(old) if not not_grey else old
-    target = cv2.bilateralFilter(target, 9, 75, 75)
 
     if not interpolation:
         interpolation = cv2.INTER_AREA
@@ -181,4 +198,5 @@ def get_timestamp_str() -> str:
 
 if __name__ == '__main__':
     t = cv2.imread('../1.png', cv2.IMREAD_GRAYSCALE)
-    turn_surf_desc(t)
+    t = sharpen_frame(t)
+    cv2.imwrite('a.png', t)

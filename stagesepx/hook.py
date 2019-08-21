@@ -105,6 +105,15 @@ class GreyHook(BaseHook):
         return toolbox.turn_grey(frame)
 
 
+class RefineHook(BaseHook):
+    """ this hook was built for refining the edges of images """
+
+    @change_origin
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+        super().do(frame_id, frame, *_, **__)
+        return toolbox.sharpen_frame(frame)
+
+
 # --- inner hook end ---
 
 class FrameSaveHook(BaseHook):
