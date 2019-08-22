@@ -10,7 +10,7 @@
 ---
 
 [![PyPI version](https://badge.fury.io/py/stagesepx.svg)](https://badge.fury.io/py/stagesepx)
-[![Actions Status](https://wdp9fww0r9.execute-api.us-west-2.amazonaws.com/production/badge/williamfzc/stagesepx)](https://wdp9fww0r9.execute-api.us-west-2.amazonaws.com/production/results/williamfzc/stagesepx)
+![actions](https://action-badges.now.sh/williamfzc/stagesepx)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability)
 
 ---
