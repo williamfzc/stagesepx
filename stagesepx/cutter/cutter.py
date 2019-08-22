@@ -74,7 +74,7 @@ class VideoCutter(object):
         if not block:
             block = 2
 
-        ssim_list = list()
+        range_list: typing.List[VideoCutRange] = list()
         with toolbox.video_capture(video.path) as cap:
             logger.debug(f'total frame count: {video.frame_count}, size: {video.frame_size}')
 
@@ -104,21 +104,28 @@ class VideoCutter(object):
                 start_part_list = self.pic_split(start, block)
                 end_part_list = self.pic_split(end, block)
 
-                # find the min ssim
+                # find the min ssim and the max mse
                 ssim = 1.
+                mse = 0.
                 for part_index, (each_start, each_end) in enumerate(zip(start_part_list, end_part_list)):
                     part_ssim = toolbox.compare_ssim(each_start, each_end)
                     if part_ssim < ssim:
                         ssim = part_ssim
-                    logger.debug(f'part {part_index}: {part_ssim}')
-                logger.debug(f'ssim between {start_frame_id} & {end_frame_id}: {ssim}')
 
-                ssim_list.append(
+                    # mse is very sensitive
+                    part_mse = toolbox.calc_mse(each_start, each_end)
+                    if part_mse > mse:
+                        mse = part_mse
+                    logger.debug(f'part {part_index}: ssim={part_ssim}; mse={part_mse}')
+                logger.debug(f'between {start_frame_id} & {end_frame_id}: ssim={ssim}; mse={mse}')
+
+                range_list.append(
                     VideoCutRange(
                         video,
                         start=start_frame_id,
                         end=end_frame_id,
                         ssim=[ssim],
+                        mse=[mse],
                         start_time=start_frame_time,
                         end_time=end_frame_time,
                     )
@@ -133,7 +140,7 @@ class VideoCutter(object):
                 ret, end = cap.read()
                 end_frame_time = toolbox.get_current_frame_time(cap)
 
-        return ssim_list
+        return range_list
 
     def cut(self, video_path: str, *args, **kwargs) -> VideoCutResult:
         """

@@ -128,6 +128,7 @@ class VideoCutResult(object):
                     video_start_frame_id,
                     video_end_frame_id,
                     [1.],
+                    [0.],
                     video_start_timestamp,
                     video_end_timestamp
                 )],
@@ -152,6 +153,7 @@ class VideoCutResult(object):
                     video_start_frame_id,
                     first_stable_range_end_id,
                     [1.],
+                    [0.],
                     video_start_timestamp,
                     self.get_target_range_by_id(first_stable_range_end_id).end_time,
                 )
@@ -169,6 +171,7 @@ class VideoCutResult(object):
                     end_stable_range_start_id,
                     video_end_frame_id,
                     [1.],
+                    [0.],
                     self.get_target_range_by_id(end_stable_range_start_id).end_time,
                     video_end_timestamp,
                 )
@@ -195,6 +198,7 @@ class VideoCutResult(object):
                     range_start_id,
                     range_end_id,
                     [1.],
+                    [0.],
                     self.get_target_range_by_id(range_start_id).end_time,
                     self.get_target_range_by_id(range_end_id).end_time,
                 )

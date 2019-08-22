@@ -111,6 +111,10 @@ def turn_hog_desc(old: np.ndarray) -> np.ndarray:
         cells_per_block=(1, 1),
         block_norm='L2-Hys',
         visualize=True)
+
+    # also available with opencv-python
+    # hog = cv2.HOGDescriptor()
+    # return hog.compute(old)
     return fd
 
 
@@ -132,6 +136,11 @@ def turn_lbp_desc(old: np.ndarray, radius: int = None) -> np.ndarray:
     return lbp
 
 
+def turn_blur(old: np.ndarray) -> np.ndarray:
+    # TODO these args are locked and can not be changed
+    return cv2.GaussianBlur(old, (7, 7), 0)
+
+
 def sharpen_frame(old: np.ndarray) -> np.ndarray:
     """
     refine the edges of an image
@@ -144,10 +153,15 @@ def sharpen_frame(old: np.ndarray) -> np.ndarray:
     """
 
     # TODO these args are locked and can not be changed
-    blur = cv2.GaussianBlur(old, (5, 5), 0)
+    blur = turn_blur(old)
     smooth = cv2.addWeighted(blur, 1.5, old, -0.5, 0)
     canny = cv2.Canny(smooth, 50, 150)
     return canny
+
+
+def calc_mse(pic1: np.ndarray, pic2: np.ndarray) -> float:
+    # MSE: https://en.wikipedia.org/wiki/Mean_squared_error
+    return np.sum((pic1.astype('float') - pic2.astype('float')) ** 2) / float(pic1.shape[0] * pic2.shape[1])
 
 
 def compress_frame(old: np.ndarray,

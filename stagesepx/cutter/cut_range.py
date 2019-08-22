@@ -16,6 +16,7 @@ class VideoCutRange(object):
                  start: int,
                  end: int,
                  ssim: typing.List[float],
+                 mse: typing.List[float],
                  start_time: float,
                  end_time: float):
         if isinstance(video, dict):
@@ -26,6 +27,7 @@ class VideoCutRange(object):
         self.start = start
         self.end = end
         self.ssim = ssim
+        self.mse = mse
         self.start_time = start_time
         self.end_time = end_time
 
@@ -49,6 +51,7 @@ class VideoCutRange(object):
             self.start,
             another.end,
             self.ssim + another.ssim,
+            self.mse + another.mse,
             self.start_time,
             another.end_time,
         )
@@ -135,10 +138,17 @@ class VideoCutRange(object):
     def get_length(self):
         return self.end - self.start + 1
 
-    def is_stable(self, threshold: float = None, **_) -> bool:
+    def is_stable(self, threshold: float = None, mse_threshold: float = None, **_) -> bool:
+        # IMPORTANT function!
+        # it decided whether a range is stable => everything is based on it!
         if not threshold:
             threshold = 0.95
-        return np.mean(self.ssim) > threshold
+
+        # default: disable
+        if not mse_threshold:
+            return np.mean(self.ssim) > threshold
+
+        return np.mean(self.ssim) > threshold and (np.mean(self.mse) < mse_threshold)
 
     def is_loop(self, threshold: float = None, **_) -> bool:
         if not threshold:
