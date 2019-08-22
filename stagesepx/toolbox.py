@@ -143,7 +143,7 @@ def sharpen_frame(old: np.ndarray) -> np.ndarray:
     :return:
     """
 
-    # TODO these args is locked and can not be changed
+    # TODO these args are locked and can not be changed
     blur = cv2.GaussianBlur(old, (5, 5), 0)
     smooth = cv2.addWeighted(blur, 1.5, old, -0.5, 0)
     canny = cv2.Canny(smooth, 50, 150)

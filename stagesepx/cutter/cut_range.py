@@ -108,7 +108,10 @@ class VideoCutRange(object):
         if is_random:
             return random.sample(range(self.start, self.end), frame_count)
         length = self.get_length()
-        for _ in range(frame_count):
+
+        # https://github.com/williamfzc/stagesepx/issues/37
+        frame_count += 1
+        for _ in range(1, frame_count):
             cur = int(self.start + length / frame_count * _)
             result.append(cur)
         return result
