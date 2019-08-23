@@ -104,9 +104,10 @@ class VideoCutter(object):
                 start_part_list = self.pic_split(start, block)
                 end_part_list = self.pic_split(end, block)
 
-                # find the min ssim and the max mse
+                # find the min ssim and the max mse / psnr
                 ssim = 1.
                 mse = 0.
+                psnr = 0.
                 for part_index, (each_start, each_end) in enumerate(zip(start_part_list, end_part_list)):
                     part_ssim = toolbox.compare_ssim(each_start, each_end)
                     if part_ssim < ssim:
@@ -116,8 +117,12 @@ class VideoCutter(object):
                     part_mse = toolbox.calc_mse(each_start, each_end)
                     if part_mse > mse:
                         mse = part_mse
-                    logger.debug(f'part {part_index}: ssim={part_ssim}; mse={part_mse}')
-                logger.debug(f'between {start_frame_id} & {end_frame_id}: ssim={ssim}; mse={mse}')
+
+                    part_psnr = toolbox.calc_psnr(each_start, each_end)
+                    if part_psnr > psnr:
+                        psnr = part_psnr
+                    logger.debug(f'part {part_index}: ssim={part_ssim}; mse={part_mse}; psnr={part_psnr}')
+                logger.debug(f'between {start_frame_id} & {end_frame_id}: ssim={ssim}; mse={mse}; psnr={psnr}')
 
                 range_list.append(
                     VideoCutRange(
@@ -126,6 +131,7 @@ class VideoCutter(object):
                         end=end_frame_id,
                         ssim=[ssim],
                         mse=[mse],
+                        psnr=[psnr],
                         start_time=start_frame_time,
                         end_time=end_frame_time,
                     )

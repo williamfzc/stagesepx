@@ -172,11 +172,13 @@ class Reporter(object):
         x_axis = [str(i.start) for i in data.range_list]
         ssim_axis = [i.ssim for i in data.range_list]
         mse_axis = [i.mse for i in data.range_list]
+        psnr_axis = [i.psnr for i in data.range_list]
 
         line = Line()
         line.add_xaxis(x_axis)
         line.add_yaxis('ssim', ssim_axis)
         line.add_yaxis('mse', mse_axis)
+        line.add_yaxis('psnr', psnr_axis)
         line.set_global_opts(
             title_opts=opts.TitleOpts(title='SIM'),
             toolbox_opts=opts.ToolboxOpts(is_show=True),

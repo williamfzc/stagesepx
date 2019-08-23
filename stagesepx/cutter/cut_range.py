@@ -15,8 +15,12 @@ class VideoCutRange(object):
                  video: typing.Union[VideoObject, typing.Dict],
                  start: int,
                  end: int,
+
+                 # TODO need refactored ?
                  ssim: typing.List[float],
                  mse: typing.List[float],
+                 psnr: typing.List[float],
+
                  start_time: float,
                  end_time: float):
         if isinstance(video, dict):
@@ -28,6 +32,7 @@ class VideoCutRange(object):
         self.end = end
         self.ssim = ssim
         self.mse = mse
+        self.psnr = psnr
         self.start_time = start_time
         self.end_time = end_time
 
@@ -52,6 +57,7 @@ class VideoCutRange(object):
             another.end,
             self.ssim + another.ssim,
             self.mse + another.mse,
+            self.psnr + another.psnr,
             self.start_time,
             another.end_time,
         )
@@ -138,17 +144,27 @@ class VideoCutRange(object):
     def get_length(self):
         return self.end - self.start + 1
 
-    def is_stable(self, threshold: float = None, mse_threshold: float = None, **_) -> bool:
+    def is_stable(self,
+                  threshold: float = None,
+                  mse_threshold: float = None,
+                  psnr_threshold: float = None,
+                  **_) -> bool:
         # IMPORTANT function!
         # it decided whether a range is stable => everything is based on it!
         if not threshold:
             threshold = 0.95
 
-        # default: disable
-        if not mse_threshold:
-            return np.mean(self.ssim) > threshold
+        # base
+        res = np.mean(self.ssim) > threshold
 
-        return np.mean(self.ssim) > threshold and (np.mean(self.mse) < mse_threshold)
+        # default: disable
+        if mse_threshold:
+            res = res and np.mean(self.mse) < mse_threshold
+        # default: disable
+        if psnr_threshold:
+            res = res and np.mean(self.psnr) < psnr_threshold
+
+        return res
 
     def is_loop(self, threshold: float = None, **_) -> bool:
         if not threshold:
