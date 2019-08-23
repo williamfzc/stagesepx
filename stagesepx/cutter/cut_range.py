@@ -153,14 +153,16 @@ class VideoCutRange(object):
         # it decided whether a range is stable => everything is based on it!
         if not threshold:
             threshold = 0.95
+        if not mse_threshold:
+            mse_threshold = 0.7
 
-        # base
+        # ssim
         res = np.mean(self.ssim) > threshold
+        # mse
+        res = res and np.mean(self.mse) < mse_threshold
 
-        # default: disable
-        if mse_threshold:
-            res = res and np.mean(self.mse) < mse_threshold
-        # default: disable
+        # default: disable if no threshold
+        # usually, ssim + mse is enough
         if psnr_threshold:
             res = res and np.mean(self.psnr) < psnr_threshold
 
