@@ -9,6 +9,7 @@ from loguru import logger
 
 from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
+from stagesepx.cutter import VideoCutResult
 
 TEMPLATE = r'''
 <!DOCTYPE html>
@@ -167,6 +168,24 @@ class Reporter(object):
         return line
 
     @staticmethod
+    def _draw_sim(data: VideoCutResult) -> Line:
+        x_axis = [str(i.start) for i in data.range_list]
+        ssim_axis = [i.ssim for i in data.range_list]
+        mse_axis = [i.mse for i in data.range_list]
+
+        line = Line()
+        line.add_xaxis(x_axis)
+        line.add_yaxis('ssim', ssim_axis)
+        line.add_yaxis('mse', mse_axis)
+        line.set_global_opts(
+            title_opts=opts.TitleOpts(title='SIM'),
+            toolbox_opts=opts.ToolboxOpts(is_show=True),
+            tooltip_opts=opts.TooltipOpts(is_show=True, trigger='axis', axis_pointer_type='cross'),
+        )
+        line.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
+        return line
+
+    @staticmethod
     def _draw_bar(data_list: typing.List[ClassifierResult]) -> Bar:
         # draw bar chart
         bar = Bar()
@@ -189,12 +208,14 @@ class Reporter(object):
 
     def draw(self,
              data_list: typing.List[ClassifierResult],
-             report_path: str = None):
+             report_path: str = None,
+             cut_result: VideoCutResult = None):
         """
         draw report file
 
         :param data_list: classifierResult list, output of classifier
         :param report_path: your report will be there
+        :param cut_result: more charts would be built
         :return:
         """
 
@@ -206,6 +227,10 @@ class Reporter(object):
         page = Page()
         page.add(line)
         page.add(bar)
+
+        if cut_result:
+            sim_line = self._draw_sim(cut_result)
+            page.add(sim_line)
 
         # insert extras
         template = Template(TEMPLATE)

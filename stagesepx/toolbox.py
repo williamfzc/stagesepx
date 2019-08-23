@@ -6,6 +6,7 @@ import typing
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim as origin_compare_ssim
+from skimage.measure import compare_nrmse, compare_psnr
 from skimage.feature import hog, local_binary_pattern
 
 
@@ -161,7 +162,13 @@ def sharpen_frame(old: np.ndarray) -> np.ndarray:
 
 def calc_mse(pic1: np.ndarray, pic2: np.ndarray) -> float:
     # MSE: https://en.wikipedia.org/wiki/Mean_squared_error
-    return np.sum((pic1.astype('float') - pic2.astype('float')) ** 2) / float(pic1.shape[0] * pic2.shape[1])
+    # return np.sum((pic1.astype('float') - pic2.astype('float')) ** 2) / float(pic1.shape[0] * pic2.shape[1])
+    return compare_nrmse(pic1, pic2)
+
+
+def calc_psnr(pic1: np.ndarray, pic2: np.ndarray) -> float:
+    # PSNR: https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio
+    return compare_psnr(pic1, pic2)
 
 
 def compress_frame(old: np.ndarray,
