@@ -56,6 +56,13 @@ stable, unstable = res.get_range(
     # 越高则越严格（判定为稳定的区间更少）
     # 默认为 0.95 （0-1）
     threshold=0.95,
+    # 利用 psnr 进行增强型的检测
+    # 0.5.3加入的特性，默认关闭（float，0-1）
+    # 设定后，它将对被认为stable的区间进行二次检测
+    # 例如，设定为0.5时，稳定区间的条件将变为：
+    # ssim > 0.95 and psnr > 0.5
+    # 详见 https://github.com/williamfzc/stagesepx/issues/38
+    psnr_threshold=None,
     # limit 能够过滤掉一些过于短的阶段（你可以用它忽略一些持续时间较短的变化），默认不过滤
     # 例如填入5，持续区间短于 5*step 的会被忽略
     limit=None,
@@ -147,4 +154,9 @@ for each in unstable:
 
 # 在0.3.2及之后的版本，你可以在报告中加入一些自定义内容 （https://github.com/williamfzc/stagesepx/issues/13）
 # r.add_extra('here is title', 'here is content')
-r.draw(classify_result)
+r.draw(
+    classify_result,
+    # 0.5.3新增的特性，多用于debug
+    # 传入cutter的切割结果，能够在图表末尾追加 SSIM、MSE、PSNR 的变化趋势图
+    cut_result=res,
+)
