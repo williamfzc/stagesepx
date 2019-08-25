@@ -17,7 +17,8 @@ cutter = VideoCutter(
     # 如果你担心影响分析效果，可以将其提高
     compress_rate=0.2,
     # 或者直接指定尺寸
-    target_size=(200, 400),
+    # 当压缩率与指定尺寸同时传入时，优先以指定尺寸为准
+    # target_size=(200, 400),
 )
 
 # 在 0.4.2 之后，hook特性正式被加入：https://williamfzc.github.io/stagesepx/#/pages/3_how_it_works?id=hook
@@ -74,9 +75,9 @@ stable, unstable = res.get_range(
 data_home = res.pick_and_save(
     # 这里的例子是对稳定区间进行采样
     stable,
-    # 每段区间的采样数，3即每个阶段等距离截取3张图片
+    # 每段区间的采样数，5即每个阶段等距离截取5张图片
     # 如果涉及机器学习，建议将此值提高
-    3,
+    5,
     # 采样结果保存的位置
     # 不指定的话则会在当前位置生成文件夹并返回它的路径
     # './cut_result',
