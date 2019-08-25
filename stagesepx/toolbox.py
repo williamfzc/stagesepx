@@ -168,7 +168,7 @@ def calc_mse(pic1: np.ndarray, pic2: np.ndarray) -> float:
 
 def calc_psnr(pic1: np.ndarray, pic2: np.ndarray) -> float:
     # PSNR: https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio
-    return compare_psnr(pic1, pic2)
+    return compare_psnr(pic1, pic2) / 100
 
 
 def compress_frame(old: np.ndarray,

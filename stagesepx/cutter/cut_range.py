@@ -146,25 +146,18 @@ class VideoCutRange(object):
 
     def is_stable(self,
                   threshold: float = None,
-                  mse_threshold: float = None,
                   psnr_threshold: float = None,
                   **_) -> bool:
         # IMPORTANT function!
         # it decided whether a range is stable => everything is based on it!
         if not threshold:
             threshold = 0.95
-        if not mse_threshold:
-            mse_threshold = 0.7
 
         # ssim
         res = np.mean(self.ssim) > threshold
-        # mse
-        res = res and np.mean(self.mse) < mse_threshold
-
-        # default: disable if no threshold
-        # usually, ssim + mse is enough
-        if psnr_threshold:
-            res = res and np.mean(self.psnr) < psnr_threshold
+        # psnr (double check if stable)
+        if res and psnr_threshold:
+            res = np.mean(self.psnr) > psnr_threshold
 
         return res
 
