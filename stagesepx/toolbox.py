@@ -3,6 +3,7 @@ import contextlib
 import time
 import random
 import typing
+import math
 import numpy as np
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim as origin_compare_ssim
@@ -168,7 +169,12 @@ def calc_mse(pic1: np.ndarray, pic2: np.ndarray) -> float:
 
 def calc_psnr(pic1: np.ndarray, pic2: np.ndarray) -> float:
     # PSNR: https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio
-    return compare_psnr(pic1, pic2) / 100
+    psnr = compare_psnr(pic1, pic2)
+    # when err == 0, psnr will be 'inf'
+    if math.isinf(psnr):
+        psnr = 100.
+    # normalize
+    return psnr / 100
 
 
 def compress_frame(old: np.ndarray,
