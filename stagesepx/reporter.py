@@ -234,6 +234,16 @@ class Reporter(object):
             sim_line = self._draw_sim(cut_result)
             page.add(sim_line)
 
+            # insert thumbnail
+            if not self.thumbnail_list:
+                logger.debug('auto insert thumbnail ...')
+                _, unstable = cut_result.get_range()
+                for each in unstable:
+                    self.add_thumbnail(
+                        f'{each.start}({each.start_time}) - {each.end}({each.end_time})',
+                        cut_result.thumbnail(each),
+                    )
+
         # insert extras
         template = Template(TEMPLATE)
         template_content = template.render(
