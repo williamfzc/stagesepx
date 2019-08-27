@@ -367,33 +367,41 @@ class VideoCutResult(object):
         :param kwargs:
         :return:
         """
-        raw = self._diff(another, *args, **kwargs)
+        self_stable, _ = self.get_range(*args, **kwargs)
+        another_stable, _ = another.get_range(*args, **kwargs)
+
+        result = dict()
+        result['self'] = self_stable
+        result['another'] = another_stable
+        result['data'] = self.range_diff(self_stable, another_stable, *args, **kwargs)
+
         if not auto_merge:
-            return raw
+            return result
+
         after = dict()
-        for self_stage_name, each_result in raw.items():
+        for self_stage_name, each_result in result['data'].items():
             max_one = sorted(each_result.items(), key=lambda x: max(x[1]))[-1]
             max_one = (max_one[0], max(max_one[1]))
             after[self_stage_name] = max_one
         return after
 
-    def _diff(self, another: 'VideoCutResult', *args, **kwargs) -> typing.Dict:
-        self_stable, _ = self.get_range(*args, **kwargs)
-        another_stable, _ = another.get_range(*args, **kwargs)
-
+    @staticmethod
+    def range_diff(
+            range_list_1: typing.List[VideoCutRange],
+            range_list_2: typing.List[VideoCutRange],
+            *args, **kwargs) -> typing.Dict:
         # 1. stage length compare
-        self_stable_range_count = len(self_stable)
-        another_stable_range_count = len(another_stable)
+        self_stable_range_count = len(range_list_1)
+        another_stable_range_count = len(range_list_2)
         if self_stable_range_count != another_stable_range_count:
             logger.warning(f'stage counts not equal: {self_stable_range_count} & {another_stable_range_count}')
 
         # 2. stage content compare
         # TODO will load these pictures in memory at the same time
-        result = dict()
-        for self_id, each_self_range in enumerate(self_stable):
+        data = dict()
+        for self_id, each_self_range in enumerate(range_list_1):
             temp = dict()
-            for another_id, another_self_range in enumerate(another_stable):
+            for another_id, another_self_range in enumerate(range_list_2):
                 temp[another_id] = each_self_range.diff(another_self_range, *args, **kwargs)
-            result[self_id] = temp
-
-        return result
+            data[self_id] = temp
+        return data

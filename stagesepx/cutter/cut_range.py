@@ -176,6 +176,6 @@ class VideoCutRange(object):
         return toolbox.multi_compare_ssim(self_picked, another_picked)
 
     def __str__(self):
-        return f'<VideoCutRange [{self.start}-{self.end}] ssim={self.ssim}>'
+        return f'<VideoCutRange [{self.start}({self.start_time})-{self.end}({self.end_time})] ssim={self.ssim}>'
 
     __repr__ = __str__
