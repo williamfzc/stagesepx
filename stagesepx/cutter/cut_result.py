@@ -393,7 +393,7 @@ class VideoCutResult(object):
         for self_id, each_self_range in enumerate(self_stable):
             temp = dict()
             for another_id, another_self_range in enumerate(another_stable):
-                temp[another_id] = each_self_range.diff(another_self_range)
+                temp[another_id] = each_self_range.diff(another_self_range, *args, **kwargs)
             result[self_id] = temp
 
         return result
