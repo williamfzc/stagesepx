@@ -238,8 +238,10 @@ class VideoCutResult(object):
         # direction
         if is_vertical:
             stack_func = np.vstack
+            def get_split_line(f): return np.zeros((5, f.shape[1]))
         else:
             stack_func = np.hstack
+            def get_split_line(f): return np.zeros((f.shape[0], 5))
 
         frame_list = list()
         with toolbox.video_capture(self.video.path) as cap:
@@ -250,6 +252,7 @@ class VideoCutResult(object):
             while ret and count <= length:
                 frame = toolbox.compress_frame(frame, compress_rate)
                 frame_list.append(frame)
+                frame_list.append(get_split_line(frame))
                 ret, frame = cap.read()
                 count += 1
         merged = stack_func(frame_list)

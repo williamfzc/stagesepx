@@ -211,7 +211,8 @@ class Reporter(object):
     def draw(self,
              data_list: typing.List[ClassifierResult],
              report_path: str = None,
-             cut_result: VideoCutResult = None):
+             cut_result: VideoCutResult = None,
+             *args, **kwargs):
         """
         draw report file
 
@@ -241,7 +242,7 @@ class Reporter(object):
                 for each in unstable:
                     self.add_thumbnail(
                         f'{each.start}({each.start_time}) - {each.end}({each.end_time})',
-                        cut_result.thumbnail(each),
+                        cut_result.thumbnail(each, *args, **kwargs),
                     )
 
         # insert extras
