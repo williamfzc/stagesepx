@@ -158,7 +158,7 @@ class Reporter(object):
         line.add_xaxis(x_axis)
         line.add_yaxis("stage",
                        y_axis,
-                       is_step=True,
+                       is_step=False,
                        is_symbol_show=True)
         line.set_global_opts(
             title_opts=opts.TitleOpts(title='Trend'),
