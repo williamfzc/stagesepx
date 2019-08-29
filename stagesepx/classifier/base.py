@@ -20,6 +20,11 @@ class ClassifierResult(object):
         self.timestamp = timestamp
         self.stage = stage
 
+    def __str__(self):
+        return f'<ClassifierResult stage={self.stage} frame_id={self.frame_id} timestamp={self.timestamp}>'
+
+    __repr__ = __str__
+
 
 class BaseClassifier(object):
     def __init__(self,

@@ -208,6 +208,35 @@ class Reporter(object):
         logger.debug(f'time cost: {dict(zip(x_axis, y_axis))}')
         return bar
 
+    @staticmethod
+    def calc_changing_cost(data_list: typing.List[ClassifierResult]) -> typing.Dict[str, float]:
+        # add changing cost
+        changing_flag: str = r'-1'
+        cost_dict: typing.Dict[str, float] = {}
+        i = 0
+        while i < len(data_list) - 1:
+            cur = data_list[i]
+            next_one = data_list[i + 1]
+
+            # next one is changing
+            if next_one.stage == changing_flag:
+                for j in range(i + 1, len(data_list)):
+                    i = j
+                    next_one = data_list[j]
+                    if next_one.stage != changing_flag:
+                        break
+
+                # a little weird, as a key
+                changing_name = (f'{cur.stage}(frame id={cur.frame_id} / time={cur.timestamp})'
+                                 f' - '
+                                 f'{next_one.stage}(frame id={next_one.frame_id} / time={next_one.timestamp})')
+
+                cost = next_one.timestamp - cur.timestamp
+                cost_dict[changing_name] = cost
+            else:
+                i += 1
+        return cost_dict
+
     def draw(self,
              data_list: typing.List[ClassifierResult],
              report_path: str = None,
@@ -230,6 +259,16 @@ class Reporter(object):
         page = Page()
         page.add(line)
         page.add(bar)
+
+        # calc time cost
+        cost_dict = self.calc_changing_cost(data_list)
+        # and add it to report
+        for name, cost in cost_dict.items():
+            logger.debug(f'stage {name} cost: {cost}')
+            self.add_extra(
+                f'stage changing cost: {name}',
+                str(cost)
+            )
 
         if cut_result:
             sim_line = self._draw_sim(cut_result)
