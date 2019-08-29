@@ -5,6 +5,7 @@ import random
 import typing
 import math
 import numpy as np
+from base64 import b64encode
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim as origin_compare_ssim
 from skimage.measure import compare_nrmse, compare_psnr
@@ -221,6 +222,11 @@ def get_timestamp_str() -> str:
     time_str = time.strftime("%Y%m%d%H%M%S", time.localtime())
     salt = random.randint(10, 99)
     return f'{time_str}{salt}'
+
+
+def np2b64str(frame: np.ndarray) -> str:
+    buffer = cv2.imencode(".png", frame)[1].tostring()
+    return b64encode(buffer).decode()
 
 
 if __name__ == '__main__':

@@ -1,8 +1,6 @@
 import typing
 import numpy as np
 from jinja2 import Markup, Template
-from base64 import b64encode
-import cv2
 from pyecharts.charts import Line, Bar, Page
 from pyecharts import options as opts
 from loguru import logger
@@ -37,18 +35,13 @@ TEMPLATE = r'''
     <a class="navbar-brand" href="https://github.com/williamfzc/stagesepx">stagesep x report</a>
 </nav>
 
-{% if dir_link_list %}
+{% if stable_sample %}
 <div class="container">
     <div class="card border-light">
         <div class="card-body">
-            <h2>Raw Pictures</h2>
-            <ul>
-                {% for each_link in dir_link_list %}
-                <li>
-                    <a href="{{ each_link }}">{{ each_link }}</a>
-                </li>
-                {% endfor %}
-            </ul>
+            <h2>Stable Stages</h2>
+            <p> All the stable stages will be shown here. </p>
+            <img src="data:image/png;base64,{{ stable_sample }}"/>
         </div>
     </div>
 </div>
@@ -58,12 +51,31 @@ TEMPLATE = r'''
 <div class="container">
     <div class="card border-light">
         <div class="card-body">
-            <h2>Thumbnail</h2>
+            <h2>Unstable Stages</h2>
+            <p> These pictures show what will happen when stages are changing. </p>
             <ul>
                 {% for name, each_thumbnail in thumbnail_list %}
                 <li>
                     <h3> {{ name }} </h3>
                     <img src="data:image/png;base64,{{ each_thumbnail }}"/>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if dir_link_list %}
+<div class="container">
+    <div class="card border-light">
+        <div class="card-body">
+            <h2>Raw Pictures</h2>
+            <p> You can access pictures directory via these links below. </p>
+            <ul>
+                {% for each_link in dir_link_list %}
+                <li>
+                    <a href="{{ each_link }}">{{ each_link }}</a>
                 </li>
                 {% endfor %}
             </ul>
@@ -134,8 +146,7 @@ class Reporter(object):
         :param pic_object:
         :return:
         """
-        buffer = cv2.imencode(".png", pic_object)[1].tostring()
-        b64_str = b64encode(buffer).decode()
+        b64_str = toolbox.np2b64str(pic_object)
         self.thumbnail_list.append((name, b64_str))
 
     def add_extra(self, name: str, value: str):
@@ -237,6 +248,30 @@ class Reporter(object):
                 i += 1
         return cost_dict
 
+    @staticmethod
+    def get_stable_stage_sample(data_list: typing.List[ClassifierResult], *args, **kwargs) -> np.ndarray:
+        last = data_list[0]
+        picked: typing.List[ClassifierResult] = [last]
+        for each in data_list:
+            # ignore unstable stage
+            if each.stage == '-1':
+                continue
+            if last.stage != each.stage:
+                last = each
+                picked.append(each)
+
+        def get_split_line(f): return np.zeros((f.shape[0], 5))
+
+        with toolbox.video_capture(last.video_path) as cap:
+            frame_list: typing.List[np.ndarray] = []
+            for each in picked:
+                frame = toolbox.get_frame(cap, each.frame_id)
+                frame = toolbox.compress_frame(frame, *args, **kwargs)
+                split_line = get_split_line(frame)
+                frame_list.append(frame)
+                frame_list.append(split_line)
+        return np.hstack(frame_list)
+
     def draw(self,
              data_list: typing.List[ClassifierResult],
              report_path: str = None,
@@ -270,19 +305,26 @@ class Reporter(object):
                 str(cost)
             )
 
+        # insert pictures
         if cut_result:
+            # sim chart
             sim_line = self._draw_sim(cut_result)
             page.add(sim_line)
 
+            _, unstable = cut_result.get_range()
             # insert thumbnail
             if not self.thumbnail_list:
                 logger.debug('auto insert thumbnail ...')
-                _, unstable = cut_result.get_range()
+
                 for each in unstable:
                     self.add_thumbnail(
                         f'{each.start}({each.start_time}) - {each.end}({each.end_time})',
                         cut_result.thumbnail(each, *args, **kwargs),
                     )
+
+        # insert stable frames
+        stable_stage_sample = self.get_stable_stage_sample(data_list, compress_rate=0.2)
+        stable_stage_sample = toolbox.np2b64str(stable_stage_sample)
 
         # insert extras
         template = Template(TEMPLATE)
@@ -290,6 +332,7 @@ class Reporter(object):
             chart=Markup(page.render_embed()),
             dir_link_list=self.dir_link_list,
             thumbnail_list=self.thumbnail_list,
+            stable_sample=stable_stage_sample,
             extras=self.extra_dict,
         )
 
