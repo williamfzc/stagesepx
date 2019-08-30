@@ -9,6 +9,7 @@ from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
 from stagesepx.cutter import VideoCutResult
 
+BACKGROUND_COLOR = '#fffaf4'
 TEMPLATE = r'''
 <!DOCTYPE html>
 <html lang="en">
@@ -24,9 +25,16 @@ TEMPLATE = r'''
 <style>
     .container {
         margin: 20px;
+        background-color: {{ background_color }};
+    }
+    .card-body {
+        background-color: {{ background_color }};
     }
     .footer {
         margin-bottom: 20px;
+    }
+    body {
+        background-color: {{ background_color }};
     }
 </style>
 
@@ -90,7 +98,7 @@ TEMPLATE = r'''
         <div class="card-body">
             <h2>Extras</h2>
             {% for name, value in extras.items() %}
-            <h3> {{ name }} </h3>
+            <h4> {{ name }} </h4>
             <p> {{ value }} </p>
             {% endfor %}
         </div>
@@ -165,7 +173,7 @@ class Reporter(object):
         x_axis = [str(i.timestamp) for i in data_list]
         y_axis = [i.stage for i in data_list]
 
-        line = Line()
+        line = Line(init_opts=opts.InitOpts(bg_color=BACKGROUND_COLOR))
         line.add_xaxis(x_axis)
         line.add_yaxis("stage",
                        y_axis,
@@ -185,7 +193,7 @@ class Reporter(object):
         mse_axis = [i.mse for i in data.range_list]
         psnr_axis = [i.psnr for i in data.range_list]
 
-        line = Line()
+        line = Line(init_opts=opts.InitOpts(bg_color=BACKGROUND_COLOR))
         line.add_xaxis(x_axis)
         line.add_yaxis('ssim', ssim_axis)
         line.add_yaxis('mse', mse_axis)
@@ -201,7 +209,7 @@ class Reporter(object):
     @staticmethod
     def _draw_bar(data_list: typing.List[ClassifierResult]) -> Bar:
         # draw bar chart
-        bar = Bar()
+        bar = Bar(init_opts=opts.InitOpts(bg_color=BACKGROUND_COLOR))
         x_axis = sorted(list(set([i.stage for i in data_list])))
         y_axis = list()
         offset = data_list[1].timestamp - data_list[0].timestamp
@@ -334,6 +342,7 @@ class Reporter(object):
             thumbnail_list=self.thumbnail_list,
             stable_sample=stable_stage_sample,
             extras=self.extra_dict,
+            background_color=BACKGROUND_COLOR,
         )
 
         # save to file
