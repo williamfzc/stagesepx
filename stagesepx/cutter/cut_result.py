@@ -75,11 +75,13 @@ class VideoCutResult(object):
 
     def get_range(self,
                   limit: int = None,
+                  unstable_limit: int = None,
                   **kwargs) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
         """
         return stable_range_list and unstable_range_list
 
-        :param limit: ignore some ranges which are too short, 5 means ignore unstable ranges which length < 5
+        :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
+        :param unstable_limit: ignore some ranges which are too short, 5 means ignore unstable ranges which length < 5
         :param kwargs:
             threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
             range_threshold:
@@ -107,7 +109,7 @@ class VideoCutResult(object):
             - start > 0, end = frame_count
             - start = 0, end = frame_count
         """
-        unstable_range_list = self.get_unstable_range(limit, **kwargs)
+        unstable_range_list = self.get_unstable_range(unstable_limit, **kwargs)
 
         # it is not a real frame (not existed)
         # just take it as a beginning
