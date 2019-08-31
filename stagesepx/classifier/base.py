@@ -31,6 +31,11 @@ class BaseClassifier(object):
                  compress_rate: float = None,
                  target_size: typing.Tuple[int, int] = None,
                  *args, **kwargs):
+        # default compress rate is 0.2
+        if (not compress_rate) and (not target_size):
+            logger.debug(f'no compress rate or target size received. set compress rate to 0.2')
+            compress_rate = 0.2
+
         self.compress_rate = compress_rate
         self.target_size = target_size
         logger.debug(f'compress rate: {self.compress_rate}')
