@@ -2,6 +2,7 @@ from stagesepx.cutter import VideoCutter, VideoCutResult
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
 from stagesepx.hook import ExampleHook
+import os
 
 
 video_path = '../demo.mp4'
@@ -79,6 +80,7 @@ stable, unstable = res.get_range(
 # res.thumbnail(unstable[0], to_dir='.')
 
 # 对区间进行采样
+# 采样出来的图片将保存原始尺寸以便后续分析，但会成为灰度图
 data_home = res.pick_and_save(
     # 这里的例子是对稳定区间进行采样
     stable,
@@ -156,6 +158,7 @@ for each in unstable:
 # r.add_extra('here is title', 'here is content')
 r.draw(
     classify_result,
+    report_path=os.path.join(data_home, 'report.html'),
     # 0.5.3新增的特性，多用于debug
     # 传入cutter的切割结果，能够在图表末尾追加 SSIM、MSE、PSNR 的变化趋势图
     cut_result=res,
