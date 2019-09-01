@@ -28,5 +28,11 @@ setup(
         'pyecharts>=1.3.1',
         'findit>=0.5.6',
         'Jinja2>=2.10.1',
-    ]
+        'fire>=0.2.1',
+    ],
+    entry_points={
+        "console_scripts": [
+            "stagesepx = stagesepx.cli:main",
+        ],
+    },
 )
