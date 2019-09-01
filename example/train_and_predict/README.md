@@ -7,12 +7,14 @@
 - 手动校验这些图片集的分类是否符合你的预期
 - 在校验后的训练集上 train 你的模型，并保存
 - 用稳定模型 predict 视频
+- 有业务变更，新建模型或在现有模型上进行二次训练
 
 ## example
 
 - cut 操作参见 `cut.py`
 - train 操作参见 `train.py`
 - predict 操作参见 `predict.py`
+- 二次训练 操作参见 `retrain.py`
 
 ## others
 

@@ -15,7 +15,7 @@ TARGET_VIDEO = '../../demo.mp4'
 # 但这次我们不需要用到 pick_and_save，因为这次 classifier 不会使用 cutter 的数据
 cutter = VideoCutter()
 res = cutter.cut(TARGET_VIDEO)
-stable, unstable = res.get_range()
+stable, _ = res.get_range()
 
 # classify
 # 这里的参数需要保持与train.py一致，如果你有改动的话
@@ -27,9 +27,7 @@ classify_result = cl.classify(
     stable,
 )
 
-# --- draw ---
 r = Reporter()
-
 r.draw(
     classify_result,
     report_path='report.html',

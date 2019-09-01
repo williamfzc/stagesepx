@@ -7,15 +7,7 @@
 from stagesepx.classifier import SVMClassifier
 
 DATA_HOME = './cut_result'
-cl = SVMClassifier(
-    # 默认情况下使用 HoG 进行特征提取
-    # 你可以将其关闭从而直接对原始图片进行训练与测试：feature_type='raw'
-    feature_type='hog',
-    # 默认为0.2，即将图片缩放为0.2倍
-    # 主要为了提高计算效率
-    # 如果你担心影响分析效果，可以将其提高
-    compress_rate=0.2,
-)
+cl = SVMClassifier()
 
 # 加载数据
 cl.load(DATA_HOME)
