@@ -26,12 +26,7 @@ jobs:
     - name: Test example
       run: |
         cd example
-        python cut.py
-        python classify.py
-        python classify_with_svm.py
         python cut_and_classify.py
-        python multi_video.py
-        python mini.py
         cd ..
     - name: Test Cli
       run: |
