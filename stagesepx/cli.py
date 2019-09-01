@@ -16,6 +16,7 @@ class TerminalCli(object):
     def one_step(self,
                  video_path: str,
                  output_path: str = None,
+                 threshold: float = 0.95,
                  frame_count: int = 5,
                  compress_rate: float = 0.2,
                  limit: int = None):
@@ -24,6 +25,7 @@ class TerminalCli(object):
 
         :param video_path: your video path
         :param output_path: output path (dir)
+        :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
         :param frame_count: default to 5, and finally you will get 5 frames for each range
         :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
         :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
@@ -33,7 +35,10 @@ class TerminalCli(object):
         # --- cutter ---
         cutter = VideoCutter()
         res = cutter.cut(video_path, compress_rate=compress_rate)
-        stable, unstable = res.get_range(limit=limit)
+        stable, unstable = res.get_range(
+            threshold=threshold,
+            limit=limit,
+        )
 
         data_home = res.pick_and_save(
             stable,
@@ -60,12 +65,13 @@ class TerminalCli(object):
     def cut(self,
             video_path: str,
             output_path: str = None,
+            threshold: float = 0.95,
             frame_count: int = 5,
             compress_rate: float = 0.2,
             limit: int = None):
         cutter = VideoCutter()
         res = cutter.cut(video_path, compress_rate=compress_rate)
-        stable, unstable = res.get_range(limit=limit)
+        stable, unstable = res.get_range(threshold=threshold, limit=limit)
 
         data_home = res.pick_and_save(
             stable,
