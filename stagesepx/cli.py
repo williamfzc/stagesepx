@@ -4,7 +4,6 @@ import os
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
-from stagesepx import toolbox
 
 
 class TerminalCli(object):
@@ -13,7 +12,6 @@ class TerminalCli(object):
     for flexible usage, you 'd better use the script way.
     """
 
-    @toolbox.arg_printer
     def one_step(self,
                  video_path: str,
                  output_path: str = None,
@@ -40,6 +38,8 @@ class TerminalCli(object):
             stable,
             frame_count,
             to_dir=output_path)
+        res_json_path = os.path.join(data_home, 'cut_result.json')
+        res.dump(res_json_path)
 
         # --- classify ---
         cl = SVMClassifier(compress_rate=compress_rate)
@@ -55,6 +55,23 @@ class TerminalCli(object):
             report_path=os.path.join(data_home, 'report.html'),
             cut_result=res,
         )
+
+    def cut(self,
+            video_path: str,
+            output_path: str = None,
+            frame_count: int = 5,
+            compress_rate: float = 0.2,
+            limit: int = None):
+        cutter = VideoCutter()
+        res = cutter.cut(video_path, compress_rate=compress_rate)
+        stable, unstable = res.get_range(limit=limit)
+
+        data_home = res.pick_and_save(
+            stable,
+            frame_count,
+            to_dir=output_path)
+        res_json_path = os.path.join(output_path or data_home, 'cut_result.json')
+        res.dump(res_json_path)
 
 
 def main():
