@@ -2,6 +2,7 @@ import fire
 import os
 
 from stagesepx.cutter import VideoCutter
+from stagesepx.cutter import VideoCutResult
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
 
@@ -72,6 +73,36 @@ class TerminalCli(object):
             to_dir=output_path)
         res_json_path = os.path.join(output_path or data_home, 'cut_result.json')
         res.dump(res_json_path)
+
+    def classify(self,
+                 video_path: str,
+                 data_home: str,
+                 output_path: str = None,
+                 compress_rate: float = 0.2,
+                 limit: int = None):
+        # TODO model?
+
+        cut_result_json = os.path.join(data_home, 'cut_result.json')
+
+        res = None
+        stable = None
+        if os.path.isfile(cut_result_json):
+            res = VideoCutResult.load(cut_result_json)
+            stable, _ = res.get_range(limit=limit)
+
+        cl = SVMClassifier(compress_rate=compress_rate)
+        cl.load(data_home)
+        cl.train()
+        classify_result = cl.classify(video_path, stable)
+
+        # --- draw ---
+        r = Reporter()
+        r.add_dir_link(data_home)
+        r.draw(
+            classify_result,
+            report_path=os.path.join(output_path or data_home, 'report.html'),
+            cut_result=res,
+        )
 
 
 def main():
