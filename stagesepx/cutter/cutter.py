@@ -19,10 +19,17 @@ class VideoCutter(object):
         init video cutter
 
         :param step: step between frames, default to 1
+        :param compress_rate:
+        :param target_size:
         """
         if not step:
             step = 1
         self.step = step
+
+        # default compress rate is 0.2
+        if (not compress_rate) and (not target_size):
+            logger.debug(f'no compress rate or target size received. set compress rate to 0.2')
+            compress_rate = 0.2
 
         # init inner hook
         self._hook_list: typing.List[BaseHook] = list()
