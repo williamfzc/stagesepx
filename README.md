@@ -15,19 +15,27 @@
 
 ---
 
-## 分析你的视频
+这段视频展示了一个应用的完整启动过程：
 
-[![openAmazonFromChrome.gif](https://i.loli.net/2019/07/17/5d2e8ed1e9d0b49825.gif)](https://i.loli.net/2019/07/17/5d2e8ed1e9d0b49825.gif)
+![video_readme.gif](https://i.loli.net/2019/09/01/tXRhB6ai9jAZFmc.gif)
 
-## 提取出稳定阶段与变化阶段
+stagesepx 将 自动侦测出所有处于稳定的阶段：
 
-![report1.png](https://i.loli.net/2019/08/30/SpPBsuJRKvWfLT5.png)
+![stable.png](https://i.loli.net/2019/09/01/bRtMZJvzLilpUW5.png)
 
-## 耗时计算与详细的图表展示
+并绘制出稳定阶段之间的变化过程：
 
-![report2.png](https://i.loli.net/2019/08/30/whD9oSOLlJFQip2.png)
+![unstable2.png](https://i.loli.net/2019/09/01/T72quGI5m1SlzNF.png)
 
-## 支持几乎任何视频
+![unstable1.png](https://i.loli.net/2019/09/01/ifotzbhTaDpqQFA.png)
+
+轻松查看每个阶段的耗时：
+
+![Trend-2.png](https://i.loli.net/2019/09/01/Tz2tZQ5e3vHBWJ6.png)
+
+![Time Cost.png](https://i.loli.net/2019/09/01/erK9mPsISbHEiFO.png)
+
+没有任何限制，支持几乎所有场景：
 
 [![pen.gif](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)
 
@@ -36,7 +44,9 @@
 ---
 
 - 全自动，无需前置训练与学习
-- 更少的代码
+- 更少的代码需要
+- 高度可配置化，适应不同场景
+- 支持与其他框架结合，融入你的业务
 - 所有你需要的，只是一个视频
 
 从 [官方文档](https://williamfzc.github.io/stagesepx/) 开始吧！
