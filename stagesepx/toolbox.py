@@ -5,6 +5,8 @@ import random
 import typing
 import math
 import numpy as np
+from loguru import logger
+from functools import wraps
 from base64 import b64encode
 from skimage.filters import threshold_otsu
 from skimage.measure import compare_ssim as origin_compare_ssim
@@ -227,6 +229,15 @@ def get_timestamp_str() -> str:
 def np2b64str(frame: np.ndarray) -> str:
     buffer = cv2.imencode(".png", frame)[1].tostring()
     return b64encode(buffer).decode()
+
+
+def arg_printer(func: typing.Callable):
+    @wraps(func)
+    def _wrapper(*args, **kwargs):
+        logger.debug(f'function {func.__name__} args: {args}, kwargs: {kwargs}')
+        return func(*args, **kwargs)
+
+    return _wrapper
 
 
 if __name__ == '__main__':
