@@ -4,7 +4,7 @@
 
 Python >= 3.6
 
-```python
+```bash
 pip install stagesepx
 ```
 
@@ -24,24 +24,23 @@ pip install stagesepx
 
 参见 [这里](https://github.com/williamfzc/stagesepx/tree/master/example#视频比较实验性质)
 
-...
+## 命令行使用（>=0.6.1）
 
-### 优异的性能表现
+?> 该功能旨在面向较为通用的场景提供一种简单的使用方式。较为复杂的场景还是推荐使用脚本实现。
 
-在效率方面，吸取了 [stagesep2](https://github.com/williamfzc/stagesep2) 的教训（他真的很慢，而这一点让他很难被用于生产环境），在项目规划期我们就将性能的优先级提高。对于该视频而言，可以从日志中看到，它的耗时在惊人的300毫秒左右（windows7 i7-6700 3.4GHz 16G）：
+在 0.6.1 之后，stagesepx支持直接从命令行启动。你可以不需要编写脚本直接使用。下面的例子是分析 demo.mp4 并将结果输出到 output 中。
 
 ```bash
-2019-07-17 10:52:03.429 | INFO     | stagesepx.cutter:cut:200 - start cutting: test.mp4
-...
-2019-07-17 10:52:03.792 | INFO     | stagesepx.cutter:cut:203 - cut finished: test.mp4
+stagesepx one_step ./demo.mp4 ./output
 ```
 
-除了常规的基于图像本身的优化手段，stagesepx主要利用采样机制进行性能优化，它指把时间域或空间域的连续量转化成离散量的过程。由于分类器的精确度要求较高，该机制更多被用于切割器部分，用于加速切割过程。它在计算量方面优化幅度是非常可观的，以5帧的步长为例，它相比优化前节省了80%的计算量。
+当然，它同样支持不少参数：
 
-当然，采样相比连续计算会存在一定的误差，如果你的视频变化较为激烈或者你希望有较高的准确度，你也可以关闭采样功能。
+```bash
+Usage: stagesepx one_step VIDEO_PATH <flags>
+  optional flags:        --output_path | --threshold | --frame_count |
+                         --compress_rate | --limit
 
-### 更强的稳定性
-
-stagesep2存在的另一个问题是，对视频本身的要求较高，抗干扰能力不强。这主要是它本身使用的模块（template matching、OCR等）导致的，旋转、分辨率、光照都会对识别效果造成影响；由于它强依赖预先准备好的模板图片，如果模板图片的录制环境与视频有所差异，很容易导致误判的发生。
-
-而SSIM本身的抗干扰能力相对较强。如果使用默认的SSIM分类器，所有的数据（训练集与测试集）都来源于同一个视频，保证了环境的一致性，规避了不同环境（例如旋转、光照、分辨率等）带来的影响，大幅度降低了误判的发生。
+For detailed information on this command, run:
+  stagesepx one_step --help
+```
