@@ -88,7 +88,10 @@ class SVMClassifier(BaseClassifier):
         :return:
         """
         if not self._model:
+            logger.debug('no model can be used. build a new one.')
             self._model = LinearSVC()
+        else:
+            logger.debug('already have a trained model. train on this model.')
 
         train_data = list()
         train_label = list()
