@@ -12,25 +12,17 @@ pip install stagesepx
 
 ?> sample code中提供了详细的注释。
 
-[完整例子](https://github.com/williamfzc/stagesepx/blob/master/example/cut_and_classify.py) 包括了三个部分：拆分阶段、分析视频、生成报告。你可以用它快速开始试用 stagesepx。
+[完整例子](https://github.com/williamfzc/stagesepx/tree/master/example#all-in-one) 包括了三个部分：拆分阶段、分析视频、生成报告。你可以用它快速开始试用 stagesepx。
 
 例子中使用的视频可以[点此](https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4)下载。
 
-## Feature
+## 为你的业务建立稳定的视频分析服务
 
-灵活的可定制性让 stagesepx 能够从容应对不同的视频。
+参见 [这里](https://github.com/williamfzc/stagesepx/tree/master/example#训练与预测)
 
-?> 暂时没空一个一个写在这里了，不过他们的用法都已经列举在上面那个完整例子里，请直接参考代码里的用法吧。如果有问题，可以提issue。
+## 视频比较（实验性质）
 
-### 人性化的报告
-
-想得到每个阶段的耗时？stagesepx已经帮你计算好了：
-
-[![stage_time_cost.png](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)
-
-快照功能能够让你很直观地知道每个阶段的情况：
-
-[![thumbnail.png](https://i.loli.net/2019/07/25/5d3955365dff977571.png)](https://i.loli.net/2019/07/25/5d3955365dff977571.png)
+参见 [这里](https://github.com/williamfzc/stagesepx/tree/master/example#视频比较实验性质)
 
 ...
 
