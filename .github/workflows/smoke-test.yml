@@ -1,4 +1,4 @@
-name: DailyTest
+name: smoke-test
 
 on: [push]
 
