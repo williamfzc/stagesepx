@@ -11,6 +11,13 @@ class TerminalCli(object):
     """
     this is a client for stagesepx, for easier usage.
     for flexible usage, you 'd better use the script way.
+
+    of course you can use this class in script:
+
+        from stagesepx.cli import TerminalCli
+
+        cli = TerminalCli()
+        cli.one_step('demo.mp4')
     """
 
     def one_step(self,

@@ -34,7 +34,7 @@ pip install stagesepx
 stagesepx one_step ./demo.mp4 ./output
 ```
 
-当然，它同样支持不少参数：
+它同样支持不少参数：
 
 ```bash
 Usage: stagesepx one_step VIDEO_PATH <flags>
@@ -43,4 +43,13 @@ Usage: stagesepx one_step VIDEO_PATH <flags>
 
 For detailed information on this command, run:
   stagesepx one_step --help
+```
+
+你同样可以通过脚本调用 cli 中的方法，`one_step` 的功能几乎与 [完整例子](https://github.com/williamfzc/stagesepx/tree/master/example#all-in-one) 保持一致。
+
+```python
+from stagesepx.cli import TerminalCli
+
+cli = TerminalCli()
+cli.one_step('demo.mp4')
 ```
