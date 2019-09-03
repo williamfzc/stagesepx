@@ -26,7 +26,7 @@ class TerminalCli(object):
                  threshold: float = 0.95,
                  frame_count: int = 5,
                  compress_rate: float = 0.2,
-                 offset: int = None,
+                 offset: int = 3,
                  limit: int = None):
         """
         one step => cut, classifier, draw
@@ -81,7 +81,7 @@ class TerminalCli(object):
             threshold: float = 0.95,
             frame_count: int = 5,
             compress_rate: float = 0.2,
-            offset: int = None,
+            offset: int = 3,
             limit: int = None):
 
         cutter = VideoCutter()
@@ -104,7 +104,7 @@ class TerminalCli(object):
                  data_home: str,
                  output_path: str = None,
                  compress_rate: float = 0.2,
-                 offset: int = None,
+                 offset: int = 3,
                  limit: int = None):
         # TODO model?
 
