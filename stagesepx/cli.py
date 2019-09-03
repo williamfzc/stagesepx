@@ -26,6 +26,7 @@ class TerminalCli(object):
                  threshold: float = 0.95,
                  frame_count: int = 5,
                  compress_rate: float = 0.2,
+                 offset: int = None,
                  limit: int = None):
         """
         one step => cut, classifier, draw
@@ -35,6 +36,10 @@ class TerminalCli(object):
         :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
         :param frame_count: default to 5, and finally you will get 5 frames for each range
         :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
+        :param offset:
+            it will change the way to decided whether two ranges can be merged
+            before: first_range.end == second_range.start
+            after: first_range.end + offset >= secord_range.start
         :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
         :return:
         """
@@ -45,6 +50,7 @@ class TerminalCli(object):
         stable, unstable = res.get_range(
             threshold=threshold,
             limit=limit,
+            offset=offset,
         )
 
         data_home = res.pick_and_save(
@@ -75,10 +81,16 @@ class TerminalCli(object):
             threshold: float = 0.95,
             frame_count: int = 5,
             compress_rate: float = 0.2,
+            offset: int = None,
             limit: int = None):
+
         cutter = VideoCutter()
         res = cutter.cut(video_path, compress_rate=compress_rate)
-        stable, unstable = res.get_range(threshold=threshold, limit=limit)
+        stable, unstable = res.get_range(
+            threshold=threshold,
+            limit=limit,
+            offset=offset
+        )
 
         data_home = res.pick_and_save(
             stable,
@@ -92,6 +104,7 @@ class TerminalCli(object):
                  data_home: str,
                  output_path: str = None,
                  compress_rate: float = 0.2,
+                 offset: int = None,
                  limit: int = None):
         # TODO model?
 
@@ -101,7 +114,10 @@ class TerminalCli(object):
         stable = None
         if os.path.isfile(cut_result_json):
             res = VideoCutResult.load(cut_result_json)
-            stable, _ = res.get_range(limit=limit)
+            stable, _ = res.get_range(
+                offset=offset,
+                limit=limit
+            )
 
         cl = SVMClassifier(compress_rate=compress_rate)
         cl.load(data_home)
