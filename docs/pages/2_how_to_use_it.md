@@ -16,13 +16,15 @@ pip install stagesepx
 
 例子中使用的视频可以[点此](https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4)下载。
 
-## 为你的业务建立稳定的视频分析服务
+## 更多内容
 
-参见 [这里](https://github.com/williamfzc/stagesepx/tree/master/example#训练与预测)
+你可以通过 [这个例子](https://github.com/williamfzc/stagesepx/tree/master/example/train_and_predict)：
 
-## 视频比较（实验性质）
-
-参见 [这里](https://github.com/williamfzc/stagesepx/tree/master/example#视频比较实验性质)
+- 了解如何训练一个针对特定业务的模型
+    - 利用 cutter 从视频中自动拆分
+    - 手工采集
+- 利用训练好的模型，建立长期稳定的、回归性质的视频分析
+- 当有业务变更时如何调整你的模型
 
 ## 命令行使用（>=0.6.1）
 
