@@ -2,7 +2,7 @@
 
 ## all in one
 
-`cut_and_classify.py` 提供了几乎所有的stagesepx用法及详细的注释，你可以从它开始。
+[cut_and_classify.py](./cut_and_classify.py) 提供了几乎所有的stagesepx用法及详细的注释，你可以从它开始。
 
 ## 全流程：训练与预测
 
@@ -14,8 +14,8 @@
 - 利用训练好的模型，建立长期稳定的、回归性质的视频分析
 - 当有业务变更时如何调整你的模型
 
-参见 `train_and_predict`
+参见 [train_and_predict](./train_and_predict)
 
 ## 视频比较（实验性质）
 
-参见 `compare_videos.py`
+参见 [compare_videos.py](./compare_videos.py)
