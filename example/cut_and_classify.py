@@ -141,7 +141,6 @@ for each in classify_result:
 
 # --- draw ---
 r = Reporter()
-r.add_dir_link(data_home)
 
 # 你可以将 thumbnail 直接嵌入到report中
 for each in unstable:

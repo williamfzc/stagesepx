@@ -68,7 +68,6 @@ class TerminalCli(object):
 
         # --- draw ---
         r = Reporter()
-        r.add_dir_link(data_home)
         r.draw(
             classify_result,
             report_path=os.path.join(data_home, 'report.html'),
@@ -126,7 +125,6 @@ class TerminalCli(object):
 
         # --- draw ---
         r = Reporter()
-        r.add_dir_link(data_home)
         r.draw(
             classify_result,
             report_path=os.path.join(output_path or data_home, 'report.html'),
