@@ -1,3 +1,4 @@
+import os
 import typing
 import numpy as np
 from jinja2 import Markup, Template
@@ -10,125 +11,11 @@ from stagesepx import toolbox
 from stagesepx.cutter import VideoCutResult
 
 BACKGROUND_COLOR = '#fffaf4'
-TEMPLATE = r'''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>stagesep-x report</title>
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
-</head>
 
-<style>
-    .container {
-        margin: 20px;
-        background-color: {{ background_color }};
-    }
-    .card-body {
-        background-color: {{ background_color }};
-    }
-    .footer {
-        margin-bottom: 20px;
-    }
-    body {
-        background-color: {{ background_color }};
-    }
-</style>
-
-<body>
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="https://github.com/williamfzc/stagesepx">stagesep x report</a>
-</nav>
-
-{% if stable_sample %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Stable Stages</h2>
-            <p> All the stable stages will be shown here. </p>
-            <img src="data:image/png;base64,{{ stable_sample }}"/>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if thumbnail_list %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Unstable Stages</h2>
-            <p> These pictures show what will happen when stages are changing. </p>
-            <ul>
-                {% for name, each_thumbnail in thumbnail_list %}
-                <li>
-                    <h3> {{ name }} </h3>
-                    <img src="data:image/png;base64,{{ each_thumbnail }}"/>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if dir_link_list %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Raw Pictures</h2>
-            <p> You can access pictures directory via these links below. </p>
-            <ul>
-                {% for each_link in dir_link_list %}
-                <li>
-                    <a href="{{ each_link }}">{{ each_link }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if extras %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Extras</h2>
-            {% for name, value in extras.items() %}
-            <h4> {{ name }} </h4>
-            <p> {{ value }} </p>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Charts</h2>
-            <div>
-                {{ chart }}
-            </div>
-        </div>
-    </div>
-</div>
-
-<footer class="footer" style="text-align:center">
-    <div class="container-fluid">
-        <HR>
-        <span class="text-muted">
-            Build with <a href="https://github.com/williamfzc/stagesepx">@stagesepx</a> :)
-        </span>
-    </div>
-</footer>
-
-</body>
-</html>
-'''
+# load template
+template_path = os.path.join(os.path.dirname(__file__), 'template', 'report.html')
+with open(template_path, encoding='utf-8') as t:
+    TEMPLATE = t.read()
 
 
 class Reporter(object):
