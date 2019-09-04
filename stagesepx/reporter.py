@@ -67,7 +67,10 @@ class Reporter(object):
                        is_step=False,
                        is_symbol_show=True)
         line.set_global_opts(
-            title_opts=opts.TitleOpts(title='Trend'),
+            title_opts=opts.TitleOpts(
+                title='Trend',
+                subtitle='describe how these stages switching'
+            ),
             toolbox_opts=opts.ToolboxOpts(is_show=True),
             tooltip_opts=opts.TooltipOpts(is_show=True, trigger='axis', axis_pointer_type='cross'),
         )
@@ -108,7 +111,10 @@ class Reporter(object):
         bar.add_xaxis(x_axis)
         bar.add_yaxis('time cost', y_axis)
         bar.set_global_opts(
-            title_opts=opts.TitleOpts(title="Time Cost"),
+            title_opts=opts.TitleOpts(
+                title='Time Cost',
+                subtitle='... of each stages'
+            ),
             toolbox_opts=opts.ToolboxOpts(is_show=True),
         )
         logger.debug(f'time cost: {dict(zip(x_axis, y_axis))}')
