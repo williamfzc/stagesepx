@@ -115,10 +115,12 @@ class Reporter(object):
         return bar
 
     @staticmethod
-    def calc_changing_cost(data_list: typing.List[ClassifierResult]) -> typing.Dict[str, float]:
+    def calc_changing_cost(
+            data_list: typing.List[ClassifierResult]
+    ) -> typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]]:
         # add changing cost
         changing_flag: str = r'-1'
-        cost_dict: typing.Dict[str, float] = {}
+        cost_dict: typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]] = {}
         i = 0
         while i < len(data_list) - 1:
             cur = data_list[i]
@@ -132,13 +134,8 @@ class Reporter(object):
                     if next_one.stage != changing_flag:
                         break
 
-                # a little weird, as a key
-                changing_name = (f'{cur.stage}(frame id={cur.frame_id} / time={cur.timestamp})'
-                                 f' - '
-                                 f'{next_one.stage}(frame id={next_one.frame_id} / time={next_one.timestamp})')
-
-                cost = next_one.timestamp - cur.timestamp
-                cost_dict[changing_name] = cost
+                changing_name = f'{cur.stage} - {next_one.stage}'
+                cost_dict[changing_name] = (cur, next_one)
             else:
                 i += 1
         return cost_dict
@@ -192,13 +189,6 @@ class Reporter(object):
 
         # calc time cost
         cost_dict = self.calc_changing_cost(data_list)
-        # and add it to report
-        for name, cost in cost_dict.items():
-            logger.debug(f'stage {name} cost: {cost}')
-            self.add_extra(
-                f'stage changing cost: {name}',
-                str(cost)
-            )
 
         # insert pictures
         if cut_result:
@@ -230,6 +220,7 @@ class Reporter(object):
             stable_sample=stable_stage_sample,
             extras=self.extra_dict,
             background_color=BACKGROUND_COLOR,
+            cost_dict=cost_dict,
         )
 
         # save to file

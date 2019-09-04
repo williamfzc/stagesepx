@@ -79,6 +79,23 @@
 </div>
 {% endif %}
 
+{% if cost_dict %}
+<div class="container">
+    <div class="card border-light">
+        <div class="card-body">
+            <h2>Cost between stages</h2>
+            {% for name, result in cost_dict.items() %}
+                <h4> stage {{ name }} </h4>
+                <ul>
+                    <li>range: {{ result[0].frame_id }} - {{ result[1].frame_id }} ({{ result[0].timestamp }} - {{ result[1].timestamp }}) </li>
+                    <li>time cost: {{ result[1].timestamp - result[0].timestamp }} </li>
+                </ul>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% if extras %}
 <div class="container">
     <div class="card border-light">
