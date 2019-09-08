@@ -35,8 +35,8 @@ class SVMClassifier(BaseClassifier):
             feature_type = 'hog'
         if feature_type not in self.FEATURE_DICT:
             raise AttributeError(f'no feature func named {feature_type}')
-        self.feature_func = self.FEATURE_DICT[feature_type]
-        self._model = None
+        self.feature_func: typing.Callable = self.FEATURE_DICT[feature_type]
+        self._model: typing.Optional[LinearSVC] = None
         logger.debug(f'feature function: {feature_type}')
 
     def clean_model(self):
@@ -127,7 +127,10 @@ class SVMClassifier(BaseClassifier):
         """
         pic_object = self.feature_func(pic_object)
         pic_object = pic_object.reshape(1, -1)
-        return self._model.predict(pic_object)[0]
+        # scores for each stages
+        scores = self._model.decision_function(pic_object)[0]
+        logger.debug(f'scores: {scores}')
+        return self._model.classes_[np.argmax(scores)]
 
     def _classify_frame(self,
                         frame_id: int,
