@@ -1,9 +1,8 @@
 from stagesepx.cutter import VideoCutter, VideoCutResult
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
-from stagesepx.hook import ExampleHook
+from stagesepx.hook import ExampleHook, CropHook
 import os
-
 
 video_path = '../demo.mp4'
 
@@ -32,6 +31,29 @@ cutter.add_hook(hook)
 # 否则 hook 操作的都是 frame 的副本
 hook1 = ExampleHook(overwrite=True)
 cutter.add_hook(hook1)
+
+# 在 0.7.0 之后，CropHook加入，被用于局部检测
+# 它能够对帧进行裁剪，使用户能够只对视频的其中一部分进行分析
+# 例如，它能够顺利解决轮播图问题：https://github.com/williamfzc/stagesepx/issues/55
+# 它采用两种参数，size 与 offset，分别对应 裁剪区域大小 与 偏移量
+# 例如，你希望裁剪出画面右下角的 1/4
+hook2 = CropHook(
+    # 高度为 0.5 * height，宽度为 0.5 * width
+    size=(0.5, 0.5),
+    # 除了指定比例，你也可以直接指定绝对长度
+    # 例如你希望裁剪 高度100 宽度200 的一部分
+    # size=(100, 200),
+
+    # 默认情况下，所有的坐标都是从左上角开始的
+    # 如果我们需要偏移到右下角，意味着我们需要向下偏移 0.5 * height，向右偏移 0.5 * width
+    # offset=(0.5, 0.5),
+    # 当然，这里也可以指定绝对长度，同size
+    # offset=(100, 100),
+    overwrite=True
+)
+# 在初始化完成后，你就可以将hook添加到 cutter 或 classifier 中了
+# 在添加完成后，你可以发现，stagesepx 只会对你裁剪后的区域进行检测
+cutter.add_hook(hook2)
 
 # 开始切割
 res = cutter.cut(
