@@ -143,6 +143,10 @@ for each in classify_result:
 r = Reporter()
 
 # 你可以将 thumbnail 直接嵌入到report中
+# 如果不手动设定的话，report也会在报告中自动加入 thumbnail
+# 但如此做，你需要在 draw函数 传入 与你的 get_range 相同的参数
+# 否则自动提取的阶段会采用默认参数，可能会与你希望的不太一样
+# 可以参考 cli.py 中的实现
 for each in unstable:
     r.add_thumbnail(
         f'{each.start}({each.start_time}) - {each.end}({each.end_time})',

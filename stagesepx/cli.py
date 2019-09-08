@@ -56,7 +56,8 @@ class TerminalCli(object):
         data_home = res.pick_and_save(
             stable,
             frame_count,
-            to_dir=output_path)
+            to_dir=output_path
+        )
         res_json_path = os.path.join(data_home, 'cut_result.json')
         res.dump(res_json_path)
 
@@ -72,6 +73,12 @@ class TerminalCli(object):
             classify_result,
             report_path=os.path.join(data_home, 'report.html'),
             cut_result=res,
+
+            # kwargs of get_range
+            # otherwise these thumbnails may become different
+            threshold=threshold,
+            limit=limit,
+            offset=offset,
         )
 
     def cut(self,

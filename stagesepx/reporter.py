@@ -202,7 +202,7 @@ class Reporter(object):
             sim_line = self._draw_sim(cut_result)
             page.add(sim_line)
 
-            _, unstable = cut_result.get_range()
+            _, unstable = cut_result.get_range(*args, **kwargs)
             # insert thumbnail
             if not self.thumbnail_list:
                 logger.debug('auto insert thumbnail ...')
