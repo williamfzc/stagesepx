@@ -149,8 +149,10 @@ r = Reporter()
 # 可以参考 cli.py 中的实现
 for each in unstable:
     r.add_thumbnail(
-        f'{each.start}({each.start_time}) - {each.end}({each.end_time})',
-        res.thumbnail(each))
+        f'{each.start}({each.start_time}) - {each.end}({each.end_time}), '
+        f'duration: {each.end_time - each.start_time}',
+        res.thumbnail(each)
+    )
 
 # 你可以将把一些文件夹路径插入到报告中
 # 这样你可以很方便地从报告中查看各项相关内容

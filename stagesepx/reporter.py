@@ -209,7 +209,8 @@ class Reporter(object):
 
                 for each in unstable:
                     self.add_thumbnail(
-                        f'{each.start}({each.start_time}) - {each.end}({each.end_time})',
+                        f'{each.start}({each.start_time}) - {each.end}({each.end_time}), '
+                        f'duration: {each.end_time - each.start_time}',
                         cut_result.thumbnail(each, *args, **kwargs),
                     )
 
