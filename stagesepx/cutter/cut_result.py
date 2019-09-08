@@ -225,7 +225,8 @@ class VideoCutResult(object):
                   target_range: VideoCutRange,
                   to_dir: str = None,
                   compress_rate: float = None,
-                  is_vertical: bool = None) -> np.ndarray:
+                  is_vertical: bool = None,
+                  *_, **__) -> np.ndarray:
         """
         build a thumbnail, for easier debug or something else
 

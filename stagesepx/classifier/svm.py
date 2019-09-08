@@ -137,6 +137,7 @@ class SVMClassifier(BaseClassifier):
         """
         pic_object = self.feature_func(pic_object)
         pic_object = pic_object.reshape(1, -1)
+
         # scores for each stages
         # IMPORTANT:
         # these scores are not always precise
@@ -146,6 +147,15 @@ class SVMClassifier(BaseClassifier):
         # but the calculated value may becomes weird
         scores = self._model.decision_function(pic_object)[0]
         logger.debug(f'scores: {scores}')
+
+        # in the binary case, return type is different (wtf ...)
+        # for more effective i think
+        if len(self._model.classes_) == 2:
+            # scores is a float
+            # confidence score for self.classes_[1] where >0 means this
+            # class would be predicted
+            return self._model.classes_[1 if scores > 0 else 0]
+
         # unknown
         if max(scores) < self.score_threshold:
             logger.warning(f'max score is lower than {self.score_threshold}, unknown class')

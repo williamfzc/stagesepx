@@ -10,7 +10,8 @@ from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
 from stagesepx.cutter import VideoCutResult
 
-BACKGROUND_COLOR = '#fffaf4'
+BACKGROUND_COLOR = r'#fffaf4'
+UNSTABLE_FLAG = r'-1'
 
 # load template
 template_path = os.path.join(os.path.dirname(__file__), 'template', 'report.html')
@@ -125,7 +126,6 @@ class Reporter(object):
             data_list: typing.List[ClassifierResult]
     ) -> typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]]:
         # add changing cost
-        changing_flag: str = r'-1'
         cost_dict: typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]] = {}
         i = 0
         while i < len(data_list) - 1:
@@ -133,11 +133,11 @@ class Reporter(object):
             next_one = data_list[i + 1]
 
             # next one is changing
-            if next_one.stage == changing_flag:
+            if next_one.stage == UNSTABLE_FLAG:
                 for j in range(i + 1, len(data_list)):
                     i = j
                     next_one = data_list[j]
-                    if next_one.stage != changing_flag:
+                    if next_one.stage != UNSTABLE_FLAG:
                         break
 
                 changing_name = f'{cur.stage} - {next_one.stage}'
@@ -152,7 +152,7 @@ class Reporter(object):
         picked: typing.List[ClassifierResult] = [last]
         for each in data_list:
             # ignore unstable stage
-            if each.stage == '-1':
+            if each.stage == UNSTABLE_FLAG:
                 continue
             if last.stage != each.stage:
                 last = each
