@@ -114,6 +114,55 @@ class RefineHook(BaseHook):
         return toolbox.sharpen_frame(frame)
 
 
+class CropHook(BaseHook):
+    """ this hook was built for cropping frames, eg: keep only a half of origin frame """
+
+    def __init__(self,
+                 size: typing.Tuple[typing.Union[int, float], typing.Union[int, float]],
+                 offset: typing.Tuple[typing.Union[int, float], typing.Union[int, float]] = None,
+                 *_, **__):
+        """
+        init crop hook, (height, width)
+
+        :param size:
+        :param offset:
+        :param _:
+        :param __:
+        """
+        super().__init__(*_, **__)
+
+        self.size = size
+        self.offset = offset or (0, 0)
+        logger.debug(f'size: {self.size}')
+        logger.debug(f'offset: {self.offset}')
+
+    @staticmethod
+    def is_proportion(target: typing.Tuple[typing.Union[int, float], typing.Union[int, float]]) -> bool:
+        return len([i for i in target if 0. <= i <= 1.]) == 2
+
+    @change_origin
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+        super().do(frame_id, frame, *_, **__)
+        origin_h, origin_w = frame.shape
+        logger.debug(f'origin size: ({origin_h}, {origin_w})')
+
+        # convert to real size
+        size_h, size_w = self.size
+        if self.is_proportion(self.size):
+            size_h, size_w = origin_h * self.size[0], origin_w * self.size[1]
+        logger.debug(f'size: ({size_h}, {size_w})')
+
+        offset_h, offset_w = self.offset
+        if self.is_proportion(self.offset):
+            offset_h, offset_w = origin_h * self.offset[0], origin_w * self.offset[1]
+        logger.debug(f'offset: {offset_h}, {offset_w}')
+
+        height_range = (int(offset_h), int(offset_h + size_h))
+        width_range = (int(offset_w), int(offset_w + size_w))
+        logger.debug(f'crop range h: {height_range}, w: {width_range}')
+        return frame[height_range[0]: height_range[1], width_range[0]: width_range[1]]
+
+
 # --- inner hook end ---
 
 class FrameSaveHook(BaseHook):
