@@ -114,9 +114,7 @@ class RefineHook(BaseHook):
         return toolbox.sharpen_frame(frame)
 
 
-class CropHook(BaseHook):
-    """ this hook was built for cropping frames, eg: keep only a half of origin frame """
-
+class _AreaBaseHook(BaseHook):
     def __init__(self,
                  size: typing.Tuple[typing.Union[int, float], typing.Union[int, float]],
                  offset: typing.Tuple[typing.Union[int, float], typing.Union[int, float]] = None,
@@ -140,27 +138,51 @@ class CropHook(BaseHook):
     def is_proportion(target: typing.Tuple[typing.Union[int, float], typing.Union[int, float]]) -> bool:
         return len([i for i in target if 0. <= i <= 1.]) == 2
 
+    @staticmethod
+    def convert(
+            origin_h: int,
+            origin_w: int,
+            input_h: typing.Union[float, int],
+            input_w: typing.Union[float, int]
+    ) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
+        if _AreaBaseHook.is_proportion((input_h, input_w)):
+            return origin_h * input_h, origin_w * input_w
+        return input_h, input_w
+
+    def convert_size_and_offset(self, *origin_size) -> typing.Tuple[typing.Tuple, typing.Tuple]:
+        # convert to real size
+        logger.debug(f'origin size: ({origin_size})')
+        size_h, size_w = self.convert(*origin_size, *self.size)
+        logger.debug(f'size: ({size_h}, {size_w})')
+        offset_h, offset_w = self.convert(*origin_size, *self.offset)
+        logger.debug(f'offset: {offset_h}, {offset_w}')
+        height_range, width_range = (int(offset_h), int(offset_h + size_h)), (int(offset_w), int(offset_w + size_w))
+        logger.debug(f'final range h: {height_range}, w: {width_range}')
+        return height_range, width_range
+
+
+class CropHook(_AreaBaseHook):
+    """ this hook was built for cropping frames, eg: keep only a half of origin frame """
+
     @change_origin
     def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
-        origin_h, origin_w = frame.shape
-        logger.debug(f'origin size: ({origin_h}, {origin_w})')
 
-        # convert to real size
-        size_h, size_w = self.size
-        if self.is_proportion(self.size):
-            size_h, size_w = origin_h * self.size[0], origin_w * self.size[1]
-        logger.debug(f'size: ({size_h}, {size_w})')
-
-        offset_h, offset_w = self.offset
-        if self.is_proportion(self.offset):
-            offset_h, offset_w = origin_h * self.offset[0], origin_w * self.offset[1]
-        logger.debug(f'offset: {offset_h}, {offset_w}')
-
-        height_range = (int(offset_h), int(offset_h + size_h))
-        width_range = (int(offset_w), int(offset_w + size_w))
-        logger.debug(f'crop range h: {height_range}, w: {width_range}')
+        height_range, width_range = self.convert_size_and_offset(*frame.shape)
         return frame[height_range[0]: height_range[1], width_range[0]: width_range[1]]
+
+
+class IgnoreHook(_AreaBaseHook):
+    """ ignore some area of frames """
+
+    @change_origin
+    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+        super().do(frame_id, frame, *_, **__)
+
+        height_range, width_range = self.convert_size_and_offset(*frame.shape)
+        # ignore this area
+        frame[height_range[0]: height_range[1], width_range[0]: width_range[1]] = 0
+        return frame
 
 
 # --- inner hook end ---
