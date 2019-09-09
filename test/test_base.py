@@ -6,6 +6,7 @@ import os
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
+MODEL_PATH = os.path.join(PROJECT_PATH, 'model.pkl')
 
 
 def test_base():
@@ -26,6 +27,7 @@ def test_base():
     cl = SVMClassifier()
     cl.load(data_home)
     cl.train()
+    cl.save_model(MODEL_PATH)
     classify_result = cl.classify(VIDEO_PATH, stable)
 
     # --- draw ---
@@ -37,3 +39,15 @@ def test_base():
         cut_result=res,
     )
     assert os.path.isfile(report_path)
+
+
+def test_save_and_load():
+    # test save and load
+    cl = SVMClassifier()
+    cl.load_model(MODEL_PATH)
+
+    classify_result = cl.classify(VIDEO_PATH)
+
+    # --- draw ---
+    r = Reporter()
+    r.draw(classify_result)

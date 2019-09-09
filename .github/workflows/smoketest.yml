@@ -20,9 +20,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install .
-      - name: Download test video
+      - name: Download test resource
         run: |
           curl -o demo.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
+          curl -o demo.jpg https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/pictures/amazon.jpg
       - name: Generate coverage report
         run: |
           pip install pytest
