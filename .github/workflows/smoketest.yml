@@ -12,40 +12,40 @@ jobs:
         python-version: [3.6, 3.7]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        pip install .
-    - name: Download test video
-      run: |
-        curl -o demo.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
-    - name: Generate coverage report
-      run: |
-        pip install pytest
-        pip install pytest-cov
-        pytest --cov=./ --cov-report=xml
-    - name: Upload coverage to Codecov
+      - uses: actions/checkout@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install .
+      - name: Download test video
+        run: |
+          curl -o demo.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
+      - name: Generate coverage report
+        run: |
+          pip install pytest
+          pip install pytest-cov
+          pytest --cov=./ --cov-report=xml
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
-    - name: Test example
-      run: |
-        cd example
-        python cut_and_classify.py
-        cd ..
-    - name: Test Cli
-      run: |
-        stagesepx one_step ./demo.mp4
-        stagesepx one_step ./demo.mp4 ./output
-        rm -rf ./output
+      - name: Test example
+        run: |
+          cd example
+          python cut_and_classify.py
+          cd ..
+      - name: Test Cli
+        run: |
+          stagesepx one_step ./demo.mp4
+          stagesepx one_step ./demo.mp4 ./output
+          rm -rf ./output
 
-        stagesepx cut ./demo.mp4
-        stagesepx cut ./demo.mp4 ./output
-        stagesepx classify ./demo.mp4 ./output
+          stagesepx cut ./demo.mp4
+          stagesepx cut ./demo.mp4 ./output
+          stagesepx classify ./demo.mp4 ./output
