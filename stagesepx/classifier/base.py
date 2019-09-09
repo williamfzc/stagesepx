@@ -137,7 +137,7 @@ class BaseClassifier(object):
 
     @staticmethod
     def read_from_path(data: typing.List[pathlib.Path], *_, **__):
-        return (cv2.imread(each.as_posix()) for each in data)
+        return (toolbox.imread(each.as_posix()) for each in data)
 
     def read_from_list(self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__):
         cur_frame_id = toolbox.get_current_frame_id(video_cap)

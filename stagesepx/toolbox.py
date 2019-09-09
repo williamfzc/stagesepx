@@ -4,6 +4,7 @@ import time
 import random
 import typing
 import math
+import os
 import numpy as np
 from loguru import logger
 from functools import wraps
@@ -58,6 +59,12 @@ def get_current_frame_id(video_cap: cv2.VideoCapture) -> int:
 
 def get_current_frame_time(video_cap: cv2.VideoCapture) -> float:
     return video_cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
+
+
+def imread(img_path: str, *_, **__) -> np.ndarray:
+    """ wrapper of cv2.imread """
+    assert os.path.isfile(img_path), f'file {img_path} is not existed'
+    return cv2.imread(img_path, *_, **__)
 
 
 def get_frame_time(video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None) -> float:
@@ -238,9 +245,3 @@ def arg_printer(func: typing.Callable):
         return func(*args, **kwargs)
 
     return _wrapper
-
-
-if __name__ == '__main__':
-    t = cv2.imread('../1.png', cv2.IMREAD_GRAYSCALE)
-    t = sharpen_frame(t)
-    cv2.imwrite('a.png', t)

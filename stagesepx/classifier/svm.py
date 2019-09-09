@@ -125,7 +125,7 @@ class SVMClassifier(BaseClassifier):
         :param pic_path:
         :return:
         """
-        pic_object = cv2.imread(pic_path)
+        pic_object = toolbox.imread(pic_path)
         return self.predict_with_object(pic_object)
 
     def predict_with_object(self, pic_object: np.ndarray) -> str:

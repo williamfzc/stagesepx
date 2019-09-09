@@ -80,7 +80,7 @@ class VideoCutRange(object):
         if image_path:
             logger.debug(f'found image path, use it first: {image_path}')
             assert os.path.isfile(image_path), f'image {image_path} not existed'
-            image_object = cv2.imread(image_path)
+            image_object = toolbox.imread(image_path)
         image_object = toolbox.turn_grey(image_object)
 
         # TODO use client or itself..?
