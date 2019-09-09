@@ -1,7 +1,7 @@
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
-from stagesepx.hook import ExampleHook, IgnoreHook, CropHook, FrameSaveHook
+from stagesepx.hook import ExampleHook, IgnoreHook, CropHook, FrameSaveHook, RefineHook, InvalidFrameDetectHook
 
 import os
 
@@ -24,6 +24,8 @@ def test_hook():
         offset=(0., 0.5),
         overwrite=True,
     )
+    hook5 = RefineHook()
+    hook6 = InvalidFrameDetectHook()
 
     # --- cutter ---
     cutter = VideoCutter()
@@ -33,6 +35,8 @@ def test_hook():
     cutter.add_hook(hook2)
     cutter.add_hook(hook3)
     cutter.add_hook(hook4)
+    cutter.add_hook(hook5)
+    cutter.add_hook(hook6)
 
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
@@ -62,3 +66,4 @@ def test_hook():
 
     # hook check
     assert os.path.isdir(frame_home)
+    assert hook6.result

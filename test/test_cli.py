@@ -20,12 +20,3 @@ def test_cli():
     logger.info('checking classifier ...')
     subprocess.check_call(['stagesepx', 'classify', VIDEO_PATH, 'output'])
     shutil.rmtree('output')
-
-# same as:
-# stagesepx one_step ./demo.mp4
-# stagesepx one_step ./demo.mp4 ./output
-# rm -rf ./output
-#
-# stagesepx cut ./demo.mp4
-# stagesepx cut ./demo.mp4 ./output
-# stagesepx classify ./demo.mp4 ./output

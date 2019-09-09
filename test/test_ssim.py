@@ -1,5 +1,5 @@
 from stagesepx.cutter import VideoCutter
-from stagesepx.classifier import SVMClassifier
+from stagesepx.classifier import SSIMClassifier
 from stagesepx.reporter import Reporter
 
 import os
@@ -23,9 +23,8 @@ def test_base():
     assert os.path.isdir(data_home), 'result dir not existed'
 
     # --- classify ---
-    cl = SVMClassifier()
+    cl = SSIMClassifier()
     cl.load(data_home)
-    cl.train()
     classify_result = cl.classify(VIDEO_PATH, stable)
 
     # --- draw ---
