@@ -1,12 +1,15 @@
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
-from stagesepx.hook import ExampleHook, IgnoreHook, CropHook, FrameSaveHook, RefineHook, InvalidFrameDetectHook
+from stagesepx.hook import ExampleHook, IgnoreHook, CropHook, FrameSaveHook, RefineHook, InvalidFrameDetectHook, TemplateCompareHook
 
 import os
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
+IMAGE_NAME = 'demo.jpg'
+IMAGE_PATH = os.path.join(PROJECT_PATH, IMAGE_NAME)
+assert os.path.isfile(IMAGE_PATH)
 
 
 def test_hook():
@@ -26,9 +29,12 @@ def test_hook():
     )
     hook5 = RefineHook()
     hook6 = InvalidFrameDetectHook()
+    hook7 = TemplateCompareHook({
+        'amazon': IMAGE_PATH,
+    })
 
     # --- cutter ---
-    cutter = VideoCutter()
+    cutter = VideoCutter(compress_rate=0.8)
     # add hook
     cutter.add_hook(hook)
     cutter.add_hook(hook1)
@@ -37,6 +43,7 @@ def test_hook():
     cutter.add_hook(hook4)
     cutter.add_hook(hook5)
     cutter.add_hook(hook6)
+    cutter.add_hook(hook7)
 
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
@@ -67,3 +74,4 @@ def test_hook():
     # hook check
     assert os.path.isdir(frame_home)
     assert hook6.result
+    assert hook7.result

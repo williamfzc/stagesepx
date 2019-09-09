@@ -1,5 +1,6 @@
 from stagesepx.classifier import SSIMClassifier, SVMClassifier
 from stagesepx.reporter import Reporter
+from stagesepx.cutter import VideoCutResult
 
 from test_cutter import test_default as cutter_default
 from test_cutter import RESULT_DIR as CUTTER_RESULT_DIR
@@ -11,7 +12,7 @@ VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
 MODEL_PATH = os.path.join(PROJECT_PATH, 'model.pkl')
 
 # cut, and get result dir
-cutter_res = cutter_default()
+cutter_res: VideoCutResult = cutter_default()
 
 
 def _draw_report(res):
@@ -29,7 +30,7 @@ def test_default():
     cl = SVMClassifier()
     cl.load(CUTTER_RESULT_DIR)
     cl.train()
-    cl.save_model(MODEL_PATH)
+    cl.save_model(MODEL_PATH, overwrite=True)
     classify_result = cl.classify(VIDEO_PATH)
 
     # --- draw ---
@@ -63,6 +64,15 @@ def test_work_with_cutter():
         VIDEO_PATH,
         stable,
     )
+
+    # --- draw ---
+    _draw_report(classify_result)
+
+
+def test_load_from_range_list():
+    cl = SSIMClassifier()
+    cl.load(cutter_res.range_list)
+    classify_result = cl.classify(VIDEO_PATH)
 
     # --- draw ---
     _draw_report(classify_result)
