@@ -4,7 +4,8 @@ from stagesepx.reporter import Reporter
 
 import os
 
-VIDEO_PATH = '../demo.mp4'
+PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
+VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
 
 
 def test_base():
