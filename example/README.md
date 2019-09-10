@@ -1,8 +1,11 @@
 # example for stagesepx
 
-## all in one
+## quick start
 
-[cut_and_classify.py](./cut_and_classify.py) 提供了几乎所有的stagesepx用法及详细的注释，你可以从它开始。
+- [mini.py](./mini.py) 提供了一个不到30行的例子。当然，这也意味着肯定不会包含太多功能。
+- [cut_and_classify.py](./cut_and_classify.py) 提供了几乎所有的stagesepx用法及详细的注释。
+
+你可以先从前者开始使用，再根据自身的需要，参考后者的用法逐步补充到前者中。
 
 ## 全流程：训练与预测
 
