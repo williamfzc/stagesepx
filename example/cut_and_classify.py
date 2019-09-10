@@ -1,7 +1,7 @@
 from stagesepx.cutter import VideoCutter, VideoCutResult
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
-from stagesepx.hook import ExampleHook, CropHook
+from stagesepx.hook import ExampleHook, CropHook, IgnoreHook
 import os
 
 video_path = '../demo.mp4'
@@ -54,6 +54,19 @@ hook2 = CropHook(
 # 在初始化完成后，你就可以将hook添加到 cutter 或 classifier 中了
 # 在添加完成后，你可以发现，stagesepx 只会对你裁剪后的区域进行检测
 cutter.add_hook(hook2)
+
+# 在 0.7.1 之后，针对 CropHook 的使用场景，IgnoreHook 被加入用于对其进行进一步补充
+# 与 CropHook 相反，它被用于对帧的一部分进行屏蔽
+# 详见 https://github.com/williamfzc/stagesepx/issues/56
+hook3 = IgnoreHook(
+    # 它的参数解析方式与 CropHook 是一致的，此处不赘述
+    # 与 CropHook 不同的是，此处指定的区域会被屏蔽掉
+    size=(0.5, 0.5),
+    offset=(0.5, 0.5),
+    overwrite=True
+)
+# 为了不影响结果，在例子中先注释掉了
+# cutter.add_hook(hook3)
 
 # 开始切割
 res = cutter.cut(
