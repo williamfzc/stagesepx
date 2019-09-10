@@ -42,6 +42,7 @@ jobs:
         run: |
           cd example
           python cut_and_classify.py
+          python mini.py
           cd ..
       - name: Test Cli
         run: |
