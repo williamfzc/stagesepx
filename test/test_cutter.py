@@ -4,6 +4,9 @@ import os
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
 RESULT_DIR = os.path.join(PROJECT_PATH, 'cut_result')
+IMAGE_NAME = 'demo.jpg'
+IMAGE_PATH = os.path.join(PROJECT_PATH, IMAGE_NAME)
+assert os.path.isfile(IMAGE_PATH), f'{IMAGE_NAME} not existed!'
 
 
 def test_default():
@@ -52,3 +55,11 @@ def test_prune():
 
     data_home = res.pick_and_save(stable, 5, prune=0.99)
     assert os.path.isdir(data_home), 'result dir not existed'
+
+
+def test_cut_range():
+    cutter = VideoCutter()
+    res = cutter.cut(VIDEO_PATH)
+    stable, _ = res.get_range()
+    stable[0].contain_image(IMAGE_PATH)
+    stable[0].is_loop(0.95)
