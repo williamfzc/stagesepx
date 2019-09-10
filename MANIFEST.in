@@ -4,3 +4,4 @@ recursive-exclude * __pycache__
 recursive-exclude * *.pyc
 recursive-exclude * *.pyo
 prune example*
+prune test*
