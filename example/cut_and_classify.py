@@ -164,7 +164,8 @@ classify_result = cl.classify(
 )
 
 # 分类出来的结果是一个 list，里面包含 ClassifierResult 对象
-# 你可以用它进行二次开发
+# 如果你希望这个东西能够接入你的业务，与其他的工具协同，那么光靠后面的报告其实意义不大
+# 你可以基于 classify_result 进行定制化开发
 for each in classify_result:
     # 它的帧编号
     print(each.frame_id)
@@ -173,6 +174,11 @@ for each in classify_result:
     # 它被划分为什么类型
     print(each.stage)
     break
+# 例如，将阶段1的部分提取出来？
+stage_1_list = [each for each in classify_result if each.stage == '1']
+# 然后计算出它的范围
+print(stage_1_list[-1].timestamp - stage_1_list[0].timestamp)
+# 你也可以参考 report.py 中 calc_changing_cost 的实现
 
 # --- draw ---
 r = Reporter()
