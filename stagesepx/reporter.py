@@ -19,6 +19,35 @@ with open(template_path, encoding='utf-8') as t:
     TEMPLATE = t.read()
 
 
+class DataUtils(object):
+    """ some functions to analyse ClassiferResult list """
+    @staticmethod
+    def calc_changing_cost(
+            data_list: typing.List[ClassifierResult]
+    ) -> typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]]:
+        """ calc time cost between stages """
+        # add changing cost
+        cost_dict: typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]] = {}
+        i = 0
+        while i < len(data_list) - 1:
+            cur = data_list[i]
+            next_one = data_list[i + 1]
+
+            # next one is changing
+            if next_one.stage == UNSTABLE_FLAG:
+                for j in range(i + 1, len(data_list)):
+                    i = j
+                    next_one = data_list[j]
+                    if next_one.stage != UNSTABLE_FLAG:
+                        break
+
+                changing_name = f'{cur.stage} - {next_one.stage}'
+                cost_dict[changing_name] = (cur, next_one)
+            else:
+                i += 1
+        return cost_dict
+
+
 class Reporter(object):
     def __init__(self):
         self.dir_link_list: typing.List[str] = list()
@@ -122,31 +151,6 @@ class Reporter(object):
         return bar
 
     @staticmethod
-    def calc_changing_cost(
-            data_list: typing.List[ClassifierResult]
-    ) -> typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]]:
-        # add changing cost
-        cost_dict: typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]] = {}
-        i = 0
-        while i < len(data_list) - 1:
-            cur = data_list[i]
-            next_one = data_list[i + 1]
-
-            # next one is changing
-            if next_one.stage == UNSTABLE_FLAG:
-                for j in range(i + 1, len(data_list)):
-                    i = j
-                    next_one = data_list[j]
-                    if next_one.stage != UNSTABLE_FLAG:
-                        break
-
-                changing_name = f'{cur.stage} - {next_one.stage}'
-                cost_dict[changing_name] = (cur, next_one)
-            else:
-                i += 1
-        return cost_dict
-
-    @staticmethod
     def get_stable_stage_sample(data_list: typing.List[ClassifierResult], *args, **kwargs) -> np.ndarray:
         last = data_list[0]
         picked: typing.List[ClassifierResult] = [last]
@@ -158,7 +162,8 @@ class Reporter(object):
                 last = each
                 picked.append(each)
 
-        def get_split_line(f): return np.zeros((f.shape[0], 5))
+        def get_split_line(f):
+            return np.zeros((f.shape[0], 5))
 
         with toolbox.video_capture(last.video_path) as cap:
             frame_list: typing.List[np.ndarray] = []
@@ -194,7 +199,7 @@ class Reporter(object):
         page.add(bar)
 
         # calc time cost
-        cost_dict = self.calc_changing_cost(data_list)
+        cost_dict = DataUtils.calc_changing_cost(data_list)
 
         # insert pictures
         if cut_result:
