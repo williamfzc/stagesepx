@@ -17,7 +17,7 @@ UNSTABLE_FLAG = r'-1'
 
 # load template
 template_path = os.path.join(os.path.dirname(__file__), 'template', 'report.html')
-with open(template_path, encoding='utf-8') as t:
+with open(template_path, encoding=constants.CHARSET) as t:
     TEMPLATE = t.read()
 
 
@@ -106,6 +106,10 @@ class Reporter(object):
             ),
             toolbox_opts=opts.ToolboxOpts(is_show=True),
             tooltip_opts=opts.TooltipOpts(is_show=True, trigger='axis', axis_pointer_type='cross'),
+            brush_opts=opts.BrushOpts(
+                x_axis_index='all',
+                tool_box=['lineX'],
+            )
         )
         return line
 
@@ -190,7 +194,6 @@ class Reporter(object):
         assert os.path.isfile(from_file), f'file {from_file} not existed'
         with open(from_file, encoding=constants.CHARSET) as f:
             content = json.load(f)
-        logger.error(content)
         return [ClassifierResult(**each) for each in content]
 
     def draw(self,
