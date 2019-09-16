@@ -76,3 +76,19 @@ def test_load_from_range_list():
 
     # --- draw ---
     _draw_report(classify_result)
+
+
+def test_save_and_load():
+    cl = SVMClassifier()
+    cl.load_model(MODEL_PATH)
+    classify_result = cl.classify(VIDEO_PATH)
+
+    result_file = 'save.json'
+    reporter = Reporter()
+    reporter.save(result_file, classify_result)
+    assert os.path.isfile(result_file)
+    classify_result_after = Reporter.load(result_file)
+
+    assert len(classify_result) == len(classify_result_after)
+    for i, j in zip(classify_result, classify_result_after):
+        assert i.to_dict() == j.to_dict()
