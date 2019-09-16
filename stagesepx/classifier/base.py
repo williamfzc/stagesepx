@@ -20,6 +20,9 @@ class ClassifierResult(object):
         self.timestamp = timestamp
         self.stage = stage
 
+    def to_dict(self) -> typing.Dict:
+        return self.__dict__
+
     def __str__(self):
         return f'<ClassifierResult stage={self.stage} frame_id={self.frame_id} timestamp={self.timestamp}>'
 

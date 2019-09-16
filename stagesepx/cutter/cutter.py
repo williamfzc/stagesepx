@@ -83,7 +83,7 @@ class VideoCutter(object):
 
         range_list: typing.List[VideoCutRange] = list()
         with toolbox.video_capture(video.path) as cap:
-            logger.debug(f'total frame count: {video.frame_count}, size: {video.frame_size}')
+            logger.info(f'total frame count: {video.frame_count}, size: {video.frame_size}')
 
             # load the first two frames
             _, start = cap.read()

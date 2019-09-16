@@ -1,5 +1,6 @@
 import os
 import typing
+import json
 import numpy as np
 from jinja2 import Markup, Template
 from pyecharts.charts import Line, Bar, Page
@@ -8,6 +9,7 @@ from loguru import logger
 
 from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
+from stagesepx import constants
 from stagesepx.cutter import VideoCutResult
 
 BACKGROUND_COLOR = r'#fffaf4'
@@ -21,6 +23,7 @@ with open(template_path, encoding='utf-8') as t:
 
 class DataUtils(object):
     """ some functions to analyse ClassiferResult list """
+
     @staticmethod
     def calc_changing_cost(
             data_list: typing.List[ClassifierResult]
@@ -174,6 +177,21 @@ class Reporter(object):
                 frame_list.append(frame)
                 frame_list.append(split_line)
         return np.hstack(frame_list)
+
+    @classmethod
+    def save(cls, to_file: str, data_list: typing.List[ClassifierResult]):
+        assert not os.path.isfile(to_file), f'file {to_file} already existed'
+        data = [i.to_dict() for i in data_list]
+        with open(to_file, 'w', encoding=constants.CHARSET) as f:
+            json.dump(data, f)
+
+    @classmethod
+    def load(cls, from_file: str) -> typing.List[ClassifierResult]:
+        assert os.path.isfile(from_file), f'file {from_file} not existed'
+        with open(from_file, encoding=constants.CHARSET) as f:
+            content = json.load(f)
+        logger.error(content)
+        return [ClassifierResult(**each) for each in content]
 
     def draw(self,
              data_list: typing.List[ClassifierResult],
