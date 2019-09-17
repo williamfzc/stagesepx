@@ -115,6 +115,8 @@ class SVMClassifier(BaseClassifier):
                 train_data.append(each_pic_object)
                 train_label.append(each_label)
         logger.debug('data ready')
+
+        assert len(train_label) > 1, f'seems only one class in the training dataset, at least two classes are required: {train_label}'
         self._model.fit(train_data, train_label)
         logger.debug('train finished')
 
