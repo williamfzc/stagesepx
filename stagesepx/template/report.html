@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <title>stagesep-x report</title>
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
 </head>
 
 <style>
@@ -18,10 +15,17 @@
         background-color: {{ background_color }};
     }
     .footer {
-        margin-bottom: 20px;
+        position: fixed;
+        height: 80px;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+        text-align: center;
+        background-color: {{ background_color }};
     }
     body {
         background-color: {{ background_color }};
+        margin-bottom: 80px;
     }
 </style>
 
@@ -30,106 +34,130 @@
     <a class="navbar-brand" href="https://github.com/williamfzc/stagesepx">stagesep x report</a>
 </nav>
 
-{% if stable_sample %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Stable Stages</h2>
-            <p> All the stable stages will be shown here. </p>
-            <img src="data:image/png;base64,{{ stable_sample }}"/>
-        </div>
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" data-toggle="tab" href="#nav-stages" role="tab"
+           aria-controls="nav-stages" aria-selected="true">Stages</a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#nav-charts" role="tab"
+           aria-controls="nav-charts" aria-selected="false">Charts</a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#nav-others" role="tab"
+           aria-controls="nav-others" aria-selected="false">Others</a>
     </div>
-</div>
-{% endif %}
+</nav>
 
-{% if thumbnail_list %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Unstable Stages</h2>
-            <p> These pictures show what will happen when stages are changing. </p>
-            <ul>
-                {% for name, each_thumbnail in thumbnail_list %}
-                <li>
-                    <h3> {{ name }} </h3>
-                    <img src="data:image/png;base64,{{ each_thumbnail }}"/>
-                </li>
-                {% endfor %}
-            </ul>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-stages" role="tabpanel">
+        {% if stable_sample %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>Stable Stages</h2>
+                    <p> All the stable stages will be shown here. </p>
+                    <img src="data:image/png;base64,{{ stable_sample }}"/>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-{% endif %}
+        {% endif %}
 
-{% if dir_link_list %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Raw Pictures</h2>
-            <p> You can access pictures directory via these links below. </p>
-            <ul>
-                {% for each_link in dir_link_list %}
-                <li>
-                    <a href="{{ each_link }}">{{ each_link }}</a>
-                </li>
-                {% endfor %}
-            </ul>
+        {% if thumbnail_list %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>Unstable Stages</h2>
+                    <p> These pictures show what will happen when stages are changing. </p>
+                    <ul>
+                        {% for name, each_thumbnail in thumbnail_list %}
+                        <li>
+                            <h3> {{ name }} </h3>
+                            <img src="data:image/png;base64,{{ each_thumbnail }}"/>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
+        {% endif %}
     </div>
-</div>
-{% endif %}
-
-{% if cost_dict %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Time Cost between stages</h2>
-            <p> Calculate the time spent on stage changes. </p>
-            {% for name, result in cost_dict.items() %}
-                <h4> stage {{ name }} </h4>
-                <ul>
-                    <li>range: {{ result[0].frame_id }} - {{ result[1].frame_id }} ({{ result[0].timestamp }} - {{ result[1].timestamp }}) </li>
-                    <li>time cost: {{ result[1].timestamp - result[0].timestamp }} </li>
-                </ul>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if extras %}
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Extras</h2>
-            {% for name, value in extras.items() %}
-            <h4> {{ name }} </h4>
-            <p> {{ value }} </p>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<div class="container">
-    <div class="card border-light">
-        <div class="card-body">
-            <h2>Charts</h2>
-            <div>
-                {{ chart }}
+    <div class="tab-pane fade" id="nav-charts" role="tabpanel">
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>Charts</h2>
+                    <div>
+                        {{ chart }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <div class="tab-pane fade" id="nav-others" role="tabpanel">
+        {% if dir_link_list %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>Raw Pictures</h2>
+                    <p> You can access pictures directory via these links below. </p>
+                    <ul>
+                        {% for each_link in dir_link_list %}
+                        <li>
+                            <a href="{{ each_link }}">{{ each_link }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if cost_dict %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>Time Cost between stages</h2>
+                    <p> Calculate the time spent on stage changes. </p>
+                    {% for name, result in cost_dict.items() %}
+                    <h4> stage {{ name }} </h4>
+                    <ul>
+                        <li>range: {{ result[0].frame_id }} - {{ result[1].frame_id }} ({{ result[0].timestamp }} - {{
+                            result[1].timestamp }})
+                        </li>
+                        <li>time cost: {{ result[1].timestamp - result[0].timestamp }}</li>
+                    </ul>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if extras %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>Extras</h2>
+                    {% for name, value in extras.items() %}
+                    <h4> {{ name }} </h4>
+                    <p> {{ value }} </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
-<footer class="footer" style="text-align:center">
+
+<footer class="footer">
     <div class="container-fluid">
         <HR>
         <span class="text-muted">
-            Build with <a href="https://github.com/williamfzc/stagesepx">@stagesepx</a> :)
+            Built with <a href="https://github.com/williamfzc/stagesepx">@stagesepx</a>,
+            Page generated: {{ timestamp }}
         </span>
     </div>
 </footer>
 
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
 </body>
 </html>

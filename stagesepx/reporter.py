@@ -244,6 +244,9 @@ class Reporter(object):
         stable_stage_sample = self.get_stable_stage_sample(data_list, compress_rate=0.2)
         stable_stage_sample = toolbox.np2b64str(stable_stage_sample)
 
+        # time stamp
+        timestamp = toolbox.get_timestamp_str()
+
         # insert extras
         template = Template(TEMPLATE)
         template_content = template.render(
@@ -254,11 +257,12 @@ class Reporter(object):
             extras=self.extra_dict,
             background_color=BACKGROUND_COLOR,
             cost_dict=cost_dict,
+            timestamp=timestamp,
         )
 
         # save to file
         if not report_path:
-            report_path = f'{toolbox.get_timestamp_str()}.html'
+            report_path = f'{timestamp}.html'
         with open(report_path, "w") as fh:
             fh.write(template_content)
         logger.info(f'save report to {report_path}')
