@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>stagesep-x report</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+</head>
+
+<style>
+    .container {
+        margin: 20px;
+        background-color: {{ background_color }};
+    }
+    .card-body {
+        background-color: {{ background_color }};
+    }
+    .footer {
+        position: fixed;
+        height: 80px;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+        text-align: center;
+        background-color: {{ background_color }};
+    }
+    body {
+        background-color: {{ background_color }};
+        margin-bottom: 80px;
+    }
+</style>
+
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="https://github.com/williamfzc/stagesepx">stagesep x report</a>
+</nav>
+
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" data-toggle="tab" href="#nav-stages" role="tab"
+           aria-controls="nav-stages" aria-selected="true">阶段</a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#nav-charts" role="tab"
+           aria-controls="nav-charts" aria-selected="false">图表</a>
+        <a class="nav-item nav-link" data-toggle="tab" href="#nav-others" role="tab"
+           aria-controls="nav-others" aria-selected="false">其他</a>
+    </div>
+</nav>
+
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-stages" role="tabpanel">
+        {% if stable_sample %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>稳定阶段</h2>
+                    <p>按照时间顺序展示了 stagesepx 认为的、属于稳定状态的阶段。这里的图片默认取这些阶段的首帧。</p>
+                    <img src="data:image/png;base64,{{ stable_sample }}"/>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if thumbnail_list %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>变化过程</h2>
+                    <p>这里的图片展示了阶段切换的整个过程。你可以很清楚地知道这些阶段变化过程中发生了什么，及他们对应的区间。</p>
+                    <ul>
+                        {% for name, each_thumbnail in thumbnail_list %}
+                        <li>
+                            <h3> {{ name }} </h3>
+                            <img src="data:image/png;base64,{{ each_thumbnail }}"/>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="nav-charts" role="tabpanel">
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    关于图表对应的含义，可以参考 <a href="https://williamfzc.github.io/stagesepx/#/pages/0_what_is_it?id=stagesepx-%e8%83%bd%e5%81%9a%e4%bb%80%e4%b9%88">这里</a>。
+
+                    <h2>Charts</h2>
+                    <div>
+                        {{ chart }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="nav-others" role="tabpanel">
+        {% if dir_link_list %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>相关链接</h2>
+                    <p>通过下面的链接触达相应的资源。</p>
+                    <ul>
+                        {% for each_link in dir_link_list %}
+                        <li>
+                            <a href="{{ each_link }}">{{ each_link }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if cost_dict %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>阶段之间的耗时</h2>
+                    <p>自动计算出阶段之间的切换耗时。</p>
+                    {% for name, result in cost_dict.items() %}
+                    <h4> stage {{ name }} </h4>
+                    <ul>
+                        <li>range: {{ result[0].frame_id }} - {{ result[1].frame_id }} ({{ result[0].timestamp }} - {{
+                            result[1].timestamp }})
+                        </li>
+                        <li>time cost: {{ result[1].timestamp - result[0].timestamp }}</li>
+                    </ul>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if extras %}
+        <div class="container">
+            <div class="card border-light">
+                <div class="card-body">
+                    <h2>额外内容</h2>
+                    {% for name, value in extras.items() %}
+                    <h4> {{ name }} </h4>
+                    <p> {{ value }} </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<footer class="footer">
+    <div class="container-fluid">
+        <HR>
+        <span class="text-muted">
+            Built with <a href="https://github.com/williamfzc/stagesepx">@stagesepx</a>,
+            Page generated: {{ timestamp }}
+        </span>
+    </div>
+</footer>
+
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</body>
+</html>

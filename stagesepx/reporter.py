@@ -16,9 +16,20 @@ BACKGROUND_COLOR = r'#fffaf4'
 UNSTABLE_FLAG = r'-1'
 
 # load template
-template_path = os.path.join(os.path.dirname(__file__), 'template', 'report.html')
-with open(template_path, encoding=constants.CHARSET) as t:
-    TEMPLATE = t.read()
+template_dir_path = os.path.join(os.path.dirname(__file__), 'template')
+template_path = os.path.join(template_dir_path, 'report.html')
+template_zh_path = os.path.join(template_dir_path, 'report_zh.html')
+
+
+def get_template(lang: str) -> str:
+    lang_dict = {
+        'en': template_path,
+        'zh': template_zh_path,
+    }
+    assert lang in lang_dict, f'template {lang} not found'
+    with open(lang_dict[lang], encoding=constants.CHARSET) as t:
+        template = t.read()
+    return template
 
 
 class DataUtils(object):
@@ -200,6 +211,7 @@ class Reporter(object):
              data_list: typing.List[ClassifierResult],
              report_path: str = None,
              cut_result: VideoCutResult = None,
+             language: str = None,
              *args, **kwargs):
         """
         draw report file
@@ -207,6 +219,7 @@ class Reporter(object):
         :param data_list: classifierResult list, output of classifier
         :param report_path: your report will be there
         :param cut_result: more charts would be built
+        :param language: 'en' or 'zh'
         :return:
         """
 
@@ -248,7 +261,10 @@ class Reporter(object):
         timestamp = toolbox.get_timestamp_str()
 
         # insert extras
-        template = Template(TEMPLATE)
+        # default: zh_cn report
+        if not language:
+            language = 'zh'
+        template = Template(get_template(language))
         template_content = template.render(
             chart=Markup(page.render_embed()),
             dir_link_list=self.dir_link_list,
@@ -263,6 +279,6 @@ class Reporter(object):
         # save to file
         if not report_path:
             report_path = f'{timestamp}.html'
-        with open(report_path, "w") as fh:
+        with open(report_path, "w", encoding=constants.CHARSET) as fh:
             fh.write(template_content)
         logger.info(f'save report to {report_path}')
