@@ -53,7 +53,10 @@ stagesepx 将 自动侦测出所有处于稳定的阶段：
 - 支持与其他框架结合，融入你的业务
 - 所有你需要的，只是一个视频
 
-从 [官方文档](https://williamfzc.github.io/stagesepx/) 开始吧！
+## 快速开始
+
+- 一个 [仅有30行的例子](example)
+- 完善的 [官方文档](https://williamfzc.github.io/stagesepx/)
 
 ## License
 
