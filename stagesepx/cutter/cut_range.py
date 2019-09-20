@@ -71,11 +71,8 @@ class VideoCutRange(object):
     def contain_image(self,
                       image_path: str = None,
                       image_object: np.ndarray = None,
-                      threshold: float = None,
-                      *args, **kwargs):
+                      *args, **kwargs) -> typing.Dict:
         assert image_path or image_object, 'should fill image_path or image_object'
-        if not threshold:
-            threshold = 0.99
 
         if image_path:
             logger.debug(f'found image path, use it first: {image_path}')
@@ -96,11 +93,7 @@ class VideoCutRange(object):
             frame = toolbox.turn_grey(frame)
 
             result = fi.find(str(target_id), target_pic_object=frame)
-        find_result = result['data'][fi_template_name]['TemplateEngine']
-        position = find_result['target_point']
-        sim = find_result['target_sim']
-        logger.debug(f'position: {position}, sim: {sim}')
-        return sim > threshold
+        return result['data'][fi_template_name]['TemplateEngine']
 
     def pick(self,
              frame_count: int = None,
