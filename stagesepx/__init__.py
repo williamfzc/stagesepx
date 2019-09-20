@@ -33,7 +33,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-__author__ = r'williamfzc'
-__author_email__ = 'fengzc@vip.qq.com'
-__license__ = r'MIT'
-__url__ = r'https://github.com/williamfzc/stagesepx'
+__PROJECT_NAME__ = r'stagesepx'
+__AUTHOR__ = r'williamfzc'
+__AUTHOR_EMAIL__ = r'fengzc@vip.qq.com'
+__LICENSE__ = r'MIT'
+__URL__ = r'https://github.com/williamfzc/stagesepx'
+__VERSION__ = r'0.7.3'
+__DESCRIPTION__ = r'detect stages in video automatically'

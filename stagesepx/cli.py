@@ -5,20 +5,25 @@ from stagesepx.cutter import VideoCutter
 from stagesepx.cutter import VideoCutResult
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
+from stagesepx import __PROJECT_NAME__, __VERSION__, __URL__
+
+_desc = f'''
+{__PROJECT_NAME__}({__URL__}) version: {__VERSION__}
+    
+this is a client for stagesepx, for easier usage.
+for flexible usage, you 'd better use the script way.
+
+of course you can use this class in script:
+
+    from stagesepx.cli import TerminalCli
+
+    cli = TerminalCli()
+    cli.one_step('demo.mp4')
+'''
 
 
 class TerminalCli(object):
-    """
-    this is a client for stagesepx, for easier usage.
-    for flexible usage, you 'd better use the script way.
-
-    of course you can use this class in script:
-
-        from stagesepx.cli import TerminalCli
-
-        cli = TerminalCli()
-        cli.one_step('demo.mp4')
-    """
+    __doc__ = _desc
 
     def one_step(self,
                  video_path: str,
