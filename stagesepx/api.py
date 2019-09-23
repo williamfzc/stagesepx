@@ -7,8 +7,6 @@ from stagesepx.classifier import SVMClassifier, ClassifierResult
 from stagesepx.reporter import Reporter
 
 
-# TODO default values handler?
-
 def one_step(
     video_path: str,
     output_path: str = None,
@@ -36,11 +34,23 @@ def one_step(
 
     # --- cutter ---
     res, data_home = cut(
-        video_path, output_path, threshold, frame_count, compress_rate, offset, limit
+        video_path,
+        output_path,
+        threshold=threshold,
+        frame_count=frame_count,
+        compress_rate=compress_rate,
+        offset=offset,
+        limit=limit,
     )
 
     # --- classify ---
-    classify_result = classify(video_path, data_home, compress_rate, offset, limit)
+    classify_result = classify(
+        video_path,
+        data_home=data_home,
+        compress_rate=compress_rate,
+        offset=offset,
+        limit=limit,
+    )
 
     # --- draw ---
     r = Reporter()
@@ -93,7 +103,9 @@ def cut(
 
 def classify(
     video_path: str,
-    data_home: str,
+    data_home: str = None,
+    model: str = None,
+    # optional: these args below are sent for `get_range`
     compress_rate: float = 0.2,
     offset: int = 3,
     limit: int = None,
@@ -104,6 +116,7 @@ def classify(
 
     :param video_path: your video path
     :param data_home: output path (dir)
+    :param model: LinearSVC model (path)
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
     :param offset:
         it will change the way to decided whether two ranges can be merged
@@ -113,7 +126,7 @@ def classify(
 
     :return: typing.List[ClassifierResult]
     """
-    # TODO model?
+    assert data_home or model, "classification should based on dataset or trained model"
     cut_result_json = os.path.join(data_home, "cut_result.json")
 
     stable = None
@@ -122,8 +135,11 @@ def classify(
         stable, _ = res.get_range(offset=offset, limit=limit)
 
     cl = SVMClassifier(compress_rate=compress_rate)
-    cl.load(data_home)
-    cl.train()
+    if model:
+        cl.load_model(model)
+    else:
+        cl.load(data_home)
+        cl.train()
     return cl.classify(video_path, stable)
 
 
