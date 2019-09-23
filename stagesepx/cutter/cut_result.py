@@ -21,11 +21,6 @@ class VideoCutResult(object):
 
         # kwargs sent to `cut` function
         self.cut_kwargs = cut_kwargs or {}
-        # kwargs (will be) sent to classifier
-        # and they support:
-        # - save and load
-        # - auto parsed by classifier
-        self.classify_kwargs = {}
 
     def get_target_range_by_id(self, frame_id: int) -> VideoCutRange:
         """ get target VideoCutRange by id (which belongs to) """
