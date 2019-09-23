@@ -180,4 +180,5 @@ class VideoCutter(object):
         return VideoCutResult(
             video,
             range_list,
+            cut_kwargs=kwargs,
         )
