@@ -16,7 +16,7 @@ def test_cut_and_classify():
     res, data_home = cut(VIDEO_PATH)
 
     # test train
-    train(data_home, "hello.pkl")
+    train(data_home, "model1.pkl")
 
     # test classify
     classify_result = classify(VIDEO_PATH, data_home)
