@@ -17,6 +17,9 @@ def test_cli():
     subprocess.check_call(['stagesepx', 'cut', VIDEO_PATH])
     subprocess.check_call(['stagesepx', 'cut', VIDEO_PATH, 'output'])
 
+    logger.info('checking train ...')
+    subprocess.check_call(['stagesepx', 'train', 'output', 'model.pkl'])
+
     logger.info('checking classifier ...')
     subprocess.check_call(['stagesepx', 'classify', VIDEO_PATH, 'output'])
     shutil.rmtree('output')

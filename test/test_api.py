@@ -1,6 +1,6 @@
 import os
 
-from stagesepx.api import cut, classify, one_step
+from stagesepx.api import cut, classify, one_step, train
 from stagesepx.reporter import Reporter
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -12,10 +12,13 @@ def test_one_step():
 
 
 def test_cut_and_classify():
-    # --- cutter ---
+    # test cut
     res, data_home = cut(VIDEO_PATH)
 
-    # --- classify ---
+    # test train
+    train(data_home, "hello.pkl")
+
+    # test classify
     classify_result = classify(VIDEO_PATH, data_home)
 
     # --- draw ---
