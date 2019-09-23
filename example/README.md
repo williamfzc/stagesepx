@@ -2,6 +2,20 @@
 
 ## quick start
 
+### 命令行方式
+
+stagesepx支持直接从命令行启动。在此模式下，你无需编写任何代码。
+
+试着分析你的第一个视频：
+
+```bash
+stagesepx one_step demo.mp4
+```
+
+### 脚本方式
+
+如果你想要更多定制，或者你希望与其他程序进行结合，那么你最好通过脚本使用。
+
 - [mini.py](./mini.py) 提供了一个不到30行的例子。当然，这也意味着肯定不会包含太多功能。
 - [cut_and_classify.py](./cut_and_classify.py) 提供了几乎所有的stagesepx用法及详细的注释。
 
