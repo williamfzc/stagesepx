@@ -1,3 +1,6 @@
+"""
+high level API
+"""
 import os
 import typing
 
@@ -13,6 +16,7 @@ def one_step(
     threshold: float = 0.95,
     frame_count: int = 5,
     compress_rate: float = 0.2,
+    target_size: typing.Tuple[int, int] = None,
     offset: int = 3,
     limit: int = None,
 ):
@@ -24,6 +28,7 @@ def one_step(
     :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
     :param frame_count: default to 5, and finally you will get 5 frames for each range
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
+    :param target_size: (100, 200)
     :param offset:
         it will change the way to decided whether two ranges can be merged
         before: first_range.end == second_range.start
@@ -39,6 +44,7 @@ def one_step(
         threshold=threshold,
         frame_count=frame_count,
         compress_rate=compress_rate,
+        target_size=target_size,
         offset=offset,
         limit=limit,
     )
@@ -48,6 +54,7 @@ def one_step(
         video_path,
         data_home=data_home,
         compress_rate=compress_rate,
+        target_size=target_size,
         offset=offset,
         limit=limit,
     )
@@ -72,6 +79,7 @@ def cut(
     threshold: float = 0.95,
     frame_count: int = 5,
     compress_rate: float = 0.2,
+    target_size: typing.Tuple[int, int] = None,
     offset: int = 3,
     limit: int = None,
 ) -> typing.Tuple[VideoCutResult, str]:
@@ -83,6 +91,7 @@ def cut(
     :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
     :param frame_count: default to 5, and finally you will get 5 frames for each range
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
+    :param target_size: (100, 200)
     :param offset:
         it will change the way to decided whether two ranges can be merged
         before: first_range.end == second_range.start
@@ -92,7 +101,7 @@ def cut(
     :return: tuple, (VideoCutResult, data_home)
     """
     cutter = VideoCutter()
-    res = cutter.cut(video_path, compress_rate=compress_rate)
+    res = cutter.cut(video_path, compress_rate=compress_rate, target_size=target_size)
     stable, unstable = res.get_range(threshold=threshold, limit=limit, offset=offset)
 
     data_home = res.pick_and_save(stable, frame_count, to_dir=output_path)
@@ -107,6 +116,7 @@ def classify(
     model: str = None,
     # optional: these args below are sent for `get_range`
     compress_rate: float = 0.2,
+    target_size: typing.Tuple[int, int] = None,
     offset: int = 3,
     limit: int = None,
 ) -> typing.List[ClassifierResult]:
@@ -118,6 +128,7 @@ def classify(
     :param data_home: output path (dir)
     :param model: LinearSVC model (path)
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
+    :param target_size: (100, 200)
     :param offset:
         it will change the way to decided whether two ranges can be merged
         before: first_range.end == second_range.start
@@ -134,7 +145,7 @@ def classify(
         res = VideoCutResult.load(cut_result_json)
         stable, _ = res.get_range(offset=offset, limit=limit)
 
-    cl = SVMClassifier(compress_rate=compress_rate)
+    cl = SVMClassifier(compress_rate=compress_rate, target_size=target_size)
     if model:
         cl.load_model(model)
     else:
