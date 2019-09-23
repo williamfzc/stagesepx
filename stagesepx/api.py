@@ -110,6 +110,28 @@ def cut(
     return res, data_home
 
 
+def train(
+    data_home: str,
+    save_to: str,
+    compress_rate: float = 0.2,
+    target_size: typing.Tuple[int, int] = None,
+):
+    """
+    build a trained model with a dataset
+
+    :param data_home: output path (dir)
+    :param save_to: model will be saved to this path
+    :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
+    :param target_size: (100, 200)
+    """
+    assert os.path.isdir(data_home), f"dir {data_home} not existed"
+    assert not os.path.isfile(save_to), f"file {save_to} already existed"
+    cl = SVMClassifier(compress_rate=compress_rate, target_size=target_size)
+    cl.load(data_home)
+    cl.train()
+    cl.save_model(save_to)
+
+
 def classify(
     video_path: str,
     data_home: str = None,

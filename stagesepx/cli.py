@@ -18,6 +18,7 @@ class TerminalCli(object):
     one_step = staticmethod(api.one_step)
     cut = staticmethod(api.cut)
     classify = staticmethod(api.classify)
+    train = staticmethod(api.train)
 
 
 def main():
