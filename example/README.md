@@ -21,6 +21,36 @@ stagesepx one_step demo.mp4
 
 你可以先从前者开始使用，再根据自身的需要，参考后者的用法逐步补充到前者中。
 
+### docker image
+
+基于docker，我们提供了更为简洁的方式使它能够运行在容器内。你无需关心复杂的依赖，并且能够更轻松地与其它系统（诸如Jenkins）结合。
+
+例如你的视频放置在 `video_dir` 目录下，名为 `demo.mp4`：
+
+```bash
+cd video_dir
+```
+
+创建并启动容器：
+
+```bash
+docker run \
+    --rm \
+    -v ${PWD}:/usr/src/app \
+    williamfzc/stagesepx \
+    stagesepx one_step demo.mp4
+```
+
+当然你也可以使用脚本方式：
+
+```bash
+docker run \
+    --rm \
+    -v ${PWD}:/usr/src/app \
+    williamfzc/stagesepx \
+    python your_script.py
+```
+
 ## 常规落地方案
 
 常规情况下，有一个比较通用的落地方案：
