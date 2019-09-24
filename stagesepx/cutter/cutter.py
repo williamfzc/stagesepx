@@ -22,9 +22,7 @@ class VideoCutter(object):
         :param compress_rate:
         :param target_size:
         """
-        if not step:
-            step = 1
-        self.step = step
+        self.step = step or 1
 
         # default compress rate is 0.2
         if (not compress_rate) and (not target_size):
@@ -180,4 +178,5 @@ class VideoCutter(object):
         return VideoCutResult(
             video,
             range_list,
+            cut_kwargs=kwargs,
         )

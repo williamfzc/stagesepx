@@ -14,9 +14,13 @@ from stagesepx.cutter.cut_range import VideoCutRange
 class VideoCutResult(object):
     def __init__(self,
                  video: VideoObject,
-                 range_list: typing.List[VideoCutRange]):
+                 range_list: typing.List[VideoCutRange],
+                 cut_kwargs: typing.Dict = None):
         self.video = video
         self.range_list = range_list
+
+        # kwargs sent to `cut` function
+        self.cut_kwargs = cut_kwargs or {}
 
     def get_target_range_by_id(self, frame_id: int) -> VideoCutRange:
         """ get target VideoCutRange by id (which belongs to) """

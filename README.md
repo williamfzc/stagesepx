@@ -55,6 +55,7 @@ stagesepx 将 自动侦测出所有处于稳定的阶段：
 
 ## 快速开始
 
+- 直接 [通过命令行使用](example)
 - 一个 [仅有30行的例子](example)
 - 完善的 [官方文档](https://williamfzc.github.io/stagesepx/)
 
