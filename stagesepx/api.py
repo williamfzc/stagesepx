@@ -8,6 +8,7 @@ from stagesepx.cutter import VideoCutter
 from stagesepx.cutter import VideoCutResult
 from stagesepx.classifier import SVMClassifier, ClassifierResult
 from stagesepx.reporter import Reporter
+from stagesepx import constants
 
 
 def one_step(
@@ -63,7 +64,7 @@ def one_step(
     r = Reporter()
     r.draw(
         classify_result,
-        report_path=os.path.join(data_home, "report.html"),
+        report_path=os.path.join(data_home, constants.REPORT_FILE_NAME),
         cut_result=res,
         # kwargs of get_range
         # otherwise these thumbnails may become different
@@ -105,7 +106,7 @@ def cut(
     stable, unstable = res.get_range(threshold=threshold, limit=limit, offset=offset)
 
     data_home = res.pick_and_save(stable, frame_count, to_dir=output_path)
-    res_json_path = os.path.join(output_path or data_home, "cut_result.json")
+    res_json_path = os.path.join(output_path or data_home, constants.CUT_RESULT_FILE_NAME)
     res.dump(res_json_path)
     return res, data_home
 
@@ -136,11 +137,12 @@ def classify(
     video_path: str,
     data_home: str = None,
     model: str = None,
-    # optional: these args below are sent for `get_range`
+    # optional: these args below are sent for `cutter`
     compress_rate: float = 0.2,
     target_size: typing.Tuple[int, int] = None,
     offset: int = 3,
     limit: int = None,
+    threshold: float = 0.95,
 ) -> typing.List[ClassifierResult]:
     """
     classify a video with some tagged pictures
@@ -156,24 +158,25 @@ def classify(
         before: first_range.end == second_range.start
         after: first_range.end + offset >= secord_range.start
     :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
+    :param threshold: cutter threshold
 
     :return: typing.List[ClassifierResult]
     """
     assert data_home or model, "classification should based on dataset or trained model"
-
-    stable = None
     cl = SVMClassifier(compress_rate=compress_rate, target_size=target_size)
 
     if model:
         cl.load_model(model)
     else:
-        cut_result_json = os.path.join(data_home, "cut_result.json")
-
-        if os.path.isfile(cut_result_json):
-            res = VideoCutResult.load(cut_result_json)
-            stable, _ = res.get_range(offset=offset, limit=limit)
         cl.load(data_home)
         cl.train()
+    # re cut
+    cut_result, _ = cut(
+        video_path,
+        compress_rate=compress_rate,
+        threshold=threshold,
+    )
+    stable, _ = cut_result.get_range(offset=offset, limit=limit)
     return cl.classify(video_path, stable)
 
 
