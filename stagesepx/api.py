@@ -176,4 +176,4 @@ def classify(
     return cl.classify(video_path, stable)
 
 
-__all__ = ("cut", "classify", "one_step")
+__all__ = ("cut", "classify", "one_step", "train")
