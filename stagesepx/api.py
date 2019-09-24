@@ -160,17 +160,18 @@ def classify(
     :return: typing.List[ClassifierResult]
     """
     assert data_home or model, "classification should based on dataset or trained model"
-    cut_result_json = os.path.join(data_home, "cut_result.json")
 
     stable = None
-    if os.path.isfile(cut_result_json):
-        res = VideoCutResult.load(cut_result_json)
-        stable, _ = res.get_range(offset=offset, limit=limit)
-
     cl = SVMClassifier(compress_rate=compress_rate, target_size=target_size)
+
     if model:
         cl.load_model(model)
     else:
+        cut_result_json = os.path.join(data_home, "cut_result.json")
+
+        if os.path.isfile(cut_result_json):
+            res = VideoCutResult.load(cut_result_json)
+            stable, _ = res.get_range(offset=offset, limit=limit)
         cl.load(data_home)
         cl.train()
     return cl.classify(video_path, stable)
