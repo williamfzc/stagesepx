@@ -1,6 +1,14 @@
 # example for stagesepx
 
-## quick start
+## 安装
+
+支持 python3.6 及更高的版本。
+
+```bash
+pip install stagesepx
+```
+
+## 快速开始
 
 ### 命令行方式
 
