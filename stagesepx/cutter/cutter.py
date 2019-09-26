@@ -81,8 +81,8 @@ class VideoCutter(object):
 
         # load the first two frames
         video_operator = video.get_operator()
-        cur_frame = video_operator.get_frame_by_id(0)
-        next_frame = video_operator.get_frame_by_id(self.step + 1)
+        cur_frame = video_operator.get_frame_by_id(1)
+        next_frame = video_operator.get_frame_by_id(1 + self.step)
 
         # hook
         cur_frame.data = self._apply_hook(cur_frame.frame_id, cur_frame.data)
@@ -155,23 +155,26 @@ class VideoCutter(object):
 
         return range_list
 
-    def cut(self, video_path: str, *args, **kwargs) -> VideoCutResult:
+    def cut(
+        self, video: typing.Union[str, VideoObject], *args, **kwargs
+    ) -> VideoCutResult:
         """
         convert video file, into a VideoCutResult
 
-        :param video_path: video file path
+        :param video: video file path or VideoObject
         :param kwargs: parameters of toolbox.compress_frame can be used here
         :return:
         """
+        if isinstance(video, str):
+            video = VideoObject(video)
 
-        logger.info(f"start cutting: {video_path}")
-        video = VideoObject(video_path)
+        logger.info(f"start cutting: {video.path}")
 
         # if video contains 100 frames
         # it starts from 1, and length of list is 99, not 100
         # [Range(1-2), Range(2-3), Range(3-4) ... Range(99-100)]
         range_list = self._convert_video_into_range_list(video, *args, **kwargs)
-        logger.info(f"cut finished: {video_path}")
+        logger.info(f"cut finished: {video}")
 
         # TODO other analysis results can be added to VideoCutResult, such as AI cutter?
         return VideoCutResult(video, range_list, cut_kwargs=kwargs)

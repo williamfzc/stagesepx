@@ -23,6 +23,9 @@ class VideoFrame(object):
         grey = toolbox.turn_grey(frame)
         return VideoFrame(frame_id, timestamp, grey)
 
+    def copy(self):
+        return VideoFrame(self.frame_id, self.timestamp, self.data[:])
+
 
 class _BaseFrameOperator(object):
     def __init__(self, video: "VideoObject"):
@@ -39,9 +42,10 @@ class _BaseFrameOperator(object):
 
 class MemFrameOperator(_BaseFrameOperator):
     def get_frame_by_id(self, frame_id: int) -> typing.Optional[VideoFrame]:
+        frame_id = frame_id - 1
         if frame_id >= self.get_length():
             return None
-        return self.video.data[frame_id][:]
+        return self.video.data[frame_id].copy()
 
 
 class FileFrameOperator(_BaseFrameOperator):
@@ -69,7 +73,7 @@ class VideoObject(object):
     __repr__ = __str__
 
     def clean_frames(self):
-        self.data = []
+        self.data = ()
 
     def load_frames(self):
         # TODO full frames list can be very huge

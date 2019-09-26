@@ -140,7 +140,7 @@ class BaseClassifier(object):
 
     def classify(
         self,
-        video_path: str,
+        video: typing.Union[str, VideoObject],
         limit_range: typing.List[VideoCutRange] = None,
         step: int = None,
         *args,
@@ -149,7 +149,7 @@ class BaseClassifier(object):
         """
         start classification
 
-        :param video_path: path to target video
+        :param video: path to target video or VideoObject
         :param limit_range: frames in these range will be ignored
         :param step: step between frames, default to 1
         :param args:
@@ -162,10 +162,11 @@ class BaseClassifier(object):
             step = 1
 
         final_result: typing.List[ClassifierResult] = list()
-        video_object = VideoObject(video_path)
+        if isinstance(video, str):
+            video = VideoObject(video)
 
-        operator = video_object.get_operator()
-        frame = operator.get_frame_by_id(0)
+        operator = video.get_operator()
+        frame = operator.get_frame_by_id(1)
         while frame is not None:
             if limit_range:
                 if not any([each.contain(frame.frame_id) for each in limit_range]):
@@ -174,7 +175,7 @@ class BaseClassifier(object):
                     )
                     final_result.append(
                         ClassifierResult(
-                            video_path, frame.frame_id, frame.timestamp, "-1"
+                            video.path, frame.frame_id, frame.timestamp, "-1"
                         )
                     )
                     frame = operator.get_frame_by_id(frame.frame_id + step)
@@ -189,7 +190,7 @@ class BaseClassifier(object):
             )
 
             final_result.append(
-                ClassifierResult(video_path, frame.frame_id, frame.timestamp, result)
+                ClassifierResult(video.path, frame.frame_id, frame.timestamp, result)
             )
             frame = operator.get_frame_by_id(frame.frame_id + step)
         return final_result
