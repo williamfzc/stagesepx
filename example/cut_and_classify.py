@@ -4,7 +4,13 @@ from stagesepx.reporter import Reporter
 from stagesepx.hook import ExampleHook, CropHook, IgnoreHook
 import os
 
-video_path = '../demo.mp4'
+video = '../demo.mp4'
+
+# 在 0.8.0 之后，你可以利用视频预加载模式，大幅度提升分析速度
+from stagesepx.video import VideoObject
+video = VideoObject(video)
+# 预加载（会消耗一定内存）
+video.load_frames()
 
 # --- cut ---
 cutter = VideoCutter(
@@ -70,7 +76,7 @@ hook3 = IgnoreHook(
 
 # 开始切割
 res = cutter.cut(
-    video_path,
+    video,
     # block 能够对每帧进行切割并分别进行比较，计算出更加敏感的ssim值
     # 默认为2，即切为4宫格；若为4，即切为16宫格，以此类推；为1即不做切割，全图比较
     # 值得注意，如果无法整除，block是会报错的
@@ -156,7 +162,7 @@ cl.train()
 # 那么分析时只会分析处于范围内的帧！
 # 例如，这里只传入了stable的范围，那么非stable范围内的帧都会被忽略掉，标记为 -1
 classify_result = cl.classify(
-    video_path,
+    video,
     stable,
     # 步长，可以自行设置用于平衡效率与颗粒度
     # 默认为1，即每帧都检测
