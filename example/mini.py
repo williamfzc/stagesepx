@@ -6,7 +6,7 @@ from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
 
-video_path = '../demo.mp4'
+video_path = "../demo.mp4"
 
 
 # --- cutter ---
