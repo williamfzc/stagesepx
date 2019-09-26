@@ -88,7 +88,7 @@ class VideoCutRange(object):
         operator = self.video.get_operator()
         frame = operator.get_frame_by_id(target_id)
 
-        result = fi.find(str(target_id), target_pic_object=frame)
+        result = fi.find(str(target_id), target_pic_object=frame.data)
         return result["data"][fi_template_name]["TemplateEngine"]
 
     def pick(

@@ -40,9 +40,9 @@ def multi_compare_ssim(
     pic2_list: typing.Union[typing.List[VideoFrame], typing.List[np.ndarray]],
 ) -> typing.List[float]:
     if isinstance(pic1_list[0], VideoFrame):
-        pic1_list = [i.frame for i in pic1_list]
+        pic1_list = [i.data for i in pic1_list]
     if isinstance(pic2_list[0], VideoFrame):
-        pic2_list = [i.frame for i in pic2_list]
+        pic2_list = [i.data for i in pic2_list]
     return [compare_ssim(a, b) for a, b in zip(pic1_list, pic2_list)]
 
 

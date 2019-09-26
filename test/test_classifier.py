@@ -63,15 +63,6 @@ def test_work_with_cutter():
     _draw_report(classify_result)
 
 
-def test_load_from_range_list():
-    cl = SSIMClassifier()
-    cl.load(cutter_res.range_list)
-    classify_result = cl.classify(VIDEO_PATH)
-
-    # --- draw ---
-    _draw_report(classify_result)
-
-
 def test_save_and_load():
     cl = SVMClassifier()
     cl.load_model(MODEL_PATH)
