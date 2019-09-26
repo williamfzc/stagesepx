@@ -1,32 +1,25 @@
 from loguru import logger
-import cv2
-import numpy as np
 
 from stagesepx.classifier.base import BaseClassifier
 from stagesepx import toolbox
+from stagesepx.video import VideoFrame
 
 
 class SSIMClassifier(BaseClassifier):
     def _classify_frame(
-        self,
-        frame_id: int,
-        frame: np.ndarray,
-        video_cap: cv2.VideoCapture,
-        threshold: float = None,
-        *_,
-        **__,
+        self, frame: VideoFrame, threshold: float = None, *_, **__
     ) -> str:
         if not threshold:
             threshold = 0.85
 
         result = list()
-        for each_stage_name, each_stage_pic_list in self.read(video_cap):
+        for each_stage_name, each_stage_pic_list in self.read():
             each_result = list()
             for target_pic in each_stage_pic_list:
                 # apply hooks
                 target_pic = self._apply_hook(-1, target_pic)
 
-                each_pic_ssim = toolbox.compare_ssim(frame, target_pic)
+                each_pic_ssim = toolbox.compare_ssim(frame.data, target_pic)
                 each_result.append(each_pic_ssim)
             ssim = max(each_result)
             result.append((each_stage_name, ssim))

@@ -41,7 +41,7 @@ class MemFrameOperator(_BaseFrameOperator):
     def get_frame_by_id(self, frame_id: int) -> typing.Optional[VideoFrame]:
         if frame_id >= self.get_length():
             return None
-        return self.video.data[frame_id]
+        return self.video.data[frame_id][:]
 
 
 class FileFrameOperator(_BaseFrameOperator):
@@ -49,8 +49,8 @@ class FileFrameOperator(_BaseFrameOperator):
         with toolbox.video_capture(self.video.path) as cap:
             toolbox.video_jump(cap, frame_id)
             success, frame = cap.read()
-            ret = VideoFrame.init(cap, frame) if success else None
-        return ret
+            video_frame = VideoFrame.init(cap, frame) if success else None
+        return video_frame
 
 
 class VideoObject(object):

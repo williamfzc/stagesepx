@@ -344,7 +344,7 @@ class VideoCutResult(object):
 
             for each_frame_object in each_frame_list:
                 each_frame_path = os.path.join(each_stage_dir, f"{uuid.uuid4()}.png")
-                compressed = toolbox.compress_frame(each_frame_object.frame, **kwargs)
+                compressed = toolbox.compress_frame(each_frame_object.data, **kwargs)
                 cv2.imwrite(each_frame_path, compressed)
                 logger.debug(
                     f"frame [{each_frame_object.frame_id}] saved to {each_frame_path}"

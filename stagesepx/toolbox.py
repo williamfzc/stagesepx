@@ -14,14 +14,7 @@ from skimage.measure import compare_ssim as origin_compare_ssim
 from skimage.measure import compare_nrmse, compare_psnr
 from skimage.feature import hog, local_binary_pattern
 
-
-class VideoFrame(object):
-    """ loaded frame """
-
-    def __init__(self, frame_id: int, frame_timestamp: float, frame: np.ndarray):
-        self.frame_id = frame_id
-        self.frame_timestamp = frame_timestamp
-        self.frame = frame
+from stagesepx.video import VideoFrame
 
 
 @contextlib.contextmanager

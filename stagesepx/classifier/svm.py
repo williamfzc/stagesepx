@@ -8,6 +8,7 @@ from sklearn.svm import LinearSVC
 
 from stagesepx.classifier.base import BaseClassifier
 from stagesepx import toolbox
+from stagesepx.video import VideoFrame
 
 
 class SVMClassifier(BaseClassifier):
@@ -136,14 +137,14 @@ class SVMClassifier(BaseClassifier):
         pic_object = toolbox.imread(pic_path)
         return self.predict_with_object(pic_object)
 
-    def predict_with_object(self, pic_object: np.ndarray) -> str:
+    def predict_with_object(self, frame: np.ndarray) -> str:
         """
         predict a single object
 
-        :param pic_object:
+        :param frame:
         :return:
         """
-        pic_object = self.feature_func(pic_object)
+        pic_object = self.feature_func(frame)
         pic_object = pic_object.reshape(1, -1)
 
         # scores for each stages
@@ -173,5 +174,5 @@ class SVMClassifier(BaseClassifier):
 
         return self._model.classes_[np.argmax(scores)]
 
-    def _classify_frame(self, frame_id: int, frame: np.ndarray, *_, **__) -> str:
-        return self.predict_with_object(frame)
+    def _classify_frame(self, frame: VideoFrame, *_, **__) -> str:
+        return self.predict_with_object(frame.data)

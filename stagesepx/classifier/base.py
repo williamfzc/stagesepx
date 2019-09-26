@@ -7,6 +7,7 @@ from loguru import logger
 from stagesepx.cutter import VideoCutRange
 from stagesepx import toolbox
 from stagesepx.hook import BaseHook, GreyHook, CompressHook
+from stagesepx.video import VideoObject, VideoFrame
 
 
 class ClassifierResult(object):
@@ -125,19 +126,9 @@ class BaseClassifier(object):
     def read_from_list(
         self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__
     ):
-        cur_frame_id = toolbox.get_current_frame_id(video_cap)
-        data = (toolbox.get_frame(video_cap, each) for each in data)
-        toolbox.video_jump(video_cap, cur_frame_id)
-        return data
+        raise DeprecationWarning("this function already deprecated")
 
-    def _classify_frame(
-        self,
-        frame_id: int,
-        frame: np.ndarray,
-        video_cap: cv2.VideoCapture,
-        *args,
-        **kwargs,
-    ) -> str:
+    def _classify_frame(self, frame: VideoFrame, *args, **kwargs) -> str:
         """ must be implemented by sub class """
 
     def _apply_hook(
@@ -171,35 +162,34 @@ class BaseClassifier(object):
             step = 1
 
         final_result: typing.List[ClassifierResult] = list()
-        with toolbox.video_capture(video_path) as cap:
-            ret, frame = cap.read()
-            while ret:
-                frame_id = toolbox.get_current_frame_id(cap)
-                frame_timestamp = toolbox.get_current_frame_time(cap)
-                if limit_range:
-                    if not any([each.contain(frame_id) for each in limit_range]):
-                        logger.debug(
-                            f"frame {frame_id} ({frame_timestamp}) not in target range, skip"
+        video_object = VideoObject(video_path)
+
+        operator = video_object.get_operator()
+        frame = operator.get_frame_by_id(0)
+        while frame is not None:
+            if limit_range:
+                if not any([each.contain(frame.frame_id) for each in limit_range]):
+                    logger.debug(
+                        f"frame {frame.frame_id} ({frame.timestamp}) not in target range, skip"
+                    )
+                    final_result.append(
+                        ClassifierResult(
+                            video_path, frame.frame_id, frame.timestamp, "-1"
                         )
-                        final_result.append(
-                            ClassifierResult(
-                                video_path, frame_id, frame_timestamp, "-1"
-                            )
-                        )
-                        ret, frame = cap.read()
-                        continue
+                    )
+                    frame = operator.get_frame_by_id(frame.frame_id + step)
+                    continue
 
-                # hook
-                frame = self._apply_hook(frame_id, frame, *args, **kwargs)
+            # hook
+            frame.data = self._apply_hook(frame.frame_id, frame.data, *args, **kwargs)
 
-                result = self._classify_frame(frame_id, frame, cap, *args, **kwargs)
-                logger.debug(
-                    f"frame {frame_id} ({frame_timestamp}) belongs to {result}"
-                )
+            result = self._classify_frame(frame, *args, **kwargs)
+            logger.debug(
+                f"frame {frame.frame_id} ({frame.timestamp}) belongs to {result}"
+            )
 
-                final_result.append(
-                    ClassifierResult(video_path, frame_id, frame_timestamp, result)
-                )
-                toolbox.video_jump(cap, frame_id + step)
-                ret, frame = cap.read()
+            final_result.append(
+                ClassifierResult(video_path, frame.frame_id, frame.timestamp, result)
+            )
+            frame = operator.get_frame_by_id(frame.frame_id + step)
         return final_result

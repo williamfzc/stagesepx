@@ -1,18 +1,18 @@
 import os
 import typing
 import random
-import cv2
 import numpy as np
 from loguru import logger
 from findit import FindIt
 
 from stagesepx import toolbox
-from stagesepx.video import VideoObject
+from stagesepx.video import VideoObject, VideoFrame
 
 
 class VideoCutRange(object):
     def __init__(
         self,
+        # TODO why can it be a dict?
         video: typing.Union[VideoObject, typing.Dict],
         start: int,
         end: int,
@@ -84,12 +84,11 @@ class VideoCutRange(object):
         fi_template_name = "default"
         fi.load_template(fi_template_name, pic_object=image_object)
 
-        with toolbox.video_capture(self.video.path) as cap:
-            target_id = self.pick(*args, **kwargs)[0]
-            frame = toolbox.get_frame(cap, target_id)
-            frame = toolbox.turn_grey(frame)
+        target_id = self.pick(*args, **kwargs)[0]
+        operator = self.video.get_operator()
+        frame = operator.get_frame_by_id(target_id)
 
-            result = fi.find(str(target_id), target_pic_object=frame)
+        result = fi.find(str(target_id), target_pic_object=frame)
         return result["data"][fi_template_name]["TemplateEngine"]
 
     def pick(
@@ -118,14 +117,13 @@ class VideoCutRange(object):
 
     def get_frames(
         self, frame_id_list: typing.List[int], *_, **__
-    ) -> typing.List[toolbox.VideoFrame]:
+    ) -> typing.List[VideoFrame]:
         """ return a list of VideoFrame, usually works with pick """
         out = list()
-        with toolbox.video_capture(self.video.path) as cap:
-            for each_id in frame_id_list:
-                timestamp = toolbox.get_frame_time(cap, each_id)
-                frame = toolbox.get_frame(cap, each_id)
-                out.append(toolbox.VideoFrame(each_id, timestamp, frame))
+        operator = self.video.get_operator()
+        for each_id in frame_id_list:
+            frame = operator.get_frame_by_id(each_id)
+            out.append(frame)
         return out
 
     def pick_and_get(self, *args, **kwargs) -> typing.List[toolbox.VideoFrame]:
@@ -154,13 +152,10 @@ class VideoCutRange(object):
     def is_loop(self, threshold: float = None, **_) -> bool:
         if not threshold:
             threshold = 0.95
-        with toolbox.video_capture(video_path=self.video.path) as cap:
-            start_frame = toolbox.get_frame(cap, self.start)
-            end_frame = toolbox.get_frame(cap, self.end)
-            start_frame, end_frame = map(
-                toolbox.compress_frame, (start_frame, end_frame)
-            )
-            return toolbox.compare_ssim(start_frame, end_frame) > threshold
+        operator = self.video.get_operator()
+        start_frame = operator.get_frame_by_id(self.start)
+        end_frame = operator.get_frame_by_id(self.end)
+        return toolbox.compare_ssim(start_frame.data, end_frame.data) > threshold
 
     def diff(self, another: "VideoCutRange", *args, **kwargs) -> typing.List[float]:
         self_picked = self.pick_and_get(*args, **kwargs)
