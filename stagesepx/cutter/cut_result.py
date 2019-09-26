@@ -382,6 +382,7 @@ class VideoCutResult(object):
                 # ignore
                 return "<np.ndarray object>"
             return obj.__dict__
+
         return json.dumps(self, sort_keys=True, default=_handler)
 
     def dump(self, json_path: str, **kwargs):

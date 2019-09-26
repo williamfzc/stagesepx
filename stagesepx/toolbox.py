@@ -14,7 +14,8 @@ from skimage.measure import compare_ssim as origin_compare_ssim
 from skimage.measure import compare_nrmse, compare_psnr
 from skimage.feature import hog, local_binary_pattern
 
-from stagesepx.video import VideoFrame
+# DO NOT IMPORT ANYTHING FROM STAGESEPX HERE
+# MAKE TOOLBOX STATIC
 
 
 @contextlib.contextmanager
@@ -36,9 +37,11 @@ def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
 
 
 def multi_compare_ssim(
-    pic1_list: typing.Union[typing.List[VideoFrame], typing.List[np.ndarray]],
-    pic2_list: typing.Union[typing.List[VideoFrame], typing.List[np.ndarray]],
+    pic1_list: typing.List, pic2_list: typing.List
 ) -> typing.List[float]:
+    # avoid import loop
+    from stagesepx.video import VideoFrame
+
     if isinstance(pic1_list[0], VideoFrame):
         pic1_list = [i.data for i in pic1_list]
     if isinstance(pic2_list[0], VideoFrame):

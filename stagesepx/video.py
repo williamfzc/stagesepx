@@ -115,10 +115,3 @@ class VideoObject(object):
 
     def __iter__(self):
         return self.get_iterator()
-
-
-if __name__ == "__main__":
-    v = VideoObject("../demo.mp4")
-    v.load_frames()
-    for each in v:
-        print(each)
