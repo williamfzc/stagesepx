@@ -126,7 +126,7 @@ class VideoCutRange(object):
             out.append(frame)
         return out
 
-    def pick_and_get(self, *args, **kwargs) -> typing.List[toolbox.VideoFrame]:
+    def pick_and_get(self, *args, **kwargs) -> typing.List[VideoFrame]:
         picked = self.pick(*args, **kwargs)
         return self.get_frames(picked, *args, **kwargs)
 

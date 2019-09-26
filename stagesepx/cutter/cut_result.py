@@ -7,7 +7,7 @@ import numpy as np
 from loguru import logger
 
 from stagesepx import toolbox
-from stagesepx.video import VideoObject
+from stagesepx.video import VideoObject, VideoFrame
 from stagesepx.cutter.cut_range import VideoCutRange
 
 
@@ -355,8 +355,8 @@ class VideoCutResult(object):
     @staticmethod
     def _prune(
         threshold: float,
-        stages: typing.List[typing.Tuple[str, typing.List[toolbox.VideoFrame]]],
-    ) -> typing.List[typing.Tuple[str, typing.List[toolbox.VideoFrame]]]:
+        stages: typing.List[typing.Tuple[str, typing.List[VideoFrame]]],
+    ) -> typing.List[typing.Tuple[str, typing.List[VideoFrame]]]:
         logger.debug(
             f"start pruning ranges, origin length is {len(stages)}, threshold is {threshold}"
         )
