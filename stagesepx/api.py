@@ -9,10 +9,11 @@ from stagesepx.cutter import VideoCutResult
 from stagesepx.classifier import SVMClassifier, ClassifierResult
 from stagesepx.reporter import Reporter
 from stagesepx import constants
+from stagesepx.video import VideoObject
 
 
 def one_step(
-    video_path: str,
+    video: typing.Union[str, VideoObject],
     output_path: str = None,
     threshold: float = 0.95,
     frame_count: int = 5,
@@ -24,7 +25,7 @@ def one_step(
     """
     one step => cut, classifier, draw
 
-    :param video_path: your video path
+    :param video: video path or object
     :param output_path: output path (dir)
     :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
     :param frame_count: default to 5, and finally you will get 5 frames for each range
@@ -38,9 +39,12 @@ def one_step(
     :return:
     """
 
+    if isinstance(video, str):
+        video = VideoObject(video)
+
     # --- cutter ---
     res, data_home = cut(
-        video_path,
+        video,
         output_path,
         threshold=threshold,
         frame_count=frame_count,
@@ -52,7 +56,7 @@ def one_step(
 
     # --- classify ---
     classify_result = classify(
-        video_path,
+        video,
         data_home=data_home,
         compress_rate=compress_rate,
         target_size=target_size,
@@ -75,7 +79,7 @@ def one_step(
 
 
 def cut(
-    video_path: str,
+    video: typing.Union[str, VideoObject],
     output_path: str = None,
     threshold: float = 0.95,
     frame_count: int = 5,
@@ -87,7 +91,7 @@ def cut(
     """
     cut the video, and get series of pictures (with tag)
 
-    :param video_path: your video path
+    :param video: video path or object
     :param output_path: output path (dir)
     :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
     :param frame_count: default to 5, and finally you will get 5 frames for each range
@@ -101,8 +105,11 @@ def cut(
 
     :return: tuple, (VideoCutResult, data_home)
     """
+    if isinstance(video, str):
+        video = VideoObject(video)
+
     cutter = VideoCutter()
-    res = cutter.cut(video_path, compress_rate=compress_rate, target_size=target_size)
+    res = cutter.cut(video, compress_rate=compress_rate, target_size=target_size)
     stable, unstable = res.get_range(threshold=threshold, limit=limit, offset=offset)
 
     data_home = res.pick_and_save(stable, frame_count, to_dir=output_path)
@@ -136,7 +143,7 @@ def train(
 
 
 def classify(
-    video_path: str,
+    video: typing.Union[str, VideoObject],
     data_home: str = None,
     model: str = None,
     # optional: these args below are sent for `cutter`
@@ -150,7 +157,7 @@ def classify(
     classify a video with some tagged pictures
     optional: if you have changed the default value in `cut`, you'd better keep them(offset and limit) equal.
 
-    :param video_path: your video path
+    :param video: video path or object
     :param data_home: output path (dir)
     :param model: LinearSVC model (path)
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
@@ -164,6 +171,9 @@ def classify(
 
     :return: typing.List[ClassifierResult]
     """
+    if isinstance(video, str):
+        video = VideoObject(video)
+
     assert data_home or model, "classification should based on dataset or trained model"
     cl = SVMClassifier(compress_rate=compress_rate, target_size=target_size)
 
@@ -173,9 +183,9 @@ def classify(
         cl.load(data_home)
         cl.train()
     # re cut
-    cut_result, _ = cut(video_path, compress_rate=compress_rate, threshold=threshold)
+    cut_result, _ = cut(video, compress_rate=compress_rate, threshold=threshold)
     stable, _ = cut_result.get_range(offset=offset, limit=limit)
-    return cl.classify(video_path, stable)
+    return cl.classify(video, stable)
 
 
 __all__ = ("cut", "classify", "one_step", "train")
