@@ -24,6 +24,10 @@ jobs:
         run: |
           curl -o demo.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
           curl -o demo.jpg https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/pictures/amazon.jpg
+      - name: Black check
+        run: |
+          pip install black
+          black ./stagesepx --check
       - name: Generate coverage report
         run: |
           pip install pytest
