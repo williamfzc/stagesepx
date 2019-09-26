@@ -376,7 +376,13 @@ class VideoCutResult(object):
         return after
 
     def dumps(self) -> str:
-        return json.dumps(self, sort_keys=True, default=lambda o: o.__dict__)
+        # for np.ndarray
+        def _handler(obj: object):
+            if isinstance(obj, np.ndarray):
+                # ignore
+                return "<np.ndarray object>"
+            return obj.__dict__
+        return json.dumps(self, sort_keys=True, default=_handler)
 
     def dump(self, json_path: str, **kwargs):
         logger.debug(f"dump result to {json_path}")
