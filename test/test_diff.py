@@ -5,8 +5,8 @@ import pprint
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 
 # use same video?
-VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
-ANOTHER_VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
+VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
+ANOTHER_VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
 
 
 def test_diff():

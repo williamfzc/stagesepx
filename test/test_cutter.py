@@ -2,22 +2,22 @@ from stagesepx.cutter import VideoCutter, VideoCutResult
 import os
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
-VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
-RESULT_DIR = os.path.join(PROJECT_PATH, 'cut_result')
-IMAGE_NAME = 'demo.jpg'
+VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
+RESULT_DIR = os.path.join(PROJECT_PATH, "cut_result")
+IMAGE_NAME = "demo.jpg"
 IMAGE_PATH = os.path.join(PROJECT_PATH, IMAGE_NAME)
-assert os.path.isfile(IMAGE_PATH), f'{IMAGE_NAME} not existed!'
+assert os.path.isfile(IMAGE_PATH), f"{IMAGE_NAME} not existed!"
 
 
 def test_default():
     cutter = VideoCutter()
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
-    assert len(stable) == 3, 'count of stable range is not correct'
+    assert len(stable) == 3, "count of stable range is not correct"
 
     data_home = res.pick_and_save(stable, 5, to_dir=RESULT_DIR)
     assert data_home == RESULT_DIR
-    assert os.path.isdir(data_home), 'result dir not existed'
+    assert os.path.isdir(data_home), "result dir not existed"
     return res
 
 
@@ -26,7 +26,7 @@ def test_limit():
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range(limit=3)
     # when limit=3, final stage should be ignored.
-    assert len(stable) == 1, 'count of stable range is not correct'
+    assert len(stable) == 1, "count of stable range is not correct"
 
 
 def test_step():
@@ -34,13 +34,13 @@ def test_step():
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
     # when limit=3, final stage should be ignored.
-    assert len(stable) == 1, 'count of stable range is not correct'
+    assert len(stable) == 1, "count of stable range is not correct"
 
 
 def test_dump_and_load():
     cutter = VideoCutter()
     res = cutter.cut(VIDEO_PATH)
-    json_path = 'cutter_result.json'
+    json_path = "cutter_result.json"
     res.dump(json_path)
 
     res_from_file = VideoCutResult.load(json_path)
@@ -51,10 +51,10 @@ def test_prune():
     cutter = VideoCutter()
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
-    assert len(stable) == 3, 'count of stable range is not correct'
+    assert len(stable) == 3, "count of stable range is not correct"
 
     data_home = res.pick_and_save(stable, 5, prune=0.99)
-    assert os.path.isdir(data_home), 'result dir not existed'
+    assert os.path.isdir(data_home), "result dir not existed"
 
 
 def test_cut_range():

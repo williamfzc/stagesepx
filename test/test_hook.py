@@ -1,13 +1,21 @@
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
-from stagesepx.hook import ExampleHook, IgnoreHook, CropHook, FrameSaveHook, RefineHook, InvalidFrameDetectHook, TemplateCompareHook
+from stagesepx.hook import (
+    ExampleHook,
+    IgnoreHook,
+    CropHook,
+    FrameSaveHook,
+    RefineHook,
+    InvalidFrameDetectHook,
+    TemplateCompareHook,
+)
 
 import os
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
-VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
-IMAGE_NAME = 'demo.jpg'
+VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
+IMAGE_NAME = "demo.jpg"
 IMAGE_PATH = os.path.join(PROJECT_PATH, IMAGE_NAME)
 assert os.path.isfile(IMAGE_PATH)
 
@@ -16,22 +24,13 @@ def test_hook():
     # init hook
     hook = ExampleHook()
     hook1 = ExampleHook(overwrite=True)
-    hook2 = IgnoreHook(
-        size=(0.5, 0.5),
-        overwrite=True
-    )
-    frame_home = os.path.join(PROJECT_PATH, 'frame_save_dir')
+    hook2 = IgnoreHook(size=(0.5, 0.5), overwrite=True)
+    frame_home = os.path.join(PROJECT_PATH, "frame_save_dir")
     hook3 = FrameSaveHook(frame_home)
-    hook4 = CropHook(
-        size=(0.5, 0.5),
-        offset=(0., 0.5),
-        overwrite=True,
-    )
+    hook4 = CropHook(size=(0.5, 0.5), offset=(0.0, 0.5), overwrite=True)
     hook5 = RefineHook()
     hook6 = InvalidFrameDetectHook()
-    hook7 = TemplateCompareHook({
-        'amazon': IMAGE_PATH,
-    })
+    hook7 = TemplateCompareHook({"amazon": IMAGE_PATH})
 
     # --- cutter ---
     cutter = VideoCutter(compress_rate=0.8)
@@ -47,13 +46,10 @@ def test_hook():
 
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
-    assert len(stable) == 2, 'count of stable range is not correct'
+    assert len(stable) == 2, "count of stable range is not correct"
 
-    data_home = res.pick_and_save(
-        stable,
-        5,
-    )
-    assert os.path.isdir(data_home), 'result dir not existed'
+    data_home = res.pick_and_save(stable, 5)
+    assert os.path.isdir(data_home), "result dir not existed"
 
     # --- classify ---
     cl = SVMClassifier()
@@ -63,12 +59,8 @@ def test_hook():
 
     # --- draw ---
     r = Reporter()
-    report_path = os.path.join(data_home, 'report.html')
-    r.draw(
-        classify_result,
-        report_path=report_path,
-        cut_result=res,
-    )
+    report_path = os.path.join(data_home, "report.html")
+    r.draw(classify_result, report_path=report_path, cut_result=res)
     assert os.path.isfile(report_path)
 
     # hook check

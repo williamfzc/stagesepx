@@ -21,11 +21,7 @@ class VideoFrame(object):
         frame_id = toolbox.get_current_frame_id(cap)
         timestamp = toolbox.get_current_frame_time(cap)
         grey = toolbox.turn_grey(frame)
-        return VideoFrame(
-            frame_id,
-            timestamp,
-            grey
-        )
+        return VideoFrame(frame_id, timestamp, grey)
 
 
 class _BaseFrameOperator(object):
@@ -58,10 +54,8 @@ class FileFrameOperator(_BaseFrameOperator):
 
 
 class VideoObject(object):
-    def __init__(self,
-                 path: str = None,
-                 *_, **__):
-        assert os.path.isfile(path), f'video [{path}] not existed'
+    def __init__(self, path: str = None, *_, **__):
+        assert os.path.isfile(path), f"video [{path}] not existed"
         self.path = path
         self.data: typing.Tuple[VideoFrame] = tuple()
 
@@ -70,7 +64,7 @@ class VideoObject(object):
             self.frame_size = toolbox.get_frame_size(cap)
 
     def __str__(self):
-        return f'<VideoObject path={self.path}>'
+        return f"<VideoObject path={self.path}>"
 
     __repr__ = __str__
 
@@ -119,8 +113,8 @@ class VideoObject(object):
         return self.get_iterator()
 
 
-if __name__ == '__main__':
-    v = VideoObject('../demo.mp4')
+if __name__ == "__main__":
+    v = VideoObject("../demo.mp4")
     v.load_frames()
     for each in v:
         print(each)

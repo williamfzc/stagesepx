@@ -11,18 +11,18 @@ from stagesepx.video import VideoObject
 
 
 class VideoCutRange(object):
-    def __init__(self,
-                 video: typing.Union[VideoObject, typing.Dict],
-                 start: int,
-                 end: int,
-
-                 # TODO need refactored ?
-                 ssim: typing.List[float],
-                 mse: typing.List[float],
-                 psnr: typing.List[float],
-
-                 start_time: float,
-                 end_time: float):
+    def __init__(
+        self,
+        video: typing.Union[VideoObject, typing.Dict],
+        start: int,
+        end: int,
+        # TODO need refactored ?
+        ssim: typing.List[float],
+        mse: typing.List[float],
+        psnr: typing.List[float],
+        start_time: float,
+        end_time: float,
+    ):
         if isinstance(video, dict):
             self.video = VideoObject(**video)
         else:
@@ -42,14 +42,14 @@ class VideoCutRange(object):
             self.start, self.end = self.end, self.start
             self.start_time, self.end_time = self.end_time, self.start_time
 
-    def can_merge(self, another: 'VideoCutRange', offset: int = None, **_):
+    def can_merge(self, another: "VideoCutRange", offset: int = None, **_):
         if not offset:
             is_continuous = self.end == another.start
         else:
             is_continuous = self.end + offset >= another.start
         return is_continuous and self.video.path == another.video.path
 
-    def merge(self, another: 'VideoCutRange', **kwargs) -> 'VideoCutRange':
+    def merge(self, another: "VideoCutRange", **kwargs) -> "VideoCutRange":
         assert self.can_merge(another, **kwargs)
         return __class__(
             self.video,
@@ -68,23 +68,20 @@ class VideoCutRange(object):
         # range(0, 10 + 1) => [0, 10]
         return frame_id in range(self.start, self.end + 1)
 
-    def contain_image(self,
-                      image_path: str = None,
-                      image_object: np.ndarray = None,
-                      *args, **kwargs) -> typing.Dict:
-        assert image_path or image_object, 'should fill image_path or image_object'
+    def contain_image(
+        self, image_path: str = None, image_object: np.ndarray = None, *args, **kwargs
+    ) -> typing.Dict:
+        assert image_path or image_object, "should fill image_path or image_object"
 
         if image_path:
-            logger.debug(f'found image path, use it first: {image_path}')
-            assert os.path.isfile(image_path), f'image {image_path} not existed'
+            logger.debug(f"found image path, use it first: {image_path}")
+            assert os.path.isfile(image_path), f"image {image_path} not existed"
             image_object = toolbox.imread(image_path)
         image_object = toolbox.turn_grey(image_object)
 
         # TODO use client or itself..?
-        fi = FindIt(
-            engine=['template']
-        )
-        fi_template_name = 'default'
+        fi = FindIt(engine=["template"])
+        fi_template_name = "default"
         fi.load_template(fi_template_name, pic_object=image_object)
 
         with toolbox.video_capture(self.video.path) as cap:
@@ -93,18 +90,19 @@ class VideoCutRange(object):
             frame = toolbox.turn_grey(frame)
 
             result = fi.find(str(target_id), target_pic_object=frame)
-        return result['data'][fi_template_name]['TemplateEngine']
+        return result["data"][fi_template_name]["TemplateEngine"]
 
-    def pick(self,
-             frame_count: int = None,
-             is_random: bool = None,
-             *_, **__) -> typing.List[int]:
+    def pick(
+        self, frame_count: int = None, is_random: bool = None, *_, **__
+    ) -> typing.List[int]:
         if not frame_count:
             frame_count = 3
-        logger.debug(f'pick {frame_count} frames '
-                     f'from {self.start}({self.start_time}) '
-                     f'to {self.end}({self.end_time}) '
-                     f'on video {self.video.path}')
+        logger.debug(
+            f"pick {frame_count} frames "
+            f"from {self.start}({self.start_time}) "
+            f"to {self.end}({self.end_time}) "
+            f"on video {self.video.path}"
+        )
 
         result = list()
         if is_random:
@@ -118,9 +116,9 @@ class VideoCutRange(object):
             result.append(cur)
         return result
 
-    def get_frames(self,
-                   frame_id_list: typing.List[int],
-                   *_, **__) -> typing.List[toolbox.VideoFrame]:
+    def get_frames(
+        self, frame_id_list: typing.List[int], *_, **__
+    ) -> typing.List[toolbox.VideoFrame]:
         """ return a list of VideoFrame, usually works with pick """
         out = list()
         with toolbox.video_capture(self.video.path) as cap:
@@ -137,10 +135,9 @@ class VideoCutRange(object):
     def get_length(self):
         return self.end - self.start + 1
 
-    def is_stable(self,
-                  threshold: float = None,
-                  psnr_threshold: float = None,
-                  **_) -> bool:
+    def is_stable(
+        self, threshold: float = None, psnr_threshold: float = None, **_
+    ) -> bool:
         # IMPORTANT function!
         # it decided whether a range is stable => everything is based on it!
         if not threshold:
@@ -160,15 +157,17 @@ class VideoCutRange(object):
         with toolbox.video_capture(video_path=self.video.path) as cap:
             start_frame = toolbox.get_frame(cap, self.start)
             end_frame = toolbox.get_frame(cap, self.end)
-            start_frame, end_frame = map(toolbox.compress_frame, (start_frame, end_frame))
+            start_frame, end_frame = map(
+                toolbox.compress_frame, (start_frame, end_frame)
+            )
             return toolbox.compare_ssim(start_frame, end_frame) > threshold
 
-    def diff(self, another: 'VideoCutRange', *args, **kwargs) -> typing.List[float]:
+    def diff(self, another: "VideoCutRange", *args, **kwargs) -> typing.List[float]:
         self_picked = self.pick_and_get(*args, **kwargs)
         another_picked = another.pick_and_get(*args, **kwargs)
         return toolbox.multi_compare_ssim(self_picked, another_picked)
 
     def __str__(self):
-        return f'<VideoCutRange [{self.start}({self.start_time})-{self.end}({self.end_time})] ssim={self.ssim}>'
+        return f"<VideoCutRange [{self.start}({self.start_time})-{self.end}({self.end_time})] ssim={self.ssim}>"
 
     __repr__ = __str__

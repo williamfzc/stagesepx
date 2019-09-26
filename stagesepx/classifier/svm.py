@@ -12,18 +12,16 @@ from stagesepx import toolbox
 
 class SVMClassifier(BaseClassifier):
     FEATURE_DICT = {
-        'hog': toolbox.turn_hog_desc,
-        'lbp': toolbox.turn_lbp_desc,
-
+        "hog": toolbox.turn_hog_desc,
+        "lbp": toolbox.turn_lbp_desc,
         # do not use feature transform
-        'raw': lambda x: x,
+        "raw": lambda x: x,
     }
-    UNKNOWN_STAGE_NAME = '-2'
+    UNKNOWN_STAGE_NAME = "-2"
 
-    def __init__(self,
-                 feature_type: str = None,
-                 score_threshold: float = None,
-                 *args, **kwargs):
+    def __init__(
+        self, feature_type: str = None, score_threshold: float = None, *args, **kwargs
+    ):
         """
         init classifier
 
@@ -38,16 +36,16 @@ class SVMClassifier(BaseClassifier):
 
         # feature settings
         if not feature_type:
-            feature_type = 'hog'
+            feature_type = "hog"
         if feature_type not in self.FEATURE_DICT:
-            raise AttributeError(f'no feature func named {feature_type}')
+            raise AttributeError(f"no feature func named {feature_type}")
         self.feature_func: typing.Callable = self.FEATURE_DICT[feature_type]
-        logger.debug(f'feature function: {feature_type}')
+        logger.debug(f"feature function: {feature_type}")
 
         # model settings
         self._model: typing.Optional[LinearSVC] = None
-        self.score_threshold: float = score_threshold or 0.
-        logger.debug(f'score threshold: {self.score_threshold}')
+        self.score_threshold: float = score_threshold or 0.0
+        logger.debug(f"score threshold: {self.score_threshold}")
 
     def clean_model(self):
         self._model = None
@@ -60,13 +58,15 @@ class SVMClassifier(BaseClassifier):
         :param overwrite:
         :return:
         """
-        logger.debug(f'save model to {model_path}')
+        logger.debug(f"save model to {model_path}")
         # assert model file
         if os.path.isfile(model_path) and not overwrite:
-            raise FileExistsError(f'model file {model_path} already existed, you can set `overwrite` True to cover it')
+            raise FileExistsError(
+                f"model file {model_path} already existed, you can set `overwrite` True to cover it"
+            )
         # assert model data is not empty
-        assert self._model, 'model is empty'
-        with open(model_path, 'wb') as f:
+        assert self._model, "model is empty"
+        with open(model_path, "wb") as f:
             pickle.dump(self._model, f)
 
     def load_model(self, model_path: str, overwrite: bool = None):
@@ -77,19 +77,23 @@ class SVMClassifier(BaseClassifier):
         :param overwrite:
         :return:
         """
-        logger.debug(f'load model from {model_path}')
+        logger.debug(f"load model from {model_path}")
         # assert model file
-        assert os.path.isfile(model_path), f'model file {model_path} not existed'
+        assert os.path.isfile(model_path), f"model file {model_path} not existed"
         # assert model data is empty
         if self._model and not overwrite:
-            raise RuntimeError(f'model is not empty, you can set `overwrite` True to cover it')
+            raise RuntimeError(
+                f"model is not empty, you can set `overwrite` True to cover it"
+            )
 
         # joblib raise an error ( i have no idea about how to fix it ) here, so use pickle instead
-        with open(model_path, 'rb') as f:
+        with open(model_path, "rb") as f:
             self._model = pickle.load(f)
 
-    def read_from_list(self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__):
-        raise NotImplementedError('svm classifier only support loading data from files')
+    def read_from_list(
+        self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__
+    ):
+        raise NotImplementedError("svm classifier only support loading data from files")
 
     def train(self):
         """
@@ -98,27 +102,29 @@ class SVMClassifier(BaseClassifier):
         :return:
         """
         if not self._model:
-            logger.debug('no model can be used. build a new one.')
+            logger.debug("no model can be used. build a new one.")
             self._model = LinearSVC()
         else:
-            logger.debug('already have a trained model. train on this model.')
+            logger.debug("already have a trained model. train on this model.")
 
         train_data = list()
         train_label = list()
         for each_label, each_label_pic_list in self.read():
             for each_pic_object in each_label_pic_list:
-                logger.debug(f'training label: {each_label}')
+                logger.debug(f"training label: {each_label}")
                 # apply hook
                 each_pic_object = self._apply_hook(-1, each_pic_object)
 
                 each_pic_object = self.feature_func(each_pic_object).flatten()
                 train_data.append(each_pic_object)
                 train_label.append(each_label)
-        logger.debug('data ready')
+        logger.debug("data ready")
 
-        assert len(train_label) > 1, f'seems only one class in the training dataset, at least two classes are required: {train_label}'
+        assert (
+            len(train_label) > 1
+        ), f"seems only one class in the training dataset, at least two classes are required: {train_label}"
         self._model.fit(train_data, train_label)
-        logger.debug('train finished')
+        logger.debug("train finished")
 
     def predict(self, pic_path: str) -> str:
         """
@@ -148,7 +154,7 @@ class SVMClassifier(BaseClassifier):
         # actually, it can know which one is the target class
         # but the calculated value may becomes weird
         scores = self._model.decision_function(pic_object)[0]
-        logger.debug(f'scores: {scores}')
+        logger.debug(f"scores: {scores}")
 
         # in the binary case, return type is different (wtf ...)
         # for more effective i think
@@ -160,13 +166,12 @@ class SVMClassifier(BaseClassifier):
 
         # unknown
         if max(scores) < self.score_threshold:
-            logger.warning(f'max score is lower than {self.score_threshold}, unknown class')
+            logger.warning(
+                f"max score is lower than {self.score_threshold}, unknown class"
+            )
             return self.UNKNOWN_STAGE_NAME
 
         return self._model.classes_[np.argmax(scores)]
 
-    def _classify_frame(self,
-                        frame_id: int,
-                        frame: np.ndarray,
-                        *_, **__) -> str:
+    def _classify_frame(self, frame_id: int, frame: np.ndarray, *_, **__) -> str:
         return self.predict_with_object(frame)

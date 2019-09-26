@@ -43,8 +43,8 @@ def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
 
 
 def multi_compare_ssim(
-        pic1_list: typing.Union[typing.List[VideoFrame], typing.List[np.ndarray]],
-        pic2_list: typing.Union[typing.List[VideoFrame], typing.List[np.ndarray]],
+    pic1_list: typing.Union[typing.List[VideoFrame], typing.List[np.ndarray]],
+    pic2_list: typing.Union[typing.List[VideoFrame], typing.List[np.ndarray]],
 ) -> typing.List[float]:
     if isinstance(pic1_list[0], VideoFrame):
         pic1_list = [i.frame for i in pic1_list]
@@ -63,11 +63,13 @@ def get_current_frame_time(video_cap: cv2.VideoCapture) -> float:
 
 def imread(img_path: str, *_, **__) -> np.ndarray:
     """ wrapper of cv2.imread """
-    assert os.path.isfile(img_path), f'file {img_path} is not existed'
+    assert os.path.isfile(img_path), f"file {img_path} is not existed"
     return cv2.imread(img_path, *_, **__)
 
 
-def get_frame_time(video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None) -> float:
+def get_frame_time(
+    video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None
+) -> float:
     cur = get_current_frame_id(video_cap)
     video_jump(video_cap, frame_id)
     result = get_current_frame_time(video_cap)
@@ -90,11 +92,13 @@ def get_frame_size(video_cap: cv2.VideoCapture) -> typing.Tuple[int, int]:
     return int(w), int(h)
 
 
-def get_frame(video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None) -> np.ndarray:
+def get_frame(
+    video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None
+) -> np.ndarray:
     cur = get_current_frame_id(video_cap)
     video_jump(video_cap, frame_id)
     ret, frame = video_cap.read()
-    assert ret, f'read frame failed, frame id: {frame_id}'
+    assert ret, f"read frame failed, frame id: {frame_id}"
 
     if recover:
         video_jump(video_cap, cur)
@@ -121,8 +125,9 @@ def turn_hog_desc(old: np.ndarray) -> np.ndarray:
         orientations=8,
         pixels_per_cell=(16, 16),
         cells_per_block=(1, 1),
-        block_norm='L2-Hys',
-        visualize=True)
+        block_norm="L2-Hys",
+        visualize=True,
+    )
 
     # also available with opencv-python
     # hog = cv2.HOGDescriptor()
@@ -144,7 +149,7 @@ def turn_lbp_desc(old: np.ndarray, radius: int = None) -> np.ndarray:
     n_points = 8 * radius
 
     grey = turn_grey(old)
-    lbp = local_binary_pattern(grey, n_points, radius, method='default')
+    lbp = local_binary_pattern(grey, n_points, radius, method="default")
     return lbp
 
 
@@ -182,17 +187,20 @@ def calc_psnr(pic1: np.ndarray, pic2: np.ndarray) -> float:
     psnr = compare_psnr(pic1, pic2)
     # when err == 0, psnr will be 'inf'
     if math.isinf(psnr):
-        psnr = 100.
+        psnr = 100.0
     # normalize
     return psnr / 100
 
 
-def compress_frame(old: np.ndarray,
-                   compress_rate: float = None,
-                   target_size: typing.Tuple[int, int] = None,
-                   not_grey: bool = None,
-                   interpolation: int = None,
-                   *_, **__) -> np.ndarray:
+def compress_frame(
+    old: np.ndarray,
+    compress_rate: float = None,
+    target_size: typing.Tuple[int, int] = None,
+    not_grey: bool = None,
+    interpolation: int = None,
+    *_,
+    **__,
+) -> np.ndarray:
     """
     Compress frame
 
@@ -224,13 +232,15 @@ def compress_frame(old: np.ndarray,
     # default rate is 1 (no compression)
     if not compress_rate:
         return target
-    return cv2.resize(target, (0, 0), fx=compress_rate, fy=compress_rate, interpolation=interpolation)
+    return cv2.resize(
+        target, (0, 0), fx=compress_rate, fy=compress_rate, interpolation=interpolation
+    )
 
 
 def get_timestamp_str() -> str:
     time_str = time.strftime("%Y%m%d%H%M%S", time.localtime())
     salt = random.randint(10, 99)
-    return f'{time_str}{salt}'
+    return f"{time_str}{salt}"
 
 
 def np2b64str(frame: np.ndarray) -> str:
@@ -241,7 +251,7 @@ def np2b64str(frame: np.ndarray) -> str:
 def arg_printer(func: typing.Callable):
     @wraps(func)
     def _wrapper(*args, **kwargs):
-        logger.debug(f'function {func.__name__} args: {args}, kwargs: {kwargs}')
+        logger.debug(f"function {func.__name__} args: {args}, kwargs: {kwargs}")
         return func(*args, **kwargs)
 
     return _wrapper

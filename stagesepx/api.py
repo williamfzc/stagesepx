@@ -106,7 +106,9 @@ def cut(
     stable, unstable = res.get_range(threshold=threshold, limit=limit, offset=offset)
 
     data_home = res.pick_and_save(stable, frame_count, to_dir=output_path)
-    res_json_path = os.path.join(output_path or data_home, constants.CUT_RESULT_FILE_NAME)
+    res_json_path = os.path.join(
+        output_path or data_home, constants.CUT_RESULT_FILE_NAME
+    )
     res.dump(res_json_path)
     return res, data_home
 
@@ -171,11 +173,7 @@ def classify(
         cl.load(data_home)
         cl.train()
     # re cut
-    cut_result, _ = cut(
-        video_path,
-        compress_rate=compress_rate,
-        threshold=threshold,
-    )
+    cut_result, _ = cut(video_path, compress_rate=compress_rate, threshold=threshold)
     stable, _ = cut_result.get_range(offset=offset, limit=limit)
     return cl.classify(video_path, stable)
 

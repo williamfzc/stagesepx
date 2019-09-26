@@ -10,7 +10,7 @@ from stagesepx import toolbox
 
 class BaseHook(object):
     def __init__(self, overwrite: bool = None, *_, **__):
-        logger.debug(f'start initialing: {self.__class__.__name__} ...')
+        logger.debug(f"start initialing: {self.__class__.__name__} ...")
 
         # default: dict
         self.result = dict()
@@ -18,14 +18,16 @@ class BaseHook(object):
         # overwrite label
         # decide whether the origin frame will be changed
         self.overwrite = bool(overwrite)
-        logger.debug(f'overwrite: {self.overwrite}')
+        logger.debug(f"overwrite: {self.overwrite}")
 
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
-        info = f'execute hook: {self.__class__.__name__}'
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
+        info = f"execute hook: {self.__class__.__name__}"
 
         # when frame id == -1, it means handling some pictures outside the video
         if frame_id != -1:
-            logger.debug(f'{info}, frame id: {frame_id}')
+            logger.debug(f"{info}, frame id: {frame_id}")
         return
 
 
@@ -35,7 +37,7 @@ def change_origin(_func):
         if not self.overwrite:
             return frame
         if res is not None:
-            logger.debug(f'origin frame has been changed by {self.__class__.__name__}')
+            logger.debug(f"origin frame has been changed by {self.__class__.__name__}")
             return res
         else:
             return frame
@@ -59,7 +61,9 @@ class ExampleHook(BaseHook):
         # ...
 
     @change_origin
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
 
         # you can get frame_id and frame data here
@@ -84,23 +88,32 @@ class ExampleHook(BaseHook):
 
 # --- inner hook start ---
 
+
 class CompressHook(BaseHook):
-    def __init__(self, compress_rate: float, target_size: typing.Tuple[int, int], *_, **__):
+    def __init__(
+        self, compress_rate: float, target_size: typing.Tuple[int, int], *_, **__
+    ):
         super().__init__(*_, **__)
         self.compress_rate = compress_rate
         self.target_size = target_size
-        logger.debug(f'compress rate: {compress_rate}')
-        logger.debug(f'target size: {target_size}')
+        logger.debug(f"compress rate: {compress_rate}")
+        logger.debug(f"target size: {target_size}")
 
     @change_origin
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
-        return toolbox.compress_frame(frame, compress_rate=self.compress_rate, target_size=self.target_size)
+        return toolbox.compress_frame(
+            frame, compress_rate=self.compress_rate, target_size=self.target_size
+        )
 
 
 class GreyHook(BaseHook):
     @change_origin
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
         return toolbox.turn_grey(frame)
 
@@ -109,16 +122,21 @@ class RefineHook(BaseHook):
     """ this hook was built for refining the edges of images """
 
     @change_origin
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
         return toolbox.sharpen_frame(frame)
 
 
 class _AreaBaseHook(BaseHook):
-    def __init__(self,
-                 size: typing.Tuple[typing.Union[int, float], typing.Union[int, float]],
-                 offset: typing.Tuple[typing.Union[int, float], typing.Union[int, float]] = None,
-                 *_, **__):
+    def __init__(
+        self,
+        size: typing.Tuple[typing.Union[int, float], typing.Union[int, float]],
+        offset: typing.Tuple[typing.Union[int, float], typing.Union[int, float]] = None,
+        *_,
+        **__,
+    ):
         """
         init crop hook, (height, width)
 
@@ -131,33 +149,40 @@ class _AreaBaseHook(BaseHook):
 
         self.size = size
         self.offset = offset or (0, 0)
-        logger.debug(f'size: {self.size}')
-        logger.debug(f'offset: {self.offset}')
+        logger.debug(f"size: {self.size}")
+        logger.debug(f"offset: {self.offset}")
 
     @staticmethod
-    def is_proportion(target: typing.Tuple[typing.Union[int, float], typing.Union[int, float]]) -> bool:
-        return len([i for i in target if 0. <= i <= 1.]) == 2
+    def is_proportion(
+        target: typing.Tuple[typing.Union[int, float], typing.Union[int, float]]
+    ) -> bool:
+        return len([i for i in target if 0.0 <= i <= 1.0]) == 2
 
     @staticmethod
     def convert(
-            origin_h: int,
-            origin_w: int,
-            input_h: typing.Union[float, int],
-            input_w: typing.Union[float, int]
+        origin_h: int,
+        origin_w: int,
+        input_h: typing.Union[float, int],
+        input_w: typing.Union[float, int],
     ) -> typing.Tuple[typing.Union[int, float], typing.Union[int, float]]:
         if _AreaBaseHook.is_proportion((input_h, input_w)):
             return origin_h * input_h, origin_w * input_w
         return input_h, input_w
 
-    def convert_size_and_offset(self, *origin_size) -> typing.Tuple[typing.Tuple, typing.Tuple]:
+    def convert_size_and_offset(
+        self, *origin_size
+    ) -> typing.Tuple[typing.Tuple, typing.Tuple]:
         # convert to real size
-        logger.debug(f'origin size: ({origin_size})')
+        logger.debug(f"origin size: ({origin_size})")
         size_h, size_w = self.convert(*origin_size, *self.size)
-        logger.debug(f'size: ({size_h}, {size_w})')
+        logger.debug(f"size: ({size_h}, {size_w})")
         offset_h, offset_w = self.convert(*origin_size, *self.offset)
-        logger.debug(f'offset: {offset_h}, {offset_w}')
-        height_range, width_range = (int(offset_h), int(offset_h + size_h)), (int(offset_w), int(offset_w + size_w))
-        logger.debug(f'final range h: {height_range}, w: {width_range}')
+        logger.debug(f"offset: {offset_h}, {offset_w}")
+        height_range, width_range = (
+            (int(offset_h), int(offset_h + size_h)),
+            (int(offset_w), int(offset_w + size_w)),
+        )
+        logger.debug(f"final range h: {height_range}, w: {width_range}")
         return height_range, width_range
 
 
@@ -165,27 +190,32 @@ class CropHook(_AreaBaseHook):
     """ this hook was built for cropping frames, eg: keep only a half of origin frame """
 
     @change_origin
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
 
         height_range, width_range = self.convert_size_and_offset(*frame.shape)
-        return frame[height_range[0]: height_range[1], width_range[0]: width_range[1]]
+        return frame[height_range[0] : height_range[1], width_range[0] : width_range[1]]
 
 
 class IgnoreHook(_AreaBaseHook):
     """ ignore some area of frames """
 
     @change_origin
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
 
         height_range, width_range = self.convert_size_and_offset(*frame.shape)
         # ignore this area
-        frame[height_range[0]: height_range[1], width_range[0]: width_range[1]] = 0
+        frame[height_range[0] : height_range[1], width_range[0] : width_range[1]] = 0
         return frame
 
 
 # --- inner hook end ---
+
 
 class FrameSaveHook(BaseHook):
     """ add this hook, and save all the frames you want to specific dir """
@@ -197,57 +227,49 @@ class FrameSaveHook(BaseHook):
         self.target_dir = target_dir
         os.makedirs(target_dir, exist_ok=True)
 
-        logger.debug(f'target dir: {target_dir}')
+        logger.debug(f"target dir: {target_dir}")
 
     @change_origin
-    def do(self,
-           frame_id: int,
-           frame: np.ndarray,
-           *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
-        target_path = os.path.join(self.target_dir, f'{frame_id}.png')
+        target_path = os.path.join(self.target_dir, f"{frame_id}.png")
         cv2.imwrite(target_path, frame)
-        logger.debug(f'frame saved to {target_path}')
+        logger.debug(f"frame saved to {target_path}")
         return
 
 
 class InvalidFrameDetectHook(BaseHook):
-    def __init__(self,
-                 black_threshold: float = None,
-                 white_threshold: float = None,
-                 *_, **__):
+    def __init__(
+        self, black_threshold: float = None, white_threshold: float = None, *_, **__
+    ):
         super().__init__(*_, **__)
 
         # threshold
         self.black_threshold = black_threshold or 0.95
         self.white_threshold = white_threshold or 0.9
 
-        logger.debug(f'black threshold: {black_threshold}')
-        logger.debug(f'white threshold: {white_threshold}')
+        logger.debug(f"black threshold: {black_threshold}")
+        logger.debug(f"white threshold: {white_threshold}")
 
     @change_origin
-    def do(self,
-           frame_id: int,
-           frame: np.ndarray,
-           *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
         black = np.zeros([*frame.shape, 3], np.uint8)
         white = black + 255
         black_ssim = toolbox.compare_ssim(black, frame)
         white_ssim = toolbox.compare_ssim(white, frame)
-        logger.debug(f'black: {black_ssim}; white: {white_ssim}')
+        logger.debug(f"black: {black_ssim}; white: {white_ssim}")
 
-        self.result[frame_id] = {
-            'black': black_ssim,
-            'white': white_ssim,
-        }
+        self.result[frame_id] = {"black": black_ssim, "white": white_ssim}
         return
 
 
 class TemplateCompareHook(BaseHook):
-    def __init__(self,
-                 template_dict: typing.Dict[str, str],
-                 *args, **kwargs):
+    def __init__(self, template_dict: typing.Dict[str, str], *args, **kwargs):
         """
         args and kwargs will be sent to findit.__init__
 
@@ -262,22 +284,23 @@ class TemplateCompareHook(BaseHook):
         self.template_dict = template_dict
 
     @change_origin
-    def do(self,
-           frame_id: int,
-           frame: np.ndarray,
-           *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         super().do(frame_id, frame, *_, **__)
         for each_template_name, each_template_path in self.template_dict.items():
             self.fi.load_template(each_template_name, each_template_path)
         res = self.fi.find(str(frame_id), target_pic_object=frame)
-        logger.debug(f'compare with template {self.template_dict}: {res}')
+        logger.debug(f"compare with template {self.template_dict}: {res}")
         self.result[frame_id] = res
         return
 
 
 class BinaryHook(BaseHook):
     @change_origin
-    def do(self, frame_id: int, frame: np.ndarray, *_, **__) -> typing.Optional[np.ndarray]:
+    def do(
+        self, frame_id: int, frame: np.ndarray, *_, **__
+    ) -> typing.Optional[np.ndarray]:
         # TODO not always work
         super().do(frame_id, frame, *_, **__)
         return toolbox.turn_binary(frame)

@@ -4,7 +4,7 @@ from stagesepx.api import cut, classify, one_step, train
 from stagesepx.reporter import Reporter
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
-VIDEO_PATH = os.path.join(PROJECT_PATH, 'demo.mp4')
+VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
 
 
 def test_one_step():

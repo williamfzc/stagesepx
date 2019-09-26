@@ -1,4 +1,3 @@
-
 #  ________  _________  ________  ________  _______   ________  _______   ________        ___    ___
 # |\   ____\|\___   ___\\   __  \|\   ____\|\  ___ \ |\   ____\|\  ___ \ |\   __  \      |\  \  /  /|
 # \ \  \___|\|___ \  \_\ \  \|\  \ \  \___|\ \   __/|\ \  \___|\ \   __/|\ \  \|\  \     \ \  \/  / /
@@ -33,10 +32,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-__PROJECT_NAME__ = r'stagesepx'
-__AUTHOR__ = r'williamfzc'
-__AUTHOR_EMAIL__ = r'fengzc@vip.qq.com'
-__LICENSE__ = r'MIT'
-__URL__ = r'https://github.com/williamfzc/stagesepx'
-__VERSION__ = r'0.7.5'
-__DESCRIPTION__ = r'detect stages in video automatically'
+__PROJECT_NAME__ = r"stagesepx"
+__AUTHOR__ = r"williamfzc"
+__AUTHOR_EMAIL__ = r"fengzc@vip.qq.com"
+__LICENSE__ = r"MIT"
+__URL__ = r"https://github.com/williamfzc/stagesepx"
+__VERSION__ = r"0.7.5"
+__DESCRIPTION__ = r"detect stages in video automatically"
