@@ -43,16 +43,6 @@ def test_ssim_classifier():
     _draw_report(classify_result)
 
 
-def test_save_and_load():
-    # test save and load
-    cl = SVMClassifier()
-    cl.load_model(MODEL_PATH)
-    classify_result = cl.classify(VIDEO_PATH)
-
-    # --- draw ---
-    _draw_report(classify_result)
-
-
 def test_work_with_cutter():
     cl = SVMClassifier()
     cl.load_model(MODEL_PATH)
