@@ -156,7 +156,7 @@ class VideoCutResult(object):
                 [],
             )
 
-        # ATTENTION: +1 and -1 easily cause error
+        # IMPORTANT: +1 and -1 easily cause error
         # end of first stable range == start of first unstable range
         first_stable_range_end_id = unstable_range_list[0].start - 1
         # start of last stable range == end of last unstable range
@@ -212,7 +212,7 @@ class VideoCutResult(object):
                 range_start_id, range_end_id = range_end_id, range_start_id
 
             range_list.append(
-                # ATTENTION: frame's timestamp => end time of this frame
+                # IMPORTANT: frame's timestamp => end time of this frame
                 # because frame 0's timestamp is 0.0
                 # frame {range_start_id} end time - frame {range_end_id} end time
                 VideoCutRange(
