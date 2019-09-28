@@ -11,6 +11,7 @@ from stagesepx.classifier import ClassifierResult
 from stagesepx import toolbox
 from stagesepx import constants
 from stagesepx.cutter import VideoCutResult
+from stagesepx import __VERSION__
 
 BACKGROUND_COLOR = r"#fffaf4"
 UNSTABLE_FLAG = r"-1"
@@ -275,6 +276,7 @@ class Reporter(object):
             background_color=BACKGROUND_COLOR,
             cost_dict=cost_dict,
             timestamp=timestamp,
+            version_code=__VERSION__,
         )
 
         # save to file
