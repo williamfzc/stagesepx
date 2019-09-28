@@ -8,6 +8,14 @@
 pip install stagesepx
 ```
 
+你可以通过源码安装来获取还未发布的最新版本：
+
+```bash
+git clone https://github.com/williamfzc/stagesepx.git
+cd stagesepx
+pip install .
+```
+
 ## 快速开始
 
 ### 命令行方式
