@@ -58,10 +58,10 @@ class FileFrameOperator(_BaseFrameOperator):
 
 
 class VideoObject(object):
-    def __init__(self, path: str = None, *_, **__):
+    def __init__(self, path: typing.Union[bytes, str, os.PathLike], *_, **__):
         assert os.path.isfile(path), f"video [{path}] not existed"
-        self.path = path
-        self.data: typing.Tuple[VideoFrame] = tuple()
+        self.path: str = str(path)
+        self.data: typing.Optional[typing.Tuple[VideoFrame]] = tuple()
 
         with toolbox.video_capture(path) as cap:
             self.frame_count = toolbox.get_frame_count(cap)
@@ -73,7 +73,7 @@ class VideoObject(object):
     __repr__ = __str__
 
     def clean_frames(self):
-        self.data = ()
+        self.data = tuple()
 
     def load_frames(self):
         # TODO full frames list can be very huge

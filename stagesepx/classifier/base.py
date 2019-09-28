@@ -46,9 +46,7 @@ class BaseClassifier(object):
         logger.debug(f"compress rate: {self.compress_rate}")
         logger.debug(f"target size: {self.target_size}")
 
-        self._data: typing.Dict[
-            str, typing.Union[typing.List[pathlib.Path], typing.List[int]]
-        ] = dict()
+        self._data: typing.Dict[str, typing.Union[typing.List[pathlib.Path]]] = dict()
 
         # init inner hooks
         self._hook_list: typing.List[BaseHook] = list()
@@ -70,7 +68,7 @@ class BaseClassifier(object):
         logger.debug(f"add hook: {new_hook.__class__.__name__}")
 
     def load(
-        self, data: typing.Union[str, typing.List[VideoCutRange]], *args, **kwargs
+        self, data: typing.Union[str, typing.List[VideoCutRange], None], *args, **kwargs
     ):
         """
         at most of time, you MUST load data (from cutter) before classification
@@ -112,8 +110,6 @@ class BaseClassifier(object):
         for stage_name, stage_data in self._data.items():
             if isinstance(stage_data[0], pathlib.Path):
                 yield stage_name, self.read_from_path(stage_data, *args, **kwargs)
-            elif isinstance(stage_data[0], int):
-                yield stage_name, self.read_from_list(stage_data, *args, **kwargs)
             else:
                 raise TypeError(
                     f"data type error, should be str or typing.List[VideoCutRange]"

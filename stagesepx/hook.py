@@ -91,7 +91,11 @@ class ExampleHook(BaseHook):
 
 class CompressHook(BaseHook):
     def __init__(
-        self, compress_rate: float, target_size: typing.Tuple[int, int], *_, **__
+        self,
+        compress_rate: float = None,
+        target_size: typing.Tuple[int, int] = None,
+        *_,
+        **__,
     ):
         super().__init__(*_, **__)
         self.compress_rate = compress_rate
