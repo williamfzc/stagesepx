@@ -244,32 +244,24 @@ class FrameSaveHook(BaseHook):
         return
 
 
-class InvalidFrameDetectHook(BaseHook):
-    def __init__(
-        self, black_threshold: float = None, white_threshold: float = None, *_, **__
-    ):
+class EmptyFrameDetectHook(BaseHook):
+    def __init__(self, *_, **__):
         super().__init__(*_, **__)
-
-        # threshold
-        self.black_threshold = black_threshold or 0.95
-        self.white_threshold = white_threshold or 0.9
-
-        logger.debug(f"black threshold: {black_threshold}")
-        logger.debug(f"white threshold: {white_threshold}")
+        self._orb = cv2.ORB_create()
 
     @change_origin
     def do(
         self, frame_id: int, frame: np.ndarray, *_, **__
     ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
-        black = np.zeros([*frame.shape, 3], np.uint8)
-        white = black + 255
-        black_ssim = toolbox.compare_ssim(black, frame)
-        white_ssim = toolbox.compare_ssim(white, frame)
-        logger.debug(f"black: {black_ssim}; white: {white_ssim}")
-
-        self.result[frame_id] = {"black": black_ssim, "white": white_ssim}
+        kp = self._orb.detect(frame, None)
+        self.result[frame_id] = len(kp)
         return
+
+
+class InvalidFrameDetectHook(BaseHook):
+    def __init__(self, *_, **__):
+        super(InvalidFrameDetectHook, self).__init__(*_, **__)
+        raise DeprecationWarning("you'd better use EmptyFrameDetectHook instead")
 
 
 class TemplateCompareHook(BaseHook):
