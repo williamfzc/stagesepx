@@ -7,7 +7,7 @@ from stagesepx.hook import (
     CropHook,
     FrameSaveHook,
     RefineHook,
-    EmptyFrameDetectHook,
+    InterestPointHook,
     TemplateCompareHook,
 )
 
@@ -29,7 +29,7 @@ def test_hook():
     hook3 = FrameSaveHook(frame_home)
     hook4 = CropHook(size=(0.5, 0.5), offset=(0.0, 0.5), overwrite=True)
     hook5 = RefineHook()
-    hook6 = EmptyFrameDetectHook()
+    hook6 = InterestPointHook()
     hook7 = TemplateCompareHook({"amazon": IMAGE_PATH})
 
     # --- cutter ---
