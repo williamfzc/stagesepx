@@ -46,6 +46,10 @@ stagesepx 将 自动侦测出所有处于稳定的阶段：
 
 [![pen_chart.png](https://i.loli.net/2019/07/22/5d35a8858640e67521.png)](https://i.loli.net/2019/07/22/5d35a8858640e67521.png)
 
+与视频一致的高准确度。以秒表为例：
+
+![accuracy.png](https://i.loli.net/2019/10/02/Cboj743UwRQmgPS.png)
+
 ---
 
 - 全自动，无需前置训练与学习
