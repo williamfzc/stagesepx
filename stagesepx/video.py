@@ -42,14 +42,17 @@ class _BaseFrameOperator(object):
 
 class MemFrameOperator(_BaseFrameOperator):
     def get_frame_by_id(self, frame_id: int) -> typing.Optional[VideoFrame]:
-        frame_id = frame_id - 1
-        if frame_id >= self.get_length():
+        if frame_id > self.get_length():
             return None
+        # list starts from zero, but frame starts from one
+        frame_id = frame_id - 1
         return self.video.data[frame_id].copy()
 
 
 class FileFrameOperator(_BaseFrameOperator):
     def get_frame_by_id(self, frame_id: int) -> typing.Optional[VideoFrame]:
+        if frame_id > self.get_length():
+            return None
         with toolbox.video_capture(self.video.path) as cap:
             toolbox.video_jump(cap, frame_id)
             success, frame = cap.read()
