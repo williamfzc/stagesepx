@@ -53,6 +53,7 @@ class VideoCutter(object):
 
     @staticmethod
     def pic_split(origin: np.ndarray, block: int) -> typing.List[np.ndarray]:
+        """ actually, when block == 3, blocks' count would be 3 * 3 = 9 """
         res = [np.hsplit(np.vsplit(origin, block)[i], block) for i in range(block)]
         return [j for i in res for j in i]
 

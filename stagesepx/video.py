@@ -61,7 +61,13 @@ class FileFrameOperator(_BaseFrameOperator):
 
 
 class VideoObject(object):
-    def __init__(self, path: typing.Union[bytes, str, os.PathLike], *_, **__):
+    def __init__(
+        self,
+        path: typing.Union[bytes, str, os.PathLike],
+        pre_load: bool = None,
+        *_,
+        **__,
+    ):
         assert os.path.isfile(path), f"video [{path}] not existed"
         self.path: str = str(path)
         self.data: typing.Optional[typing.Tuple[VideoFrame]] = tuple()
@@ -69,6 +75,9 @@ class VideoObject(object):
         with toolbox.video_capture(path) as cap:
             self.frame_count = toolbox.get_frame_count(cap)
             self.frame_size = toolbox.get_frame_size(cap)
+
+        if pre_load:
+            self.load_frames()
 
     def __str__(self):
         return f"<VideoObject path={self.path}>"
@@ -79,7 +88,9 @@ class VideoObject(object):
         self.data = tuple()
 
     def load_frames(self):
-        # TODO full frames list can be very huge
+        # TODO full frames list can be very huge, for some devices
+        logger.info(f"start loading {self.path} to memory ...")
+
         data: typing.List[VideoFrame] = []
         with toolbox.video_capture(self.path) as cap:
             success, frame = cap.read()
@@ -87,9 +98,18 @@ class VideoObject(object):
                 frame_object = VideoFrame.init(cap, frame)
                 data.append(frame_object)
                 success, frame = cap.read()
+
+        # calculate memory cost
+        each_cost = data[0].data.nbytes
+        logger.debug(f"single frame cost: {each_cost} bytes")
+        total_cost = each_cost * self.frame_count
+        logger.debug(f"total frame cost: {total_cost} bytes")
+        logger.info(
+            f"frames loaded. frame count: {self.frame_count}. memory cost: {total_cost} bytes"
+        )
+
         # lock the order
         self.data = tuple(data)
-        logger.info(f"load frames to memory. total frame count: {len(data)}")
 
     def _read_from_file(self) -> typing.Generator[VideoFrame, None, None]:
         with toolbox.video_capture(self.path) as cap:
