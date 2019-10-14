@@ -32,7 +32,7 @@ setup(
         "opencv-contrib-python==3.4.2.17",
         "numpy>=0.16.2",
         "loguru>=0.2.5",
-        "scikit-image>=0.14.2",
+        "scikit-image>=0.16.0",
         "scikit-learn>=0.21.0",
         "pyecharts>=1.3.1",
         "findit>=0.5.6",

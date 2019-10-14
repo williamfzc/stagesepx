@@ -10,7 +10,7 @@ from loguru import logger
 from functools import wraps
 from base64 import b64encode
 from skimage.filters import threshold_otsu
-from skimage.measure import compare_ssim as origin_compare_ssim
+from skimage.metrics import structural_similarity as origin_compare_ssim
 from skimage.measure import compare_nrmse, compare_psnr
 from skimage.feature import hog, local_binary_pattern
 
