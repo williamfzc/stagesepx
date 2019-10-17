@@ -28,7 +28,7 @@ setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "opencv-python>=4.1.0.25",
+        "opencv-python==4.1.0.25",
         "opencv-contrib-python==3.4.2.17",
         "numpy>=0.16.2",
         "loguru>=0.2.5",
