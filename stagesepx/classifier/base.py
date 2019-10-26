@@ -54,6 +54,9 @@ class ClassifierResult(object):
             key=lambda x: x.frame_id,
         )
 
+    def get_length(self) -> int:
+        return len(self.data)
+
     def calc_changing_cost(
         self
     ) -> typing.Dict[str, typing.Tuple[SingleClassifierResult, SingleClassifierResult]]:

@@ -64,6 +64,6 @@ def test_save_and_load():
     assert os.path.isfile(result_file)
     classify_result_after = Reporter.load(result_file)
 
-    assert len(classify_result) == len(classify_result_after)
-    for i, j in zip(classify_result, classify_result_after):
+    assert classify_result.get_length() == classify_result_after.get_length()
+    for i, j in zip(classify_result.data, classify_result_after.data):
         assert i.to_dict() == j.to_dict()
