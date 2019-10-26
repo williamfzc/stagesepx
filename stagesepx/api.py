@@ -152,7 +152,7 @@ def classify(
     offset: int = 3,
     limit: int = None,
     threshold: float = 0.95,
-) -> typing.List[ClassifierResult]:
+) -> ClassifierResult:
     """
     classify a video with some tagged pictures
     optional: if you have changed the default value in `cut`, you'd better keep them(offset and limit) equal.

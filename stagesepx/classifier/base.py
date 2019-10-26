@@ -6,11 +6,12 @@ from loguru import logger
 
 from stagesepx.cutter import VideoCutRange
 from stagesepx import toolbox
+from stagesepx import constants
 from stagesepx.hook import BaseHook, GreyHook, CompressHook
 from stagesepx.video import VideoObject, VideoFrame
 
 
-class ClassifierResult(object):
+class SingleClassifierResult(object):
     def __init__(self, video_path: str, frame_id: int, timestamp: float, stage: str):
         self.video_path = video_path
         self.frame_id = frame_id
@@ -24,6 +25,61 @@ class ClassifierResult(object):
         return f"<ClassifierResult stage={self.stage} frame_id={self.frame_id} timestamp={self.timestamp}>"
 
     __repr__ = __str__
+
+
+class ClassifierResult(object):
+    def __init__(self, data: typing.List[SingleClassifierResult]):
+        self.video_path = data[0].video_path
+        self.data = data
+
+    def get_timestamp_list(self) -> typing.List[float]:
+        return [each.timestamp for each in self.data]
+
+    def get_stage_list(self) -> typing.List[str]:
+        return [each.stage for each in self.data]
+
+    def get_stage_set(self) -> typing.Set[str]:
+        return set(self.get_stage_list())
+
+    def get_offset(self) -> float:
+        # timestamp offset between frames
+        return self.data[1].timestamp - self.data[0].timestamp
+
+    def get_specific_stage(
+        self, stage_name: str
+    ) -> typing.List[SingleClassifierResult]:
+        """ get specific stage range by stage name """
+        return sorted(
+            [i for i in self.data if i.stage == stage_name],
+            key=lambda x: x.frame_id,
+        )
+
+    def calc_changing_cost(
+        self
+    ) -> typing.Dict[str, typing.Tuple[SingleClassifierResult, SingleClassifierResult]]:
+        """ calc time cost between stages """
+        # add changing cost
+        cost_dict: typing.Dict[
+            str, typing.Tuple[SingleClassifierResult, SingleClassifierResult]
+        ] = {}
+        i = 0
+        while i < len(self.data) - 1:
+            cur = self.data[i]
+            next_one = self.data[i + 1]
+
+            # next one is changing
+            if next_one.stage == constants.UNSTABLE_FLAG:
+                for j in range(i + 1, len(self.data)):
+                    i = j
+                    next_one = self.data[j]
+                    if next_one.stage != constants.UNSTABLE_FLAG:
+                        break
+
+                changing_name = f"{cur.stage} - {next_one.stage}"
+                cost_dict[changing_name] = (cur, next_one)
+            else:
+                i += 1
+        return cost_dict
 
 
 class BaseClassifier(object):
@@ -141,7 +197,7 @@ class BaseClassifier(object):
         step: int = None,
         *args,
         **kwargs,
-    ) -> typing.List[ClassifierResult]:
+    ) -> ClassifierResult:
         """
         start classification
 
@@ -157,7 +213,7 @@ class BaseClassifier(object):
         if not step:
             step = 1
 
-        final_result: typing.List[ClassifierResult] = list()
+        final_result: typing.List[SingleClassifierResult] = list()
         if isinstance(video, str):
             video = VideoObject(video)
 
@@ -170,7 +226,7 @@ class BaseClassifier(object):
                         f"frame {frame.frame_id} ({frame.timestamp}) not in target range, skip"
                     )
                     final_result.append(
-                        ClassifierResult(
+                        SingleClassifierResult(
                             video.path, frame.frame_id, frame.timestamp, "-1"
                         )
                     )
@@ -186,7 +242,9 @@ class BaseClassifier(object):
             )
 
             final_result.append(
-                ClassifierResult(video.path, frame.frame_id, frame.timestamp, result)
+                SingleClassifierResult(
+                    video.path, frame.frame_id, frame.timestamp, result
+                )
             )
             frame = operator.get_frame_by_id(frame.frame_id + step)
-        return final_result
+        return ClassifierResult(final_result)

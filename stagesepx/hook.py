@@ -246,6 +246,7 @@ class FrameSaveHook(BaseHook):
 
 class InterestPointHook(BaseHook):
     """ use ORB detector to get the number of interest points """
+
     def __init__(self, *_, **__):
         super().__init__(*_, **__)
         self._orb = cv2.ORB_create()

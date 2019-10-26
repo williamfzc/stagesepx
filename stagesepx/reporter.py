@@ -7,14 +7,11 @@ from pyecharts.charts import Line, Bar, Page
 from pyecharts import options as opts
 from loguru import logger
 
-from stagesepx.classifier import ClassifierResult
+from stagesepx.classifier import ClassifierResult, SingleClassifierResult
 from stagesepx import toolbox
 from stagesepx import constants
 from stagesepx.cutter import VideoCutResult
 from stagesepx import __VERSION__
-
-BACKGROUND_COLOR = r"#fffaf4"
-UNSTABLE_FLAG = r"-1"
 
 # load template
 template_dir_path = os.path.join(os.path.dirname(__file__), "template")
@@ -28,38 +25,6 @@ def get_template(lang: str) -> str:
     with open(lang_dict[lang], encoding=constants.CHARSET) as t:
         template = t.read()
     return template
-
-
-class DataUtils(object):
-    """ some functions to analyse ClassiferResult list """
-
-    @staticmethod
-    def calc_changing_cost(
-        data_list: typing.List[ClassifierResult]
-    ) -> typing.Dict[str, typing.Tuple[ClassifierResult, ClassifierResult]]:
-        """ calc time cost between stages """
-        # add changing cost
-        cost_dict: typing.Dict[
-            str, typing.Tuple[ClassifierResult, ClassifierResult]
-        ] = {}
-        i = 0
-        while i < len(data_list) - 1:
-            cur = data_list[i]
-            next_one = data_list[i + 1]
-
-            # next one is changing
-            if next_one.stage == UNSTABLE_FLAG:
-                for j in range(i + 1, len(data_list)):
-                    i = j
-                    next_one = data_list[j]
-                    if next_one.stage != UNSTABLE_FLAG:
-                        break
-
-                changing_name = f"{cur.stage} - {next_one.stage}"
-                cost_dict[changing_name] = (cur, next_one)
-            else:
-                i += 1
-        return cost_dict
 
 
 class Reporter(object):
@@ -99,12 +64,12 @@ class Reporter(object):
         self.extra_dict[name] = value
 
     @staticmethod
-    def _draw_line(data_list: typing.List[ClassifierResult]) -> Line:
+    def _draw_line(result: ClassifierResult) -> Line:
         # draw line chart
-        x_axis = [str(i.timestamp) for i in data_list]
-        y_axis = [i.stage for i in data_list]
+        x_axis = result.get_timestamp_list()
+        y_axis = result.get_stage_list()
 
-        line = Line(init_opts=opts.InitOpts(bg_color=BACKGROUND_COLOR))
+        line = Line(init_opts=opts.InitOpts(bg_color=constants.BACKGROUND_COLOR))
         line.add_xaxis(x_axis)
         line.add_yaxis("stage", y_axis, is_step=False, is_symbol_show=True)
         line.set_global_opts(
@@ -126,7 +91,7 @@ class Reporter(object):
         mse_axis = [i.mse for i in data.range_list]
         psnr_axis = [i.psnr for i in data.range_list]
 
-        line = Line(init_opts=opts.InitOpts(bg_color=BACKGROUND_COLOR))
+        line = Line(init_opts=opts.InitOpts(bg_color=constants.BACKGROUND_COLOR))
         line.add_xaxis(x_axis)
         line.add_yaxis("ssim", ssim_axis)
         line.add_yaxis("mse", mse_axis)
@@ -142,17 +107,15 @@ class Reporter(object):
         return line
 
     @staticmethod
-    def _draw_bar(data_list: typing.List[ClassifierResult]) -> Bar:
+    def _draw_bar(result: ClassifierResult) -> Bar:
         # draw bar chart
-        bar = Bar(init_opts=opts.InitOpts(bg_color=BACKGROUND_COLOR))
-        x_axis = sorted(list(set([i.stage for i in data_list])))
+        bar = Bar(init_opts=opts.InitOpts(bg_color=constants.BACKGROUND_COLOR))
+        x_axis = sorted(list(result.get_stage_set()))
         y_axis = list()
-        offset = data_list[1].timestamp - data_list[0].timestamp
+        offset = result.get_offset()
         for each_stage_name in x_axis:
-            each_stage = sorted(
-                [i for i in data_list if i.stage == each_stage_name],
-                key=lambda x: x.frame_id,
-            )
+            each_stage = result.get_specific_stage(each_stage_name)
+            # last frame - first frame
             time_cost = each_stage[-1].timestamp - each_stage[0].timestamp + offset
             y_axis.append(time_cost)
 
@@ -167,13 +130,13 @@ class Reporter(object):
 
     @staticmethod
     def get_stable_stage_sample(
-        data_list: typing.List[ClassifierResult], *args, **kwargs
+        result: ClassifierResult, *args, **kwargs
     ) -> np.ndarray:
-        last = data_list[0]
-        picked: typing.List[ClassifierResult] = [last]
-        for each in data_list:
+        last = result.data[0]
+        picked: typing.List[SingleClassifierResult] = [last]
+        for each in result.data:
             # ignore unstable stage
-            if each.stage == UNSTABLE_FLAG:
+            if each.stage == constants.UNSTABLE_FLAG:
                 continue
             if last.stage != each.stage:
                 last = each
@@ -193,22 +156,22 @@ class Reporter(object):
         return np.hstack(frame_list)
 
     @classmethod
-    def save(cls, to_file: str, data_list: typing.List[ClassifierResult]):
+    def save(cls, to_file: str, result: ClassifierResult):
         assert not os.path.isfile(to_file), f"file {to_file} already existed"
-        data = [i.to_dict() for i in data_list]
+        data = [i.to_dict() for i in result.data]
         with open(to_file, "w", encoding=constants.CHARSET) as f:
             json.dump(data, f)
 
     @classmethod
-    def load(cls, from_file: str) -> typing.List[ClassifierResult]:
+    def load(cls, from_file: str) -> ClassifierResult:
         assert os.path.isfile(from_file), f"file {from_file} not existed"
         with open(from_file, encoding=constants.CHARSET) as f:
             content = json.load(f)
-        return [ClassifierResult(**each) for each in content]
+        return ClassifierResult([SingleClassifierResult(**each) for each in content])
 
     def draw(
         self,
-        data_list: typing.List[ClassifierResult],
+        classifier_result: ClassifierResult,
         report_path: str = None,
         cut_result: VideoCutResult = None,
         language: str = None,
@@ -218,7 +181,7 @@ class Reporter(object):
         """
         draw report file
 
-        :param data_list: classifierResult list, output of classifier
+        :param classifier_result: classifierResult, output of classifier
         :param report_path: your report will be there
         :param cut_result: more charts would be built
         :param language: 'en' or 'zh'
@@ -226,8 +189,8 @@ class Reporter(object):
         """
 
         # draw
-        line = self._draw_line(data_list)
-        bar = self._draw_bar(data_list)
+        line = self._draw_line(classifier_result)
+        bar = self._draw_bar(classifier_result)
 
         # merge charts
         page = Page()
@@ -235,7 +198,7 @@ class Reporter(object):
         page.add(bar)
 
         # calc time cost
-        cost_dict = DataUtils.calc_changing_cost(data_list)
+        cost_dict = classifier_result.calc_changing_cost()
 
         # insert pictures
         if cut_result:
@@ -256,7 +219,7 @@ class Reporter(object):
                     )
 
         # insert stable frames
-        stable_stage_sample = self.get_stable_stage_sample(data_list, compress_rate=0.2)
+        stable_stage_sample = self.get_stable_stage_sample(classifier_result, compress_rate=0.2)
         stable_stage_sample = toolbox.np2b64str(stable_stage_sample)
 
         # time stamp
@@ -273,7 +236,7 @@ class Reporter(object):
             thumbnail_list=self.thumbnail_list,
             stable_sample=stable_stage_sample,
             extras=self.extra_dict,
-            background_color=BACKGROUND_COLOR,
+            background_color=constants.BACKGROUND_COLOR,
             cost_dict=cost_dict,
             timestamp=timestamp,
             version_code=__VERSION__,
