@@ -4,7 +4,7 @@ from stagesepx.reporter import Reporter
 from stagesepx.hook import ExampleHook, CropHook, IgnoreHook
 import os
 
-video = '../demo.mp4'
+video = "../demo.mp4"
 
 # 在 0.8.0 之后，你可以利用视频预加载模式，大幅度提升分析速度
 from stagesepx.video import VideoObject
@@ -49,13 +49,12 @@ hook2 = CropHook(
     # 除了指定比例，你也可以直接指定绝对长度
     # 例如你希望裁剪 高度100 宽度200 的一部分
     # size=(100, 200),
-
     # 默认情况下，所有的坐标都是从左上角开始的
     # 如果我们需要偏移到右下角，意味着我们需要向下偏移 0.5 * height，向右偏移 0.5 * width
     # offset=(0.5, 0.5),
     # 当然，这里也可以指定绝对长度，同size
     # offset=(100, 100),
-    overwrite=True
+    overwrite=True,
 )
 # 在初始化完成后，你就可以将hook添加到 cutter 或 classifier 中了
 # 在添加完成后，你可以发现，stagesepx 只会对你裁剪后的区域进行检测
@@ -69,7 +68,7 @@ hook3 = IgnoreHook(
     # 与 CropHook 不同的是，此处指定的区域会被屏蔽掉
     size=(0.5, 0.5),
     offset=(0.5, 0.5),
-    overwrite=True
+    overwrite=True,
 )
 # 为了不影响结果，在例子中先注释掉了
 # cutter.add_hook(hook3)
@@ -131,7 +130,6 @@ data_home = res.pick_and_save(
     # 采样结果保存的位置
     # 不指定的话则会在当前位置生成文件夹并返回它的路径
     # './cut_result',
-
     # prune被用于去除重复阶段（>=0.4.4）
     # float（0-1.0），设置为0.9时，如果两个stage相似度超过0.9，他们会合并成一个类别
     prune=None,
@@ -142,7 +140,7 @@ data_home = res.pick_and_save(
 cl = SVMClassifier(
     # 默认情况下使用 HoG 进行特征提取
     # 你可以将其关闭从而直接对原始图片进行训练与测试：feature_type='raw'
-    feature_type='hog',
+    feature_type="hog",
     # 默认为0.2，即将图片缩放为0.2倍
     # 主要为了提高计算效率
     # 如果你担心影响分析效果，可以将其提高
@@ -169,22 +167,11 @@ classify_result = cl.classify(
     step=1,
 )
 
-# 分类出来的结果是一个 list，里面包含 ClassifierResult 对象
-# 如果你希望这个东西能够接入你的业务，与其他的工具协同，那么光靠后面的报告其实意义不大
-# 你可以基于 classify_result 进行定制化开发
-for each in classify_result:
-    # 它的帧编号
-    print(each.frame_id)
-    # 它的时间戳
-    print(each.timestamp)
-    # 它被划分为什么类型
-    print(each.stage)
-    break
-# 例如，将阶段1的部分提取出来？
-stage_1_list = [each for each in classify_result if each.stage == '1']
-# 然后计算出它的范围
-print(stage_1_list[-1].timestamp - stage_1_list[0].timestamp)
-# 你也可以参考 report.py 中 calc_changing_cost 的实现
+# 分类得到的结果是一个 ClassifierResult 对象
+# 你可以直接通过处理里面的数据、使用它的内置方法对你的分类结果进行定制
+# 从而达到你希望的效果
+data_list = classify_result.data
+print(data_list)
 
 # --- draw ---
 r = Reporter()
@@ -196,9 +183,9 @@ r = Reporter()
 # 可以参考 cli.py 中的实现
 for each in unstable:
     r.add_thumbnail(
-        f'{each.start}({each.start_time}) - {each.end}({each.end_time}), '
-        f'duration: {each.end_time - each.start_time}',
-        res.thumbnail(each)
+        f"{each.start}({each.start_time}) - {each.end}({each.end_time}), "
+        f"duration: {each.end_time - each.start_time}",
+        res.thumbnail(each),
     )
 
 # 你可以将把一些文件夹路径插入到报告中
@@ -210,7 +197,7 @@ for each in unstable:
 # r.add_extra('here is title', 'here is content')
 r.draw(
     classify_result,
-    report_path=os.path.join(data_home, 'report.html'),
+    report_path=os.path.join(data_home, "report.html"),
     # 0.5.3新增的特性，多用于debug
     # 传入cutter的切割结果，能够在图表末尾追加 SSIM、MSE、PSNR 的变化趋势图
     cut_result=res,
