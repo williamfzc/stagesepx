@@ -21,6 +21,7 @@ class VideoFrame(object):
         frame_id = toolbox.get_current_frame_id(cap)
         timestamp = toolbox.get_current_frame_time(cap)
         grey = toolbox.turn_grey(frame)
+        logger.debug(f"new a frame: {frame_id}({timestamp})")
         return VideoFrame(frame_id, timestamp, grey)
 
     def copy(self):

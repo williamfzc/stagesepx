@@ -6,14 +6,13 @@ import typing
 import math
 import os
 import numpy as np
-from loguru import logger
-from functools import wraps
 from base64 import b64encode
 from skimage.filters import threshold_otsu
 from skimage.metrics import structural_similarity as origin_compare_ssim
 from skimage.metrics import normalized_root_mse as compare_nrmse
 from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from skimage.feature import hog, local_binary_pattern
+from loguru import logger
 
 # DO NOT IMPORT ANYTHING FROM STAGESEPX HERE
 # MAKE TOOLBOX STATIC
@@ -29,7 +28,14 @@ def video_capture(video_path: str):
 
 
 def video_jump(video_cap: cv2.VideoCapture, frame_id: int):
+    # IMPORTANT:
+    # - frame is a range actually
+    # - frame 1 's timestamp is the end of this frame
+    #
+    # video_jump(cap, 1) means: moving the pointer to the start point of frame 1 => the end point of frame 0
+
     video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1)
+    logger.debug(f"current pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})")
 
 
 def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
@@ -68,11 +74,12 @@ def get_frame_time(
     video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None
 ) -> float:
     cur = get_current_frame_id(video_cap)
-    video_jump(video_cap, frame_id)
+    video_jump(video_cap, frame_id + 1)
     result = get_current_frame_time(video_cap)
+    logger.debug(f"frame {frame_id} -> {result}")
 
     if recover:
-        video_jump(video_cap, cur)
+        video_jump(video_cap, cur + 1)
     return result
 
 
@@ -98,7 +105,7 @@ def get_frame(
     assert ret, f"read frame failed, frame id: {frame_id}"
 
     if recover:
-        video_jump(video_cap, cur)
+        video_jump(video_cap, cur + 1)
     return frame
 
 
@@ -243,12 +250,3 @@ def get_timestamp_str() -> str:
 def np2b64str(frame: np.ndarray) -> str:
     buffer = cv2.imencode(".png", frame)[1].tostring()
     return b64encode(buffer).decode()
-
-
-def arg_printer(func: typing.Callable):
-    @wraps(func)
-    def _wrapper(*args, **kwargs):
-        logger.debug(f"function {func.__name__} args: {args}, kwargs: {kwargs}")
-        return func(*args, **kwargs)
-
-    return _wrapper
