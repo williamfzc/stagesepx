@@ -40,7 +40,13 @@ stagesepx 将 自动侦测出所有处于稳定的阶段：
 
 ![Time Cost.png](https://i.loli.net/2019/09/01/erK9mPsISbHEiFO.png)
 
-没有任何限制，支持几乎所有场景：
+原生跨平台，不只是移动端：
+
+![web.gif](https://i.loli.net/2019/11/05/bQr18d6l9fNjIhS.gif)
+
+![web.png](https://i.loli.net/2019/11/05/ywZ9qag3rslNKx6.png)
+
+甚至，任何场景：
 
 [![pen.gif](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)
 
