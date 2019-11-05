@@ -5,9 +5,11 @@
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
+from stagesepx.video import VideoObject
 
 video_path = "../demo.mp4"
-
+video = VideoObject(video_path)
+video.load_frames()
 
 # --- cutter ---
 cutter = VideoCutter()
@@ -23,4 +25,4 @@ classify_result = cl.classify(video_path, stable)
 
 # --- draw ---
 r = Reporter()
-r.draw(classify_result)
+r.draw(classify_result, cut_result=res)
