@@ -66,7 +66,7 @@ class Reporter(object):
     @staticmethod
     def _draw_line(result: ClassifierResult) -> Line:
         # draw line chart
-        x_axis = result.get_timestamp_list()
+        x_axis = [str(i) for i in result.get_timestamp_list()]
         y_axis = result.get_stage_list()
 
         line = Line(init_opts=opts.InitOpts(bg_color=constants.BACKGROUND_COLOR))
