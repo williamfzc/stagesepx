@@ -13,6 +13,7 @@ from stagesepx.hook import (
     InvalidFrameDetectHook,
     _AreaBaseHook,
     change_origin,
+    BaseHook,
 )
 
 import os
@@ -33,7 +34,7 @@ def test_others():
 
     fake_frame = "abc"
     fake_hook = lambda *args, **kwargs: None
-    assert change_origin(fake_hook)(1, fake_frame) == fake_frame
+    assert change_origin(fake_hook)(BaseHook(True), 1, fake_frame) == fake_frame
 
 
 def test_hook():
