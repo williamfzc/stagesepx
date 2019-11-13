@@ -22,6 +22,7 @@ def test_read_from_mem():
     count = 0
     for f in v:
         assert isinstance(f, VideoFrame)
+        print(str(f))
         count += 1
     assert count == 30
 

@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 2
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
       - uses: actions/checkout@v1
@@ -28,7 +28,7 @@ jobs:
         run: |
           pip install pytest
           pip install pytest-cov
-          pytest --cov=./ --cov-report=xml
+          pytest --cov=./stagesepx --cov-report=xml
         env:
           PYTHONPATH: .
       - name: Upload coverage to Codecov

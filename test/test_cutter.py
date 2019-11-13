@@ -1,5 +1,7 @@
 from stagesepx.cutter import VideoCutter, VideoCutResult
+from stagesepx.video import VideoObject
 import os
+import numpy as np
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
@@ -63,3 +65,15 @@ def test_cut_range():
     stable, _ = res.get_range()
     stable[0].contain_image(IMAGE_PATH)
     stable[0].is_loop(0.95)
+
+
+def test_block_valid():
+    target = np.zeros((10, 10))
+    cutter = VideoCutter()
+    assert not cutter.is_block_valid(target, 4)
+
+
+def test_if_block_invalid():
+    cutter = VideoCutter()
+    video = VideoObject(VIDEO_PATH)
+    cutter._convert_video_into_range_list(video, 10086)
