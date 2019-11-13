@@ -17,9 +17,14 @@ def test_read_from_file():
 
 def test_read_from_mem():
     v = VideoObject(VIDEO_PATH)
+    print(str(v))
     v.load_frames()
     count = 0
     for f in v:
         assert isinstance(f, VideoFrame)
         count += 1
     assert count == 30
+
+    v = VideoObject(VIDEO_PATH, pre_load=True)
+    v.clean_frames()
+    assert not v.data

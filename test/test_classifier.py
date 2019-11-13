@@ -60,6 +60,8 @@ def test_save_and_load():
 
     result_file = "save.json"
     reporter = Reporter()
+    reporter.add_dir_link("some_link")
+    reporter.add_extra("some_name", "some_value")
     reporter.save(result_file, classify_result)
     assert os.path.isfile(result_file)
     classify_result_after = Reporter.load(result_file)
@@ -67,3 +69,5 @@ def test_save_and_load():
     assert classify_result.get_length() == classify_result_after.get_length()
     for i, j in zip(classify_result.data, classify_result_after.data):
         assert i.to_dict() == j.to_dict()
+
+    reporter.draw(classify_result)

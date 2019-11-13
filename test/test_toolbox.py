@@ -56,3 +56,14 @@ def test_get_frame():
         frame = toolbox.get_frame(cap, second)
         assert frame is not None
         assert toolbox.get_current_frame_id(cap) == second
+
+        #
+        cur_time = toolbox.get_current_frame_time(cap)
+        toolbox.get_frame_time(cap, 10, recover=True)
+        assert cur_time == toolbox.get_current_frame_time(cap)
+
+
+def test_compress():
+    image = toolbox.imread(IMAGE_PATH)
+    frame = toolbox.compress_frame(image, target_size=(100, 100))
+    assert frame.shape == (100, 100)

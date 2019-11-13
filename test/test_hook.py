@@ -9,6 +9,10 @@ from stagesepx.hook import (
     RefineHook,
     InterestPointHook,
     TemplateCompareHook,
+    BinaryHook,
+    InvalidFrameDetectHook,
+    _AreaBaseHook,
+    change_origin,
 )
 
 import os
@@ -18,6 +22,18 @@ VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
 IMAGE_NAME = "demo.jpg"
 IMAGE_PATH = os.path.join(PROJECT_PATH, IMAGE_NAME)
 assert os.path.isfile(IMAGE_PATH)
+
+
+def test_others():
+    assert _AreaBaseHook.convert(200, 200, 100, 100) == (100, 100)
+    try:
+        InvalidFrameDetectHook()
+    except DeprecationWarning:
+        pass
+
+    fake_frame = "abc"
+    fake_hook = lambda *args, **kwargs: None
+    assert change_origin(fake_hook)(1, fake_frame) == fake_frame
 
 
 def test_hook():
@@ -31,6 +47,7 @@ def test_hook():
     hook5 = RefineHook()
     hook6 = InterestPointHook()
     hook7 = TemplateCompareHook({"amazon": IMAGE_PATH})
+    hook8 = BinaryHook()
 
     # --- cutter ---
     cutter = VideoCutter(compress_rate=0.8)
@@ -43,6 +60,7 @@ def test_hook():
     cutter.add_hook(hook5)
     cutter.add_hook(hook6)
     cutter.add_hook(hook7)
+    cutter.add_hook(hook8)
 
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()

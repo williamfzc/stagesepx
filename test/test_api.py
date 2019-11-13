@@ -13,20 +13,29 @@ def test_one_step():
 
 
 def test_cut_and_classify():
+    model_name = "model1.pkl"
+    report_name = "report.html"
+
     # test cut
     res, data_home = cut(VIDEO_PATH)
 
     # test train
-    train(data_home, "model1.pkl")
+    train(data_home, model_name)
 
     # test classify
     classify_result = classify(VIDEO_PATH, data_home)
+    classify_result_1 = classify(VIDEO_PATH, data_home, model=model_name)
 
     # --- draw ---
     r = Reporter()
     r.draw(
         classify_result,
-        report_path=os.path.join(data_home, "report.html"),
+        report_path=os.path.join(data_home, report_name),
+        cut_result=res,
+    )
+    r.draw(
+        classify_result_1,
+        report_path=os.path.join(data_home, report_name),
         cut_result=res,
     )
 
