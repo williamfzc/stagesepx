@@ -65,15 +65,3 @@ def test_cut_range():
     stable, _ = res.get_range()
     stable[0].contain_image(IMAGE_PATH)
     stable[0].is_loop(0.95)
-
-
-def test_block_valid():
-    target = np.zeros((10, 10))
-    cutter = VideoCutter()
-    assert not cutter.is_block_valid(target, 4)
-
-
-def test_if_block_invalid():
-    cutter = VideoCutter()
-    video = VideoObject(VIDEO_PATH)
-    cutter._convert_video_into_range_list(video, 10086)

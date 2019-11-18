@@ -35,7 +35,9 @@ def video_jump(video_cap: cv2.VideoCapture, frame_id: int):
     # video_jump(cap, 1) means: moving the pointer to the start point of frame 1 => the end point of frame 0
 
     video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1)
-    logger.debug(f"current pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})")
+    logger.debug(
+        f"current pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})"
+    )
 
 
 def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:

@@ -219,7 +219,9 @@ class Reporter(object):
                     )
 
         # insert stable frames
-        stable_stage_sample = self.get_stable_stage_sample(classifier_result, compress_rate=0.2)
+        stable_stage_sample = self.get_stable_stage_sample(
+            classifier_result, compress_rate=0.2
+        )
         stable_stage_sample = toolbox.np2b64str(stable_stage_sample)
 
         # time stamp

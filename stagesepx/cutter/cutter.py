@@ -54,17 +54,11 @@ class VideoCutter(object):
     @staticmethod
     def pic_split(origin: np.ndarray, block: int) -> typing.List[np.ndarray]:
         """ actually, when block == 3, blocks' count would be 3 * 3 = 9 """
-        res = [np.hsplit(np.vsplit(origin, block)[i], block) for i in range(block)]
-        return [j for i in res for j in i]
-
-    @staticmethod
-    def is_block_valid(origin: np.ndarray, block: int) -> bool:
-        try:
-            _ = [np.hsplit(np.vsplit(origin, block)[i], block) for i in range(block)]
-        except ValueError:
-            return False
-        else:
-            return True
+        result: typing.List[np.ndarray] = list()
+        for each_block in np.array_split(origin, block, axis=0):
+            sub_block = np.array_split(each_block, block, axis=1)
+            result += sub_block
+        return result
 
     def _apply_hook(
         self, frame_id: int, frame: np.ndarray, *args, **kwargs
@@ -91,11 +85,6 @@ class VideoCutter(object):
         # check block
         if not block:
             block = 2
-        if not self.is_block_valid(cur_frame.data, block):
-            logger.warning(
-                "array split does not result in an equal division, set block to 1"
-            )
-            block = 1
 
         while True:
             # hook

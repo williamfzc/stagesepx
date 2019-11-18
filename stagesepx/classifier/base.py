@@ -50,8 +50,7 @@ class ClassifierResult(object):
     ) -> typing.List[SingleClassifierResult]:
         """ get specific stage range by stage name """
         return sorted(
-            [i for i in self.data if i.stage == stage_name],
-            key=lambda x: x.frame_id,
+            [i for i in self.data if i.stage == stage_name], key=lambda x: x.frame_id
         )
 
     def get_length(self) -> int:

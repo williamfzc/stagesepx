@@ -42,7 +42,9 @@ class VideoCutRange(object):
             self.start, self.end = self.end, self.start
             self.start_time, self.end_time = self.end_time, self.start_time
 
-        logger.debug(f"new a range: {self.start}({self.start_time}) - {self.end}({self.end_time})")
+        logger.debug(
+            f"new a range: {self.start}({self.start_time}) - {self.end}({self.end_time})"
+        )
 
     def can_merge(self, another: "VideoCutRange", offset: int = None, **_):
         if not offset:
