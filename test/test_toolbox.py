@@ -71,5 +71,7 @@ def test_compress():
 
 def test_convert_video():
     target_fps: int = 30
-    ret = toolbox.fps_convert(target_fps, VIDEO_PATH, os.path.join(PROJECT_PATH, f"{target_fps}.mp4"))
+    ret = toolbox.fps_convert(
+        target_fps, VIDEO_PATH, os.path.join(PROJECT_PATH, f"{target_fps}.mp4")
+    )
     assert not ret

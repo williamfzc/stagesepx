@@ -6,6 +6,7 @@ from loguru import logger
 import tempfile
 
 from stagesepx import toolbox
+from stagesepx import constants
 
 
 class VideoFrame(object):
@@ -79,7 +80,7 @@ class VideoObject(object):
         if fps:
             video_path = os.path.join(tempfile.mkdtemp(), f"tmp_{fps}.mp4")
             logger.debug(f"convert video, and bind path to {video_path}")
-            toolbox.fps_convert(fps, self.path, video_path)
+            toolbox.fps_convert(fps, self.path, video_path, constants.FFMPEG)
             self.path = video_path
 
         with toolbox.video_capture(path) as cap:

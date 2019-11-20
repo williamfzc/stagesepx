@@ -255,7 +255,19 @@ def np2b64str(frame: np.ndarray) -> str:
     return b64encode(buffer).decode()
 
 
-def fps_convert(target_fps: int, source_path: str, target_path: str) -> int:
-    command: typing.List[str] = ["ffmpeg", "-i", source_path, "-r", str(target_fps), target_path]
+def fps_convert(
+    target_fps: int, source_path: str, target_path: str, ffmpeg_exe: str = None
+) -> int:
+    # for portable ffmpeg
+    if not ffmpeg_exe:
+        ffmpeg_exe = r"ffmpeg"
+    command: typing.List[str] = [
+        ffmpeg_exe,
+        "-i",
+        source_path,
+        "-r",
+        str(target_fps),
+        target_path,
+    ]
     logger.debug(f"convert video: {command}")
     return subprocess.check_call(command)

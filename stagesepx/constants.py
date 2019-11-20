@@ -8,3 +8,6 @@ REPORT_FILE_NAME = r"report.html"
 # report
 BACKGROUND_COLOR = r"#fffaf4"
 UNSTABLE_FLAG = r"-1"
+
+# ext
+FFMPEG = r"ffmpeg"

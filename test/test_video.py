@@ -35,3 +35,13 @@ def test_convert_first():
     v = VideoObject(VIDEO_PATH, fps=30)
     v.load_frames()
     assert len(v.data) == 36
+
+
+def test_custom_ffmpeg():
+    from stagesepx import constants
+
+    constants.FFMPEG = "unknown"
+    try:
+        VideoObject(VIDEO_PATH, fps=30)
+    except FileNotFoundError:
+        pass
