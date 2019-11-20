@@ -3,6 +3,7 @@ import typing
 import cv2
 import numpy as np
 from loguru import logger
+import tempfile
 
 from stagesepx import toolbox
 
@@ -66,12 +67,20 @@ class VideoObject(object):
         self,
         path: typing.Union[bytes, str, os.PathLike],
         pre_load: bool = None,
+        fps: int = None,
         *_,
         **__,
     ):
         assert os.path.isfile(path), f"video [{path}] not existed"
         self.path: str = str(path)
         self.data: typing.Optional[typing.Tuple[VideoFrame]] = tuple()
+
+        self.fps: int = fps
+        if fps:
+            video_path = os.path.join(tempfile.mkdtemp(), f"tmp_{fps}.mp4")
+            logger.debug(f"convert video, and bind path to {video_path}")
+            toolbox.fps_convert(fps, self.path, video_path)
+            self.path = video_path
 
         with toolbox.video_capture(path) as cap:
             self.frame_count = toolbox.get_frame_count(cap)

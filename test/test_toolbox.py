@@ -67,3 +67,9 @@ def test_compress():
     image = toolbox.imread(IMAGE_PATH)
     frame = toolbox.compress_frame(image, target_size=(100, 100))
     assert frame.shape == (100, 100)
+
+
+def test_convert_video():
+    target_fps: int = 30
+    ret = toolbox.fps_convert(target_fps, VIDEO_PATH, os.path.join(PROJECT_PATH, f"{target_fps}.mp4"))
+    assert not ret

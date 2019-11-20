@@ -6,6 +6,7 @@ import typing
 import math
 import os
 import numpy as np
+import subprocess
 from base64 import b64encode
 from skimage.filters import threshold_otsu
 from skimage.metrics import structural_similarity as origin_compare_ssim
@@ -252,3 +253,9 @@ def get_timestamp_str() -> str:
 def np2b64str(frame: np.ndarray) -> str:
     buffer = cv2.imencode(".png", frame)[1].tostring()
     return b64encode(buffer).decode()
+
+
+def fps_convert(target_fps: int, source_path: str, target_path: str) -> int:
+    command: typing.List[str] = ["ffmpeg", "-i", source_path, "-r", str(target_fps), target_path]
+    logger.debug(f"convert video: {command}")
+    return subprocess.check_call(command)

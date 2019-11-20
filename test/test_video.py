@@ -29,3 +29,9 @@ def test_read_from_mem():
     v = VideoObject(VIDEO_PATH, pre_load=True)
     v.clean_frames()
     assert not v.data
+
+
+def test_convert_first():
+    v = VideoObject(VIDEO_PATH, fps=30)
+    v.load_frames()
+    assert len(v.data) == 36
