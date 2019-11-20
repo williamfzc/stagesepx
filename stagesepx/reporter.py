@@ -11,6 +11,7 @@ from stagesepx.classifier import ClassifierResult, SingleClassifierResult
 from stagesepx import toolbox
 from stagesepx import constants
 from stagesepx.cutter import VideoCutResult
+from stagesepx.video import VideoFrame
 from stagesepx import __VERSION__
 
 # load template
@@ -129,9 +130,11 @@ class Reporter(object):
         return bar
 
     @staticmethod
-    def get_stable_stage_sample(
+    def get_stable_stage_sample_frame_list(
         result: ClassifierResult, *args, **kwargs
-    ) -> np.ndarray:
+    ) -> typing.List[VideoFrame]:
+        # VideoFrame: with data
+        # SingleClassifierResult: without data
         last = result.data[0]
         picked: typing.List[SingleClassifierResult] = [last]
         for each in result.data:
@@ -142,17 +145,19 @@ class Reporter(object):
                 last = each
                 picked.append(each)
 
+        return [each.to_video_frame(*args, **kwargs) for each in picked]
+
+    @classmethod
+    def get_stable_stage_sample(
+        cls, result: ClassifierResult, *args, **kwargs
+    ) -> np.ndarray:
         def get_split_line(f):
             return np.zeros((f.shape[0], 5))
 
-        with toolbox.video_capture(last.video_path) as cap:
-            frame_list: typing.List[np.ndarray] = []
-            for each in picked:
-                frame = toolbox.get_frame(cap, each.frame_id)
-                frame = toolbox.compress_frame(frame, *args, **kwargs)
-                split_line = get_split_line(frame)
-                frame_list.append(frame)
-                frame_list.append(split_line)
+        frame_list: typing.List[np.ndarray] = list()
+        for each in cls.get_stable_stage_sample_frame_list(result, *args, **kwargs):
+            frame_list.append(each.data)
+            frame_list.append(get_split_line(each.data))
         return np.hstack(frame_list)
 
     @classmethod
@@ -175,6 +180,7 @@ class Reporter(object):
         report_path: str = None,
         cut_result: VideoCutResult = None,
         language: str = None,
+        compress_rate: float = 0.2,
         *args,
         **kwargs,
     ):
@@ -185,8 +191,10 @@ class Reporter(object):
         :param report_path: your report will be there
         :param cut_result: more charts would be built
         :param language: 'en' or 'zh'
+        :param compress_rate:
         :return:
         """
+        # TODO this function has become a little weird ...
 
         # draw
         line = self._draw_line(classifier_result)
@@ -206,21 +214,33 @@ class Reporter(object):
             sim_line = self._draw_sim(cut_result)
             page.add(sim_line)
 
-            _, unstable = cut_result.get_range(*args, **kwargs)
+            stable, unstable = cut_result.get_range(*args, **kwargs)
+
             # insert thumbnail
             if not self.thumbnail_list:
                 logger.debug("auto insert thumbnail ...")
 
-                for each in unstable:
+                for each in sorted(stable + unstable, key=lambda o: o.start):
+                    if each in stable:
+                        label = "stable"
+                        frame = each.pick_and_get(1)[0]
+                        frame = toolbox.compress_frame(
+                            frame.data, compress_rate=compress_rate, *args, **kwargs
+                        )
+                    else:
+                        label = "unstable"
+                        frame = cut_result.thumbnail(
+                            each, compress_rate=compress_rate, *args, **kwargs
+                        )
                     self.add_thumbnail(
-                        f"{each.start}({each.start_time}) - {each.end}({each.end_time}), "
+                        f"{label} {each.start}({each.start_time}) - {each.end}({each.end_time}), "
                         f"duration: {each.end_time - each.start_time}",
-                        cut_result.thumbnail(each, *args, **kwargs),
+                        frame,
                     )
 
         # insert stable frames
         stable_stage_sample = self.get_stable_stage_sample(
-            classifier_result, compress_rate=0.2
+            classifier_result, compress_rate=compress_rate
         )
         stable_stage_sample = toolbox.np2b64str(stable_stage_sample)
 

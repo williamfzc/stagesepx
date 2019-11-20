@@ -18,6 +18,15 @@ class SingleClassifierResult(object):
         self.timestamp = timestamp
         self.stage = stage
 
+    def to_video_frame(self, *args, **kwargs) -> VideoFrame:
+        # VideoFrame has `data`
+        # SingleClassifierResult has `stage`
+        with toolbox.video_capture(self.video_path) as cap:
+            frame = toolbox.get_frame(cap, self.frame_id)
+            compressed = toolbox.compress_frame(frame, *args, **kwargs)
+
+        return VideoFrame(self.frame_id, self.timestamp, compressed)
+
     def to_dict(self) -> typing.Dict:
         return self.__dict__
 
