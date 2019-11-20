@@ -20,6 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install .
+          apt-get install -y ffmpeg
       - name: Download test resource
         run: |
           curl -o demo.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
