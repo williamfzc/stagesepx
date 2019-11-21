@@ -205,6 +205,7 @@ class Reporter(object):
         # mark range
         for each in unstable_ranges:
             classifier_result.mark_range_unstable(each.start, each.end)
+        offset = classifier_result.get_offset()
         for each in classifier_result.get_stage_range():
             middle = each[len(each) // 2]
             if middle.is_stable():
@@ -216,8 +217,8 @@ class Reporter(object):
 
             first, last = each[0], each[-1]
             self.add_thumbnail(
-                f"{label} range {first.frame_id}({first.timestamp}) - {last.frame_id}({last.timestamp}), "
-                f"duration: {last.timestamp - first.timestamp} s",
+                f"{label} range {first.frame_id}({first.timestamp - offset}) - {last.frame_id}({last.timestamp}), "
+                f"duration: {last.timestamp - first.timestamp + offset}",
                 frame,
             )
         # calc time cost
