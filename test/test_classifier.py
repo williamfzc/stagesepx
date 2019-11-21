@@ -1,6 +1,7 @@
 from stagesepx.classifier import SSIMClassifier, SVMClassifier
 from stagesepx.reporter import Reporter
 from stagesepx.cutter import VideoCutResult
+import numpy as np
 
 from test_cutter import test_default as cutter_default
 from test_cutter import RESULT_DIR as CUTTER_RESULT_DIR
@@ -69,4 +70,5 @@ def test_save_and_load():
     for i, j in zip(classify_result.data, classify_result_after.data):
         assert i.to_dict() == j.to_dict()
 
+    assert isinstance(reporter.get_stable_stage_sample(classify_result), np.ndarray)
     reporter.draw(classify_result)
