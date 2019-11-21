@@ -194,8 +194,6 @@ class Reporter(object):
         :param compress_rate:
         :return:
         """
-        # TODO this function has become a little weird ...
-
         # draw
         line = self._draw_line(classifier_result)
         bar = self._draw_bar(classifier_result)
@@ -214,35 +212,26 @@ class Reporter(object):
             sim_line = self._draw_sim(cut_result)
             page.add(sim_line)
 
-            stable, unstable = cut_result.get_range(*args, **kwargs)
+            # TODO unstable from outside directly?
+            # mark range
+            _, unstable = cut_result.get_range(*args, **kwargs)
+            for each in unstable:
+                classifier_result.mark_range_unstable(each.start, each.end)
+            for each in classifier_result.get_stage_range():
+                middle = each[len(each) // 2]
+                if middle.is_stable():
+                    label = "stable"
+                    frame = toolbox.compress_frame(middle.get_data(), compress_rate=compress_rate)
+                else:
+                    label = "unstable"
+                    frame = np.hstack([toolbox.compress_frame(i.get_data(), compress_rate=compress_rate) for i in each])
 
-            # insert thumbnail
-            if not self.thumbnail_list:
-                logger.debug("auto insert thumbnail ...")
-
-                for each in sorted(stable + unstable, key=lambda o: o.start):
-                    if each in stable:
-                        label = "stable"
-                        frame = each.pick_and_get(1)[0]
-                        frame = toolbox.compress_frame(
-                            frame.data, compress_rate=compress_rate, *args, **kwargs
-                        )
-                    else:
-                        label = "unstable"
-                        frame = cut_result.thumbnail(
-                            each, compress_rate=compress_rate, *args, **kwargs
-                        )
-                    self.add_thumbnail(
-                        f"{label} {each.start}({each.start_time}) - {each.end}({each.end_time}), "
-                        f"duration: {each.end_time - each.start_time}",
-                        frame,
-                    )
-
-        # insert stable frames
-        stable_stage_sample = self.get_stable_stage_sample(
-            classifier_result, compress_rate=compress_rate
-        )
-        stable_stage_sample = toolbox.np2b64str(stable_stage_sample)
+                first, last = each[0], each[-1]
+                self.add_thumbnail(
+                    f"{label} {first.frame_id}({first.timestamp}) - {last.frame_id}({last.timestamp}), "
+                    f"duration: {last.timestamp - first.timestamp}",
+                    frame,
+                )
 
         # time stamp
         timestamp = toolbox.get_timestamp_str()
@@ -256,7 +245,6 @@ class Reporter(object):
             chart=Markup(page.render_embed()),
             dir_link_list=self.dir_link_list,
             thumbnail_list=self.thumbnail_list,
-            stable_sample=stable_stage_sample,
             extras=self.extra_dict,
             background_color=constants.BACKGROUND_COLOR,
             cost_dict=cost_dict,

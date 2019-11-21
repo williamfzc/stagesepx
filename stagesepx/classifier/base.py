@@ -27,6 +27,12 @@ class SingleClassifierResult(object):
 
         return VideoFrame(self.frame_id, self.timestamp, compressed)
 
+    def get_data(self) -> np.ndarray:
+        return self.to_video_frame().data
+
+    def is_stable(self) -> bool:
+        return self.stage != constants.UNSTABLE_FLAG
+
     def to_dict(self) -> typing.Dict:
         return self.__dict__
 
@@ -38,8 +44,8 @@ class SingleClassifierResult(object):
 
 class ClassifierResult(object):
     def __init__(self, data: typing.List[SingleClassifierResult]):
-        self.video_path = data[0].video_path
-        self.data = data
+        self.video_path: str = data[0].video_path
+        self.data: typing.List[SingleClassifierResult] = data
 
     def get_timestamp_list(self) -> typing.List[float]:
         return [each.timestamp for each in self.data]
@@ -61,6 +67,49 @@ class ClassifierResult(object):
         return sorted(
             [i for i in self.data if i.stage == stage_name], key=lambda x: x.frame_id
         )
+
+    def mark_range(self, start: int, end: int, target_stage: str):
+        for each in self.data[start: end]:
+            each.stage = target_stage
+        logger.debug(f"range {start} to {end} has been marked as {target_stage}")
+
+    def mark_range_unstable(self, start: int, end: int):
+        self.mark_range(start, end, constants.UNSTABLE_FLAG)
+
+    def to_dict(self) -> typing.Dict[str, typing.List[SingleClassifierResult]]:
+        return {
+            each_stage: self.get_specific_stage(each_stage)
+            for each_stage in self.get_stage_set()
+        }
+
+    def get_stage_range(self) -> typing.List[typing.List[SingleClassifierResult]]:
+        """
+        return a range list.
+        if your video has 30 frames, with 3 stages, this list can be:
+        [(0, 11), (12, 20), (21, 30)]
+
+        :return:
+        """
+        result: typing.List[typing.List[SingleClassifierResult]] = []
+
+        cur = self.data[0]
+        cur_index = 1
+        length = self.get_length()
+        while cur_index < length:
+            next_one = self.data[cur_index]
+            if cur.stage == next_one.stage:
+                cur_index += 1
+                continue
+            # +1 because:
+            # [1,2,3,4,5][1:3] == [2,3]
+            result.append(self.data[cur.frame_id - 1: cur_index - 1 + 1])
+            cur = next_one
+            cur_index += 1
+
+        last = self.data[-1]
+        if result[-1][-1] != last:
+            result.append(self.data[cur.frame_id - 1: last.frame_id - 1 + 1])
+        return result
 
     def get_length(self) -> int:
         return len(self.data)
