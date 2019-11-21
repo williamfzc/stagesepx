@@ -10,7 +10,7 @@ from loguru import logger
 from stagesepx.classifier import ClassifierResult, SingleClassifierResult
 from stagesepx import toolbox
 from stagesepx import constants
-from stagesepx.cutter import VideoCutResult
+from stagesepx.cutter import VideoCutResult, VideoCutRange
 from stagesepx.video import VideoFrame
 from stagesepx import __VERSION__
 
@@ -186,6 +186,7 @@ class Reporter(object):
 
         :param classifier_result: classifierResult, output of classifier
         :param report_path: your report will be there
+        :param unstable_ranges: for marking unstable ranges
         :param cut_result: more charts would be built
         :param compress_rate:
         :return:
@@ -205,35 +206,32 @@ class Reporter(object):
         page.add(line)
         page.add(bar)
 
-        # calc time cost
-        cost_dict = classifier_result.calc_changing_cost()
-
         # insert pictures
         if cut_result:
             # sim chart
             sim_line = self._draw_sim(cut_result)
             page.add(sim_line)
 
-            # TODO unstable from outside directly?
-            # mark range
-            _, unstable = cut_result.get_range(*args, **kwargs)
-            for each in unstable:
-                classifier_result.mark_range_unstable(each.start, each.end)
-            for each in classifier_result.get_stage_range():
-                middle = each[len(each) // 2]
-                if middle.is_stable():
-                    label = "stable"
-                    frame = toolbox.compress_frame(middle.get_data(), compress_rate=compress_rate)
-                else:
-                    label = "unstable"
-                    frame = np.hstack([toolbox.compress_frame(i.get_data(), compress_rate=compress_rate) for i in each])
+        # mark range
+        for each in unstable_ranges:
+            classifier_result.mark_range_unstable(each.start, each.end)
+        for each in classifier_result.get_stage_range():
+            middle = each[len(each) // 2]
+            if middle.is_stable():
+                label = "stable"
+                frame = toolbox.compress_frame(middle.get_data(), compress_rate=compress_rate)
+            else:
+                label = "unstable"
+                frame = np.hstack([toolbox.compress_frame(i.get_data(), compress_rate=compress_rate) for i in each])
 
-                first, last = each[0], each[-1]
-                self.add_thumbnail(
-                    f"{label} {first.frame_id}({first.timestamp}) - {last.frame_id}({last.timestamp}), "
-                    f"duration: {last.timestamp - first.timestamp}",
-                    frame,
-                )
+            first, last = each[0], each[-1]
+            self.add_thumbnail(
+                f"{label} range {first.frame_id}({first.timestamp}) - {last.frame_id}({last.timestamp}), "
+                f"duration: {last.timestamp - first.timestamp} s",
+                frame,
+            )
+        # calc time cost
+        cost_dict = classifier_result.calc_changing_cost()
 
         # time stamp
         timestamp = toolbox.get_timestamp_str()
