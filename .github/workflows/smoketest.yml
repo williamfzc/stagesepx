@@ -50,7 +50,3 @@ jobs:
           stagesepx one_step ./demo.mp4
           stagesepx one_step ./demo.mp4 ./output
           rm -rf ./output
-
-          stagesepx cut ./demo.mp4
-          stagesepx cut ./demo.mp4 ./output
-          stagesepx classify ./demo.mp4 ./output
