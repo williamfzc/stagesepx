@@ -60,7 +60,6 @@ def test_save_and_load():
 
     result_file = "save.json"
     reporter = Reporter()
-    reporter.add_dir_link("some_link")
     reporter.add_extra("some_name", "some_value")
     reporter.save(result_file, classify_result)
     assert os.path.isfile(result_file)
