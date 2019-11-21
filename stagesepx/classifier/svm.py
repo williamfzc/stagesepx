@@ -9,6 +9,7 @@ from sklearn.svm import LinearSVC
 from stagesepx.classifier.base import BaseClassifier
 from stagesepx import toolbox
 from stagesepx.video import VideoFrame
+from stagesepx import constants
 
 
 class SVMClassifier(BaseClassifier):
@@ -18,7 +19,7 @@ class SVMClassifier(BaseClassifier):
         # do not use feature transform
         "raw": lambda x: x,
     }
-    UNKNOWN_STAGE_NAME = "-2"
+    UNKNOWN_STAGE_NAME = constants.UNKNOWN_STAGE_FLAG
 
     def __init__(
         self, feature_type: str = None, score_threshold: float = None, *args, **kwargs

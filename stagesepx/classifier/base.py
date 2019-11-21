@@ -31,7 +31,11 @@ class SingleClassifierResult(object):
         return self.to_video_frame().data
 
     def is_stable(self) -> bool:
-        return self.stage != constants.UNSTABLE_FLAG
+        return self.stage not in (
+            constants.UNSTABLE_FLAG,
+            constants.IGNORE_FLAG,
+            constants.UNKNOWN_STAGE_FLAG,
+        )
 
     def to_dict(self) -> typing.Dict:
         return self.__dict__
@@ -128,14 +132,14 @@ class ClassifierResult(object):
             next_one = self.data[i + 1]
 
             # next one is changing
-            if next_one.stage == constants.UNSTABLE_FLAG:
+            if not next_one.is_stable():
                 for j in range(i + 1, len(self.data)):
                     i = j
                     next_one = self.data[j]
-                    if next_one.stage != constants.UNSTABLE_FLAG:
+                    if next_one.is_stable():
                         break
 
-                changing_name = f"{cur.stage} - {next_one.stage}"
+                changing_name = f"from {cur.stage} to {next_one.stage}"
                 cost_dict[changing_name] = (cur, next_one)
             else:
                 i += 1
@@ -262,7 +266,7 @@ class BaseClassifier(object):
         start classification
 
         :param video: path to target video or VideoObject
-        :param limit_range: frames in these range will be ignored
+        :param limit_range: frames out of these ranges will be ignored
         :param step: step between frames, default to 1
         :param args:
         :param kwargs:
@@ -287,7 +291,7 @@ class BaseClassifier(object):
                     )
                     final_result.append(
                         SingleClassifierResult(
-                            video.path, frame.frame_id, frame.timestamp, "-1"
+                            video.path, frame.frame_id, frame.timestamp, constants.IGNORE_FLAG
                         )
                     )
                     frame = operator.get_frame_by_id(frame.frame_id + step)

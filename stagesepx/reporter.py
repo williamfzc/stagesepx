@@ -126,7 +126,7 @@ class Reporter(object):
         picked: typing.List[SingleClassifierResult] = [last]
         for each in result.data:
             # ignore unstable stage
-            if each.stage == constants.UNSTABLE_FLAG:
+            if not each.is_stable():
                 continue
             if last.stage != each.stage:
                 last = each
