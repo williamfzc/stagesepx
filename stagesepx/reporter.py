@@ -27,18 +27,8 @@ def get_template() -> str:
 
 class Reporter(object):
     def __init__(self):
-        self.dir_link_list: typing.List[str] = list()
         self.thumbnail_list: typing.List[typing.Tuple[str, str]] = list()
         self.extra_dict: typing.Dict[str, str] = dict()
-
-    def add_dir_link(self, data_path: str):
-        """
-        add relative dir (or file) link to your report
-
-        :param data_path:
-        :return:
-        """
-        self.dir_link_list.append(data_path)
 
     def add_thumbnail(self, name: str, pic_object: np.ndarray):
         """
@@ -240,7 +230,6 @@ class Reporter(object):
         template = Template(get_template())
         template_content = template.render(
             chart=Markup(page.render_embed()),
-            dir_link_list=self.dir_link_list,
             thumbnail_list=self.thumbnail_list,
             extras=self.extra_dict,
             background_color=constants.BACKGROUND_COLOR,

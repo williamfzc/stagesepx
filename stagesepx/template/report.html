@@ -81,24 +81,6 @@
         </div>
     </div>
     <div class="tab-pane fade" id="nav-others" role="tabpanel">
-        {% if dir_link_list %}
-        <div class="container">
-            <div class="card border-light">
-                <div class="card-body">
-                    <h2>Raw Pictures</h2>
-                    <p> You can access pictures directory via these links below. </p>
-                    <ul>
-                        {% for each_link in dir_link_list %}
-                        <li>
-                            <a href="{{ each_link }}">{{ each_link }}</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
         {% if cost_dict %}
         <div class="container">
             <div class="card border-light">
