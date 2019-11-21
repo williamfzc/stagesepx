@@ -227,6 +227,11 @@ class Reporter(object):
         # time stamp
         timestamp = toolbox.get_timestamp_str()
 
+        # video
+        self.add_extra("video path", classifier_result.video_path)
+        self.add_extra("frame count", str(classifier_result.get_length()))
+        self.add_extra("offset between frames", str(classifier_result.get_offset()))
+
         # insert extras
         template = Template(get_template())
         template_content = template.render(
