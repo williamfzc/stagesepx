@@ -16,9 +16,6 @@ class TerminalCli(object):
     # this layer was built for (pre) controlling args and kwargs
     # or, some translations, default value, and so on
     one_step = staticmethod(api.one_step)
-    cut = staticmethod(api.cut)
-    classify = staticmethod(api.classify)
-    train = staticmethod(api.train)
 
 
 def main():

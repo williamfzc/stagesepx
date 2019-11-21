@@ -4,8 +4,7 @@ high level API
 import os
 import typing
 
-from stagesepx.cutter import VideoCutter
-from stagesepx.cutter import VideoCutResult
+from stagesepx.cutter import VideoCutResult, VideoCutRange, VideoCutter
 from stagesepx.classifier import SVMClassifier, ClassifierResult
 from stagesepx.reporter import Reporter
 from stagesepx import constants
@@ -43,7 +42,7 @@ def one_step(
         video = VideoObject(video)
 
     # --- cutter ---
-    res, data_home = cut(
+    res, data_home = _cut(
         video,
         output_path,
         threshold=threshold,
@@ -53,15 +52,15 @@ def one_step(
         offset=offset,
         limit=limit,
     )
+    stable, _ = res.get_range(threshold=threshold, limit=limit, offset=offset)
 
     # --- classify ---
-    classify_result = classify(
+    classify_result = _classify(
         video,
         data_home=data_home,
         compress_rate=compress_rate,
         target_size=target_size,
-        offset=offset,
-        limit=limit,
+        limit_range=stable,
     )
 
     # --- draw ---
@@ -78,7 +77,7 @@ def one_step(
     )
 
 
-def cut(
+def _cut(
     video: typing.Union[str, VideoObject],
     output_path: str = None,
     threshold: float = 0.95,
@@ -120,7 +119,7 @@ def cut(
     return res, data_home
 
 
-def train(
+def _train(
     data_home: str,
     save_to: str,
     compress_rate: float = 0.2,
@@ -142,16 +141,14 @@ def train(
     cl.save_model(save_to)
 
 
-def classify(
+def _classify(
     video: typing.Union[str, VideoObject],
     data_home: str = None,
     model: str = None,
     # optional: these args below are sent for `cutter`
     compress_rate: float = 0.2,
     target_size: typing.Tuple[int, int] = None,
-    offset: int = 3,
-    limit: int = None,
-    threshold: float = 0.95,
+    limit_range: typing.List[VideoCutRange] = None,
 ) -> ClassifierResult:
     """
     classify a video with some tagged pictures
@@ -162,12 +159,7 @@ def classify(
     :param model: LinearSVC model (path)
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
     :param target_size: (100, 200)
-    :param offset:
-        it will change the way to decided whether two ranges can be merged
-        before: first_range.end == second_range.start
-        after: first_range.end + offset >= secord_range.start
-    :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
-    :param threshold: cutter threshold
+    :param limit_range:
 
     :return: typing.List[ClassifierResult]
     """
@@ -182,10 +174,4 @@ def classify(
     else:
         cl.load(data_home)
         cl.train()
-    # re cut
-    cut_result, _ = cut(video, compress_rate=compress_rate, threshold=threshold)
-    stable, _ = cut_result.get_range(offset=offset, limit=limit)
-    return cl.classify(video, stable)
-
-
-__all__ = ("cut", "classify", "one_step", "train")
+    return cl.classify(video, limit_range=limit_range)
