@@ -210,10 +210,19 @@ class Reporter(object):
             middle = each[len(each) // 2]
             if middle.is_stable():
                 label = "stable"
-                frame = toolbox.compress_frame(middle.get_data(), compress_rate=compress_rate)
+                frame = toolbox.compress_frame(
+                    middle.get_data(), compress_rate=compress_rate
+                )
             else:
                 label = "unstable"
-                frame = np.hstack([toolbox.compress_frame(i.get_data(), compress_rate=compress_rate) for i in each])
+                frame = np.hstack(
+                    [
+                        toolbox.compress_frame(
+                            i.get_data(), compress_rate=compress_rate
+                        )
+                        for i in each
+                    ]
+                )
 
             first, last = each[0], each[-1]
             self.add_thumbnail(

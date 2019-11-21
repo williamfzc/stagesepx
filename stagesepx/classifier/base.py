@@ -73,7 +73,7 @@ class ClassifierResult(object):
         )
 
     def mark_range(self, start: int, end: int, target_stage: str):
-        for each in self.data[start: end]:
+        for each in self.data[start:end]:
             each.stage = target_stage
         logger.debug(f"range {start} to {end} has been marked as {target_stage}")
 
@@ -106,13 +106,13 @@ class ClassifierResult(object):
                 continue
             # +1 because:
             # [1,2,3,4,5][1:3] == [2,3]
-            result.append(self.data[cur.frame_id - 1: cur_index - 1 + 1])
+            result.append(self.data[cur.frame_id - 1 : cur_index - 1 + 1])
             cur = next_one
             cur_index += 1
 
         last = self.data[-1]
         if result[-1][-1] != last:
-            result.append(self.data[cur.frame_id - 1: last.frame_id - 1 + 1])
+            result.append(self.data[cur.frame_id - 1 : last.frame_id - 1 + 1])
         return result
 
     def get_length(self) -> int:
@@ -291,7 +291,10 @@ class BaseClassifier(object):
                     )
                     final_result.append(
                         SingleClassifierResult(
-                            video.path, frame.frame_id, frame.timestamp, constants.IGNORE_FLAG
+                            video.path,
+                            frame.frame_id,
+                            frame.timestamp,
+                            constants.IGNORE_FLAG,
                         )
                     )
                     frame = operator.get_frame_by_id(frame.frame_id + step)
