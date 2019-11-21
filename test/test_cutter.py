@@ -65,3 +65,12 @@ def test_cut_range():
     stable, _ = res.get_range()
     stable[0].contain_image(IMAGE_PATH)
     stable[0].is_loop(0.95)
+
+
+def test_cut_result():
+    cutter = VideoCutter()
+    v = VideoObject(VIDEO_PATH)
+    res = cutter.cut(v)
+    stable, _ = res.get_range()
+    assert isinstance(res.diff(res, auto_merge=True), dict)
+    assert isinstance(res.thumbnail(stable[0]), np.ndarray)

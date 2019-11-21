@@ -15,14 +15,3 @@ def test_cli():
     subprocess.check_call(["stagesepx", "one_step", VIDEO_PATH])
     subprocess.check_call(["stagesepx", "one_step", VIDEO_PATH, "output"])
     shutil.rmtree("output")
-
-    logger.info("checking cutter ...")
-    subprocess.check_call(["stagesepx", "cut", VIDEO_PATH])
-    subprocess.check_call(["stagesepx", "cut", VIDEO_PATH, "output"])
-
-    logger.info("checking train ...")
-    subprocess.check_call(["stagesepx", "train", "output", "model2.pkl"])
-
-    logger.info("checking classifier ...")
-    subprocess.check_call(["stagesepx", "classify", VIDEO_PATH, "output"])
-    shutil.rmtree("output")

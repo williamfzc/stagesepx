@@ -1,6 +1,6 @@
 import os
 
-from stagesepx.api import cut, classify, one_step, train
+from stagesepx.api import _cut, _classify, one_step, _train
 from stagesepx.reporter import Reporter
 from stagesepx.video import VideoObject
 
@@ -17,14 +17,14 @@ def test_cut_and_classify():
     report_name = "report.html"
 
     # test cut
-    res, data_home = cut(VIDEO_PATH)
+    res, data_home = _cut(VIDEO_PATH)
 
     # test train
-    train(data_home, model_name)
+    _train(data_home, model_name)
 
     # test classify
-    classify_result = classify(VIDEO_PATH, data_home)
-    classify_result_1 = classify(VIDEO_PATH, data_home, model=model_name)
+    classify_result = _classify(VIDEO_PATH, data_home)
+    classify_result_1 = _classify(VIDEO_PATH, data_home, model=model_name)
 
     # --- draw ---
     r = Reporter()
@@ -44,10 +44,10 @@ def test_boost():
     video = VideoObject(VIDEO_PATH)
     video.load_frames()
     # test cut
-    res, data_home = cut(video)
+    res, data_home = _cut(video)
 
     # test classify
-    classify_result = classify(video, data_home)
+    classify_result = _classify(video, data_home)
 
     # --- draw ---
     r = Reporter()
