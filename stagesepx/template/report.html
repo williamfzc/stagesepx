@@ -15,9 +15,9 @@
         background-color: {{ background_color }};
     }
     .footer {
-        position: fixed;
-        height: 80px;
-        bottom: 0px;
+        position: relative;
+        height: 40px;
+        bottom: 20px;
         left: 0px;
         right: 0px;
         text-align: center;
@@ -25,7 +25,7 @@
     }
     body {
         background-color: {{ background_color }};
-        margin-bottom: 80px;
+        margin-bottom: 40px;
     }
 </style>
 
@@ -58,7 +58,7 @@
                     <ul style="margin-top: 10px;">
                         {% for name, each_thumbnail in thumbnail_list %}
                         <li>
-                            <h3> {{ name }} </h3>
+                            <h5> {{ name }} </h5>
                             <img src="data:image/png;base64,{{ each_thumbnail }}"/>
                         </li>
                         {% endfor %}
