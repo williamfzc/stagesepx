@@ -17,13 +17,10 @@ from stagesepx import __VERSION__
 # load template
 template_dir_path = os.path.join(os.path.dirname(__file__), "template")
 template_path = os.path.join(template_dir_path, "report.html")
-template_zh_path = os.path.join(template_dir_path, "report_zh.html")
 
 
-def get_template(lang: str) -> str:
-    lang_dict = {"en": template_path, "zh": template_zh_path}
-    assert lang in lang_dict, f"template {lang} not found"
-    with open(lang_dict[lang], encoding=constants.CHARSET) as t:
+def get_template() -> str:
+    with open(template_path, encoding=constants.CHARSET) as t:
         template = t.read()
     return template
 
@@ -178,11 +175,11 @@ class Reporter(object):
         self,
         classifier_result: ClassifierResult,
         report_path: str = None,
+        unstable_ranges: typing.List[VideoCutRange] = None,
         cut_result: VideoCutResult = None,
-        language: str = None,
-        compress_rate: float = 0.2,
-        *args,
-        **kwargs,
+        compress_rate: float = None,
+        *_,
+        **__,
     ):
         """
         draw report file
@@ -190,10 +187,15 @@ class Reporter(object):
         :param classifier_result: classifierResult, output of classifier
         :param report_path: your report will be there
         :param cut_result: more charts would be built
-        :param language: 'en' or 'zh'
         :param compress_rate:
         :return:
         """
+        # default: compress_rate
+        if not compress_rate:
+            compress_rate = 0.2
+        if not unstable_ranges:
+            unstable_ranges = []
+
         # draw
         line = self._draw_line(classifier_result)
         bar = self._draw_bar(classifier_result)
@@ -237,10 +239,7 @@ class Reporter(object):
         timestamp = toolbox.get_timestamp_str()
 
         # insert extras
-        # default: zh_cn report
-        if not language:
-            language = "zh"
-        template = Template(get_template(language))
+        template = Template(get_template())
         template_content = template.render(
             chart=Markup(page.render_embed()),
             dir_link_list=self.dir_link_list,

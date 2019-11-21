@@ -47,25 +47,15 @@
 
 <div class="tab-content" id="nav-tabContent">
     <div class="tab-pane fade show active" id="nav-stages" role="tabpanel">
-        {% if stable_sample %}
-        <div class="container">
-            <div class="card border-light">
-                <div class="card-body">
-                    <h2>Stable Stages</h2>
-                    <p> All the stable stages will be shown here. </p>
-                    <img src="data:image/png;base64,{{ stable_sample }}"/>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
         {% if thumbnail_list %}
         <div class="container">
             <div class="card border-light">
                 <div class="card-body">
-                    <h2>Unstable Stages</h2>
-                    <p> These pictures show what will happen when stages are changing. </p>
-                    <ul>
+                    <h5 class="card-title">About this page</h5>
+                    <span class="card-text">This page will show what happened in your video, with precise timestamp and thumbnail.</span><br>
+                    <span class="card-text">You can view <a href="https://github.com/williamfzc/stagesepx/issues/75">#75</a> for more details.</span><br>
+
+                    <ul style="margin-top: 10px;">
                         {% for name, each_thumbnail in thumbnail_list %}
                         <li>
                             <h3> {{ name }} </h3>
