@@ -6,10 +6,18 @@ import os
 
 video = "../demo.mp4"
 
-# 在 0.8.0 之后，你可以利用视频预加载模式，大幅度提升分析速度
 from stagesepx.video import VideoObject
-video = VideoObject(video)
-# 预加载（会消耗一定内存）
+
+video = VideoObject(
+    video,
+    # fps 参数（>=0.9.0）
+    # 结合 ffmpeg，在加载前对视频进行 fps 重整，使表现更加标准
+    # 需要预先安装 ffmpeg，并配置到环境变量中。即人工在命令行下运行 ffmpeg 有正常提示
+    # 例如 fps=30 即将视频转换为fps30的格式（不会覆盖原视频）
+    # fps=30,
+)
+# 预加载（>=0.8.0，会消耗一定内存）
+# 你可以利用视频预加载模式，大幅度提升分析速度
 video.load_frames()
 
 # --- cut ---
@@ -27,7 +35,7 @@ cutter = VideoCutter(
     # target_size=(200, 400),
 )
 
-# 在 0.4.2 之后，hook特性正式被加入：https://williamfzc.github.io/stagesepx/#/pages/3_how_it_works?id=hook
+# hook特性（>=0.4.2，https://williamfzc.github.io/stagesepx/#/pages/3_how_it_works?id=hook）
 # 使用极其简单，你只需要初始化 hook
 hook = ExampleHook()
 # 再将 hook 添加到 cutter 或者 classifier 中去
@@ -38,7 +46,7 @@ cutter.add_hook(hook)
 hook1 = ExampleHook(overwrite=True)
 cutter.add_hook(hook1)
 
-# 在 0.7.0 之后，CropHook加入，被用于局部检测
+# CropHook（>=0.7.0，被用于局部检测）
 # 它能够对帧进行裁剪，使用户能够只对视频的其中一部分进行分析
 # 例如，它能够顺利解决轮播图问题：https://github.com/williamfzc/stagesepx/issues/55
 # 它采用两种参数，size 与 offset，分别对应 裁剪区域大小 与 偏移量
@@ -60,7 +68,7 @@ hook2 = CropHook(
 # 在添加完成后，你可以发现，stagesepx 只会对你裁剪后的区域进行检测
 cutter.add_hook(hook2)
 
-# 在 0.7.1 之后，针对 CropHook 的使用场景，IgnoreHook 被加入用于对其进行进一步补充
+# 针对 CropHook 的使用场景，IgnoreHook 被加入用于对其进行进一步补充（>=0.7.1）
 # 与 CropHook 相反，它被用于对帧的一部分进行屏蔽
 # 详见 https://github.com/williamfzc/stagesepx/issues/56
 hook3 = IgnoreHook(
@@ -176,28 +184,17 @@ print(data_list)
 # --- draw ---
 r = Reporter()
 
-# 你可以将 thumbnail 直接嵌入到report中
-# 如果不手动设定的话，report也会在报告中自动加入 thumbnail
-# 但如此做，你需要在 draw函数 传入 与你的 get_range 相同的参数
-# 否则自动提取的阶段会采用默认参数，可能会与你希望的不太一样
-# 可以参考 cli.py 中的实现
-for each in unstable:
-    r.add_thumbnail(
-        f"{each.start}({each.start_time}) - {each.end}({each.end_time}), "
-        f"duration: {each.end_time - each.start_time}",
-        res.thumbnail(each),
-    )
-
-# 你可以将把一些文件夹路径插入到报告中
-# 这样你可以很方便地从报告中查看各项相关内容
-# 当然，你需要想好这些路径与报告最后所在位置之间的相对位置，以确保他们能够被访问到
-# r.add_dir_link(data_home)
+# 你可以将把一些自定义数据插入到报告中
+r.add_extra("data_home", data_home)
 
 # 在0.3.2及之后的版本，你可以在报告中加入一些自定义内容 （https://github.com/williamfzc/stagesepx/issues/13）
 # r.add_extra('here is title', 'here is content')
 r.draw(
     classify_result,
     report_path=os.path.join(data_home, "report.html"),
+    # 传入 unstable 可以将对应部分标记为 unstable
+    # 会影响最终的分析结果
+    unstable_ranges=unstable,
     # 0.5.3新增的特性，多用于debug
     # 传入cutter的切割结果，能够在图表末尾追加 SSIM、MSE、PSNR 的变化趋势图
     cut_result=res,

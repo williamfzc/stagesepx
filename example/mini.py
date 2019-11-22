@@ -13,7 +13,7 @@ video.load_frames()
 
 # --- cutter ---
 cutter = VideoCutter()
-res = cutter.cut(video_path)
+res = cutter.cut(video)
 stable, unstable = res.get_range()
 data_home = res.pick_and_save(stable, 5)
 
@@ -21,8 +21,8 @@ data_home = res.pick_and_save(stable, 5)
 cl = SVMClassifier()
 cl.load(data_home)
 cl.train()
-classify_result = cl.classify(video_path, stable)
+classify_result = cl.classify(video, stable)
 
 # --- draw ---
 r = Reporter()
-r.draw(classify_result, cut_result=res)
+r.draw(classify_result)
