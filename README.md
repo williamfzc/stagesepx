@@ -24,37 +24,21 @@
 
 ![video_readme.gif](https://i.loli.net/2019/09/01/tXRhB6ai9jAZFmc.gif)
 
-stagesepx 将 自动侦测出所有处于稳定的阶段：
+将视频传递给 stagesepx，它将自动分析拆解，得到视频中所有的阶段。包括变化的过程及其耗时，以及在稳定的阶段停留的时长：
 
-![stable.png](https://i.loli.net/2019/09/01/bRtMZJvzLilpUW5.png)
+![taobao_startup.png](https://i.loli.net/2019/11/23/Cio39V4AhmWOyFL.png)
 
-并绘制出稳定阶段之间的变化过程：
+你可以据此得到每个阶段对应的精确耗时。当然，它是天然跨端的，例如web端。甚至，任何端：
 
-![unstable2.png](https://i.loli.net/2019/09/01/T72quGI5m1SlzNF.png)
+![sugar.gif](https://i.loli.net/2019/11/23/BCjI8PiJrgmxQUt.gif)
 
-![unstable1.png](https://i.loli.net/2019/09/01/ifotzbhTaDpqQFA.png)
-
-轻松查看每个阶段的耗时：
-
-![Trend-2.png](https://i.loli.net/2019/09/01/Tz2tZQ5e3vHBWJ6.png)
-
-![Time Cost.png](https://i.loli.net/2019/09/01/erK9mPsISbHEiFO.png)
-
-原生跨平台，不只是移动端：
-
-![web.gif](https://i.loli.net/2019/11/05/bQr18d6l9fNjIhS.gif)
-
-![web.png](https://i.loli.net/2019/11/05/ywZ9qag3rslNKx6.png)
-
-甚至，任何场景：
-
-[![pen.gif](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)
-
-[![pen_chart.png](https://i.loli.net/2019/07/22/5d35a8858640e67521.png)](https://i.loli.net/2019/07/22/5d35a8858640e67521.png)
+![sugar](https://i.loli.net/2019/11/23/DCpbdlNftcQ3v2w.png)
 
 与视频一致的高准确度。以秒表为例：
 
 ![accuracy.png](https://i.loli.net/2019/10/02/Cboj743UwRQmgPS.png)
+
+可以看到，与秒表的表现几乎没有差异。
 
 ---
 
@@ -66,9 +50,11 @@ stagesepx 将 自动侦测出所有处于稳定的阶段：
 
 ## 快速开始
 
-- 直接 [通过命令行使用](example)
-- 一个 [仅有30行的例子](example)
-- 完善的 [官方文档](https://williamfzc.github.io/stagesepx/)
+- [用30行代码快速跑一个demo](example/mini.py)
+- [30行代码怎么没有注释？](example/cut_and_classify.py)
+- [老板让我看看这个项目怎么落地](example)
+- [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
+- [官方文档](https://williamfzc.github.io/stagesepx/)
 
 ## License
 
