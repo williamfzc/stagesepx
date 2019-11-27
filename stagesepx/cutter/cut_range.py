@@ -72,9 +72,12 @@ class VideoCutRange(object):
         # range(0, 10 + 1) => [0, 10]
         return frame_id in range(self.start, self.end + 1)
 
+    # alias
+    contain_frame_id = contain
+
     def contain_image(
         self, image_path: str = None, image_object: np.ndarray = None, *args, **kwargs
-    ) -> typing.Dict:
+    ) -> typing.Dict[str, typing.Any]:
         assert image_path or image_object, "should fill image_path or image_object"
 
         if image_path:
@@ -83,17 +86,11 @@ class VideoCutRange(object):
             image_object = toolbox.imread(image_path)
         image_object = toolbox.turn_grey(image_object)
 
-        # TODO use client or itself..?
-        fi = FindIt(engine=["template"])
-        fi_template_name = "default"
-        fi.load_template(fi_template_name, pic_object=image_object)
-
         target_id = self.pick(*args, **kwargs)[0]
         operator = self.video.get_operator()
         frame = operator.get_frame_by_id(target_id)
 
-        result = fi.find(str(target_id), target_pic_object=frame.data)
-        return result["data"][fi_template_name]["TemplateEngine"]
+        return toolbox.match_template_with_object(image_object, frame.data)
 
     def pick(
         self, frame_count: int = None, is_random: bool = None, *_, **__

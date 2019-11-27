@@ -75,3 +75,10 @@ def test_convert_video():
         target_fps, VIDEO_PATH, os.path.join(PROJECT_PATH, f"{target_fps}.mp4")
     )
     assert not ret
+
+
+def test_match_template():
+    image1 = toolbox.imread(IMAGE_PATH)
+    image2 = toolbox.imread(IMAGE_PATH)
+    ret = toolbox.match_template_with_object(image1, image2)
+    assert ret["ok"]

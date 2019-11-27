@@ -14,6 +14,7 @@ from skimage.metrics import normalized_root_mse as compare_nrmse
 from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from skimage.feature import hog, local_binary_pattern
 from loguru import logger
+from findit import FindIt
 
 # DO NOT IMPORT ANYTHING FROM STAGESEPX HERE
 # MAKE TOOLBOX STATIC
@@ -271,3 +272,15 @@ def fps_convert(
     ]
     logger.debug(f"convert video: {command}")
     return subprocess.check_call(command)
+
+
+def match_template_with_object(
+    template: np.ndarray, target: np.ndarray
+) -> typing.Dict[str, typing.Any]:
+    fi = FindIt(engine=["template"])
+    # load template
+    fi_template_name = "default"
+    fi.load_template(fi_template_name, pic_object=template)
+
+    result = fi.find("", target_pic_object=target)
+    return result["data"][fi_template_name]["TemplateEngine"]
