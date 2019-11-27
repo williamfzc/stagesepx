@@ -56,6 +56,23 @@
 - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
 - [官方文档](https://williamfzc.github.io/stagesepx/)
 
+## 常见问题
+
+最终我还是决定通过 issue 面板维护所有的 Q&A ，毕竟问题的提出与回复是一个强交互过程。如果在查看下列链接之后你的问题依旧没有得到解答：
+
+- 请 [新建issue](https://github.com/williamfzc/stagesepx/issues/new)
+- 或在相关的 issue 下进行追问与补充
+- 你的提问将不止帮助到你一个人 :)
+
+问题列表：
+
+- [如何根据图表分析得出app启动的时间？](https://github.com/williamfzc/stagesepx/issues/73)
+- [日志太多了，如何关闭或者导出成文件？](https://github.com/williamfzc/stagesepx/issues/58)
+- [我的视频有 轮播图 或 干扰分类 的区域](https://github.com/williamfzc/stagesepx/issues/55)
+- [分类结果如何定制？](https://github.com/williamfzc/stagesepx/issues/48)
+- [算出来的结果不准确 / 跟传统方式有差距](https://github.com/williamfzc/stagesepx/issues/46)
+- ...
+
 ## License
 
 [MIT](LICENSE)
