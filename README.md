@@ -66,6 +66,7 @@
 
 问题列表：
 
+- [安装过程遇到问题？](https://github.com/williamfzc/stagesepx/issues/80)
 - [如何根据图表分析得出app启动的时间？](https://github.com/williamfzc/stagesepx/issues/73)
 - [日志太多了，如何关闭或者导出成文件？](https://github.com/williamfzc/stagesepx/issues/58)
 - [我的视频有 轮播图 或 干扰分类 的区域](https://github.com/williamfzc/stagesepx/issues/55)
