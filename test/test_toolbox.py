@@ -82,3 +82,6 @@ def test_match_template():
     image2 = toolbox.imread(IMAGE_PATH)
     ret = toolbox.match_template_with_object(image1, image2)
     assert ret["ok"]
+
+    ret = toolbox.match_template_with_path(IMAGE_PATH, image2)
+    assert ret["ok"]

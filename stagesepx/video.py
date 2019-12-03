@@ -11,9 +11,9 @@ from stagesepx import constants
 
 class VideoFrame(object):
     def __init__(self, frame_id: int, timestamp: float, data: np.ndarray):
-        self.frame_id = frame_id
-        self.timestamp = timestamp
-        self.data = data
+        self.frame_id: int = frame_id
+        self.timestamp: float = timestamp
+        self.data: np.ndarray = data
 
     def __str__(self):
         return f"<VideoFrame id={self.frame_id} timestamp={self.timestamp}>"
@@ -28,6 +28,17 @@ class VideoFrame(object):
 
     def copy(self):
         return VideoFrame(self.frame_id, self.timestamp, self.data[:])
+
+    def contain_image(
+        self, image_path: str = None, image_object: np.ndarray = None
+    ) -> typing.Dict[str, typing.Any]:
+        assert image_path or image_object, "should fill image_path or image_object"
+
+        if image_path:
+            logger.debug(f"found image path, use it first: {image_path}")
+            return toolbox.match_template_with_path(image_path, self.data)
+        image_object = toolbox.turn_grey(image_object)
+        return toolbox.match_template_with_object(image_object, self.data)
 
 
 class _BaseFrameOperator(object):

@@ -4,6 +4,8 @@ import os
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
+IMAGE_NAME = "demo.jpg"
+IMAGE_PATH = os.path.join(PROJECT_PATH, IMAGE_NAME)
 
 
 def test_read_from_file():
@@ -45,3 +47,10 @@ def test_custom_ffmpeg():
         VideoObject(VIDEO_PATH, fps=30)
     except FileNotFoundError:
         pass
+
+
+def test_contain_image():
+    v = VideoObject(VIDEO_PATH)
+    v.load_frames()
+    ret = v.data[0].contain_image(IMAGE_PATH)
+    assert ret["ok"]

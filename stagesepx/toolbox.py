@@ -284,3 +284,11 @@ def match_template_with_object(
 
     result = fi.find("", target_pic_object=target)
     return result["data"][fi_template_name]["TemplateEngine"]
+
+
+def match_template_with_path(
+    template: str, target: np.ndarray
+) -> typing.Dict[str, typing.Any]:
+    assert os.path.isfile(template), f"image {template} not existed"
+    template_object = turn_grey(imread(template))
+    return match_template_with_object(template_object, target)
