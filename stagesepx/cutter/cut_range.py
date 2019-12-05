@@ -78,20 +78,12 @@ class VideoCutRange(object):
     def contain_image(
         self, image_path: str = None, image_object: np.ndarray = None, *args, **kwargs
     ) -> typing.Dict[str, typing.Any]:
-        assert image_path or image_object, "should fill image_path or image_object"
-
-        if image_path:
-            logger.debug(f"found image path, use it first: {image_path}")
-            assert os.path.isfile(image_path), f"image {image_path} not existed"
-            image_object = toolbox.imread(image_path)
-        image_object = toolbox.turn_grey(image_object)
-
+        # todo pick only one picture?
         target_id = self.pick(*args, **kwargs)[0]
         operator = self.video.get_operator()
         frame = operator.get_frame_by_id(target_id)
-
-        return toolbox.match_template_with_object(
-            image_object, frame.data, *args, **kwargs
+        return frame.contain_image(
+            image_path=image_path, image_object=image_object, **kwargs
         )
 
     def pick(

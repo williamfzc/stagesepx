@@ -276,20 +276,20 @@ def fps_convert(
 
 
 def match_template_with_object(
-    template: np.ndarray, target: np.ndarray, *args, **kwargs
+    template: np.ndarray, target: np.ndarray, **kwargs
 ) -> typing.Dict[str, typing.Any]:
     fi = FindIt(engine=["template"])
     # load template
     fi_template_name = "default"
-    fi.load_template(fi_template_name, pic_object=template, *args, **kwargs)
+    fi.load_template(fi_template_name, pic_object=template)
 
-    result = fi.find("", target_pic_object=target)
+    result = fi.find(target_pic_name="", target_pic_object=target, **kwargs)
     return result["data"][fi_template_name]["TemplateEngine"]
 
 
 def match_template_with_path(
-    template: str, target: np.ndarray, *args, **kwargs
+    template: str, target: np.ndarray, **kwargs
 ) -> typing.Dict[str, typing.Any]:
     assert os.path.isfile(template), f"image {template} not existed"
     template_object = turn_grey(imread(template))
-    return match_template_with_object(template_object, target, *args, **kwargs)
+    return match_template_with_object(template_object, target, **kwargs)
