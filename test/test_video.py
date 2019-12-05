@@ -52,5 +52,5 @@ def test_custom_ffmpeg():
 def test_contain_image():
     v = VideoObject(VIDEO_PATH)
     v.load_frames()
-    ret = v.data[0].contain_image(IMAGE_PATH)
+    ret = v.data[0].contain_image(image_path=IMAGE_PATH)
     assert ret["ok"]
