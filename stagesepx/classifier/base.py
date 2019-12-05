@@ -12,19 +12,33 @@ from stagesepx.video import VideoObject, VideoFrame
 
 
 class SingleClassifierResult(object):
-    def __init__(self, video_path: str, frame_id: int, timestamp: float, stage: str):
-        self.video_path = video_path
-        self.frame_id = frame_id
-        self.timestamp = timestamp
-        self.stage = stage
+    def __init__(
+        self,
+        video_path: str,
+        frame_id: int,
+        timestamp: float,
+        stage: str,
+        data: np.ndarray = None,
+    ):
+        self.video_path: str = video_path
+        self.frame_id: int = frame_id
+        self.timestamp: float = timestamp
+        self.stage: str = stage
+
+        # optional
+        self.data: np.ndarray = data
 
     def to_video_frame(self, *args, **kwargs) -> VideoFrame:
         # VideoFrame has `data`
-        # SingleClassifierResult has `stage`
+        # SingleClassifierResult has `stage` (data is optional)
+
+        # already have data
+        if self.data is not None:
+            return VideoFrame(self.frame_id, self.timestamp, self.data)
+        # no data
         with toolbox.video_capture(self.video_path) as cap:
             frame = toolbox.get_frame(cap, self.frame_id)
             compressed = toolbox.compress_frame(frame, *args, **kwargs)
-
         return VideoFrame(self.frame_id, self.timestamp, compressed)
 
     def get_data(self) -> np.ndarray:
@@ -35,6 +49,13 @@ class SingleClassifierResult(object):
             constants.UNSTABLE_FLAG,
             constants.IGNORE_FLAG,
             constants.UNKNOWN_STAGE_FLAG,
+        )
+
+    def contain_image(
+        self, *, image_path: str = None, image_object: np.ndarray = None, **kwargs
+    ) -> typing.Dict[str, typing.Any]:
+        return self.to_video_frame().contain_image(
+            image_path=image_path, image_object=image_object, **kwargs
         )
 
     def to_dict(self) -> typing.Dict:
@@ -259,6 +280,7 @@ class BaseClassifier(object):
         video: typing.Union[str, VideoObject],
         limit_range: typing.List[VideoCutRange] = None,
         step: int = None,
+        keep_data: bool = None,
         *args,
         **kwargs,
     ) -> ClassifierResult:
@@ -268,6 +290,7 @@ class BaseClassifier(object):
         :param video: path to target video or VideoObject
         :param limit_range: frames out of these ranges will be ignored
         :param step: step between frames, default to 1
+        :param keep_data: default to False. if enabled, all the frames will contain numpy data.
         :param args:
         :param kwargs:
         :return:
@@ -295,6 +318,7 @@ class BaseClassifier(object):
                             frame.frame_id,
                             frame.timestamp,
                             constants.IGNORE_FLAG,
+                            frame.data if keep_data else None,
                         )
                     )
                     frame = operator.get_frame_by_id(frame.frame_id + step)
@@ -310,7 +334,11 @@ class BaseClassifier(object):
 
             final_result.append(
                 SingleClassifierResult(
-                    video.path, frame.frame_id, frame.timestamp, result
+                    video.path,
+                    frame.frame_id,
+                    frame.timestamp,
+                    result,
+                    frame.data if keep_data else None,
                 )
             )
             frame = operator.get_frame_by_id(frame.frame_id + step)
