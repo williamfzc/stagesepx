@@ -173,6 +173,10 @@ classify_result = cl.classify(
     # 步长，可以自行设置用于平衡效率与颗粒度
     # 默认为1，即每帧都检测
     step=1,
+    # 默认为 False
+    # 一旦打开，你的分类结果对象将会保留图片数据
+    # 可以提高后续处理的速度，但有高内存占用风险
+    keep_data=False,
 )
 
 # 分类得到的结果是一个 ClassifierResult 对象
@@ -180,6 +184,18 @@ classify_result = cl.classify(
 # 从而达到你希望的效果
 data_list = classify_result.data
 print(data_list)
+# classify_result 已经提供了许多方法用于更好地重整数据
+# 可以直接进入 ClassifyResult 对象中查看
+cr_dict = classify_result.to_dict()
+print(cr_dict)
+
+# contain_image (>=0.9.1)
+# 你可以利用模板匹配，对最终结果与你的预期进行对比，从而得知阶段是否与你的期望相符
+# 全自动化的校验可以在此基础上展开
+# res = data_list[0].contain_image(image_path="path/to/your/template/path")
+# print(res)
+# 你可以得到类似这样的结果：
+# {'target_point': [550, 915], 'target_sim': 0.9867244362831116, 'ok': True}
 
 # --- draw ---
 r = Reporter()
