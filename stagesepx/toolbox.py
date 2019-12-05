@@ -16,6 +16,7 @@ from skimage.feature import hog, local_binary_pattern
 from loguru import logger
 from findit import FindIt
 
+
 # DO NOT IMPORT ANYTHING FROM STAGESEPX HERE
 # MAKE TOOLBOX STATIC
 
@@ -275,20 +276,20 @@ def fps_convert(
 
 
 def match_template_with_object(
-    template: np.ndarray, target: np.ndarray
+    template: np.ndarray, target: np.ndarray, *args, **kwargs
 ) -> typing.Dict[str, typing.Any]:
     fi = FindIt(engine=["template"])
     # load template
     fi_template_name = "default"
-    fi.load_template(fi_template_name, pic_object=template)
+    fi.load_template(fi_template_name, pic_object=template, *args, **kwargs)
 
     result = fi.find("", target_pic_object=target)
     return result["data"][fi_template_name]["TemplateEngine"]
 
 
 def match_template_with_path(
-    template: str, target: np.ndarray
+    template: str, target: np.ndarray, *args, **kwargs
 ) -> typing.Dict[str, typing.Any]:
     assert os.path.isfile(template), f"image {template} not existed"
     template_object = turn_grey(imread(template))
-    return match_template_with_object(template_object, target)
+    return match_template_with_object(template_object, target, *args, **kwargs)

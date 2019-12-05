@@ -30,15 +30,19 @@ class VideoFrame(object):
         return VideoFrame(self.frame_id, self.timestamp, self.data[:])
 
     def contain_image(
-        self, image_path: str = None, image_object: np.ndarray = None
+        self, image_path: str = None, image_object: np.ndarray = None, *args, **kwargs
     ) -> typing.Dict[str, typing.Any]:
         assert image_path or image_object, "should fill image_path or image_object"
 
         if image_path:
             logger.debug(f"found image path, use it first: {image_path}")
-            return toolbox.match_template_with_path(image_path, self.data)
+            return toolbox.match_template_with_path(
+                image_path, self.data, *args, **kwargs
+            )
         image_object = toolbox.turn_grey(image_object)
-        return toolbox.match_template_with_object(image_object, self.data)
+        return toolbox.match_template_with_object(
+            image_object, self.data, *args, **kwargs
+        )
 
 
 class _BaseFrameOperator(object):

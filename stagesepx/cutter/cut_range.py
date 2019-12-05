@@ -90,7 +90,9 @@ class VideoCutRange(object):
         operator = self.video.get_operator()
         frame = operator.get_frame_by_id(target_id)
 
-        return toolbox.match_template_with_object(image_object, frame.data)
+        return toolbox.match_template_with_object(
+            image_object, frame.data, *args, **kwargs
+        )
 
     def pick(
         self, frame_count: int = None, is_random: bool = None, *_, **__
