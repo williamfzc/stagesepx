@@ -276,14 +276,26 @@ def fps_convert(
 
 
 def match_template_with_object(
-    template: np.ndarray, target: np.ndarray, **kwargs
+    template: np.ndarray,
+    target: np.ndarray,
+    engine_template_cv_method_name: str = None,
+    **kwargs,
 ) -> typing.Dict[str, typing.Any]:
-    fi = FindIt(engine=["template"])
+    # change the default method
+    if not engine_template_cv_method_name:
+        engine_template_cv_method_name = "cv2.TM_CCOEFF_NORMED"
+
+    fi = FindIt(
+        engine=["template"],
+        engine_template_cv_method_name=engine_template_cv_method_name,
+        **kwargs,
+    )
     # load template
     fi_template_name = "default"
     fi.load_template(fi_template_name, pic_object=template)
 
     result = fi.find(target_pic_name="", target_pic_object=target, **kwargs)
+    logger.debug(f"findit result: {result}")
     return result["data"][fi_template_name]["TemplateEngine"]
 
 

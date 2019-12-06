@@ -32,7 +32,9 @@ class VideoFrame(object):
     def contain_image(
         self, *, image_path: str = None, image_object: np.ndarray = None, **kwargs
     ) -> typing.Dict[str, typing.Any]:
-        assert image_path or (image_object is not None), "should fill image_path or image_object"
+        assert image_path or (
+            image_object is not None
+        ), "should fill image_path or image_object"
 
         if image_path:
             logger.debug(f"found image path, use it first: {image_path}")
