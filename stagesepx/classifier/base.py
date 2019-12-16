@@ -1,5 +1,6 @@
 import pathlib
 import typing
+from collections import OrderedDict
 import cv2
 import numpy as np
 from loguru import logger
@@ -102,10 +103,18 @@ class ClassifierResult(object):
         self.mark_range(start, end, constants.UNSTABLE_FLAG)
 
     def to_dict(self) -> typing.Dict[str, typing.List[SingleClassifierResult]]:
-        return {
-            each_stage: self.get_specific_stage(each_stage)
-            for each_stage in self.get_stage_set()
-        }
+        stage_list = list(self.get_stage_set())
+        try:
+            int(stage_list[0])
+        except ValueError:
+            stage_list.sort()
+        else:
+            stage_list.sort(key=lambda o: int(o))
+
+        d = OrderedDict()
+        for each_stage in stage_list:
+            d[each_stage] = self.get_specific_stage(each_stage)
+        return d
 
     def get_stage_range(self) -> typing.List[typing.List[SingleClassifierResult]]:
         """
