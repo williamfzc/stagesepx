@@ -134,6 +134,8 @@ class VideoObject(object):
 
         # lock the order
         self.data = tuple(data)
+        # fix the length ( the last frame may be broken sometimes )
+        self.frame_count = len(data)
 
     def _read_from_file(self) -> typing.Generator[VideoFrame, None, None]:
         with toolbox.video_capture(self.path) as cap:
