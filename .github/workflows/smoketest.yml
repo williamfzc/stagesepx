@@ -19,8 +19,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          pip install .
+          sudo apt-get update
           sudo apt-get install -y ffmpeg
+          pip install .
       - name: Download test resource
         run: |
           curl -o demo.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
