@@ -115,7 +115,10 @@ class SVMClassifier(BaseClassifier):
             for each_pic_object in each_label_pic_list:
                 logger.debug(f"training label: {each_label}")
                 # apply hook
-                each_pic_object = self._apply_hook(-1, each_pic_object)
+                each_pic_object = self._apply_hook(
+                    VideoFrame(-1, -1.0, each_pic_object)
+                )
+                each_pic_object = each_pic_object.data
 
                 each_pic_object = self.feature_func(each_pic_object).flatten()
                 train_data.append(each_pic_object)

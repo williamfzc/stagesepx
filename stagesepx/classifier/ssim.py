@@ -17,7 +17,8 @@ class SSIMClassifier(BaseClassifier):
             each_result = list()
             for target_pic in each_stage_pic_list:
                 # apply hooks
-                target_pic = self._apply_hook(-1, target_pic)
+                target_pic = self._apply_hook(VideoFrame(-1, -1.0, target_pic))
+                target_pic = target_pic.data
 
                 each_pic_ssim = toolbox.compare_ssim(frame.data, target_pic)
                 each_result.append(each_pic_ssim)

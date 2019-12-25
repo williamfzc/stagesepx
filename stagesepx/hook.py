@@ -4,8 +4,10 @@ from loguru import logger
 import cv2
 import typing
 from findit import FindIt
+import functools
 
 from stagesepx import toolbox
+from stagesepx.video import VideoFrame
 
 
 class BaseHook(object):
@@ -20,11 +22,10 @@ class BaseHook(object):
         self.overwrite = bool(overwrite)
         logger.debug(f"overwrite: {self.overwrite}")
 
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[np.ndarray]:
         info = f"execute hook: {self.__class__.__name__}"
 
+        frame_id = frame.frame_id
         # when frame id == -1, it means handling some pictures outside the video
         if frame_id != -1:
             logger.debug(f"{info}, frame id: {frame_id}")
@@ -32,8 +33,9 @@ class BaseHook(object):
 
 
 def change_origin(_func):
-    def _wrap(self: BaseHook, frame_id: int, frame: np.ndarray, *args, **kwargs):
-        res = _func(self, frame_id, frame, *args, **kwargs)
+    @functools.wraps(_func)
+    def _wrap(self: BaseHook, frame: VideoFrame, *args, **kwargs):
+        res = _func(self, frame, *args, **kwargs)
         if not self.overwrite:
             return frame
         if res is not None:
@@ -61,10 +63,8 @@ class ExampleHook(BaseHook):
         # ...
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
 
         # you can get frame_id and frame data here
         # and use them to custom your own function
@@ -73,8 +73,8 @@ class ExampleHook(BaseHook):
         # ...
 
         # for example, i want to turn grey, and save size of each frames
-        frame = toolbox.turn_grey(frame)
-        self.result[frame_id] = frame.shape
+        frame.data = toolbox.turn_grey(frame.data)
+        self.result[frame.frame_id] = frame.data.shape
 
         # if you are going to change the origin frame
         # just return the changed frame
@@ -104,33 +104,30 @@ class CompressHook(BaseHook):
         logger.debug(f"target size: {target_size}")
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
-        return toolbox.compress_frame(
-            frame, compress_rate=self.compress_rate, target_size=self.target_size
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
+        frame.data = toolbox.compress_frame(
+            frame.data, compress_rate=self.compress_rate, target_size=self.target_size
         )
+        return frame
 
 
 class GreyHook(BaseHook):
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
-        return toolbox.turn_grey(frame)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
+        frame.data = toolbox.turn_grey(frame.data)
+        return frame
 
 
 class RefineHook(BaseHook):
     """ this hook was built for refining the edges of images """
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
-        return toolbox.sharpen_frame(frame)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
+        frame.data = toolbox.sharpen_frame(frame.data)
+        return frame
 
 
 class _AreaBaseHook(BaseHook):
@@ -194,27 +191,28 @@ class CropHook(_AreaBaseHook):
     """ this hook was built for cropping frames, eg: keep only a half of origin frame """
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
 
-        height_range, width_range = self.convert_size_and_offset(*frame.shape)
-        return frame[height_range[0] : height_range[1], width_range[0] : width_range[1]]
+        height_range, width_range = self.convert_size_and_offset(*frame.data.shape)
+        frame.data = frame[
+            height_range[0] : height_range[1], width_range[0] : width_range[1]
+        ]
+        return frame
 
 
 class IgnoreHook(_AreaBaseHook):
     """ ignore some area of frames """
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
 
-        height_range, width_range = self.convert_size_and_offset(*frame.shape)
+        height_range, width_range = self.convert_size_and_offset(*frame.data.shape)
         # ignore this area
-        frame[height_range[0] : height_range[1], width_range[0] : width_range[1]] = 0
+        frame.data[
+            height_range[0] : height_range[1], width_range[0] : width_range[1]
+        ] = 0
         return frame
 
 
@@ -234,12 +232,10 @@ class FrameSaveHook(BaseHook):
         logger.debug(f"target dir: {target_dir}")
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
-        target_path = os.path.join(self.target_dir, f"{frame_id}.png")
-        cv2.imwrite(target_path, frame)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
+        target_path = os.path.join(self.target_dir, f"{frame.frame_id}.png")
+        cv2.imwrite(target_path, frame.data)
         logger.debug(f"frame saved to {target_path}")
         return
 
@@ -252,11 +248,10 @@ class InterestPointHook(BaseHook):
         self._orb = cv2.ORB_create()
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        kp = self._orb.detect(frame, None)
-        self.result[frame_id] = len(kp)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
+        kp = self._orb.detect(frame.data, None)
+        self.result[frame.frame_id] = len(kp)
         return
 
 
@@ -282,23 +277,21 @@ class TemplateCompareHook(BaseHook):
         self.template_dict = template_dict
 
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
-        super().do(frame_id, frame, *_, **__)
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
         for each_template_name, each_template_path in self.template_dict.items():
             self.fi.load_template(each_template_name, each_template_path)
-        res = self.fi.find(str(frame_id), target_pic_object=frame)
+        res = self.fi.find(str(frame.frame_id), target_pic_object=frame.data)
         logger.debug(f"compare with template {self.template_dict}: {res}")
-        self.result[frame_id] = res
+        self.result[frame.frame_id] = res
         return
 
 
 class BinaryHook(BaseHook):
     @change_origin
-    def do(
-        self, frame_id: int, frame: np.ndarray, *_, **__
-    ) -> typing.Optional[np.ndarray]:
+    def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
+        super().do(frame, *_, **__)
         # TODO not always work
-        super().do(frame_id, frame, *_, **__)
-        return toolbox.turn_binary(frame)
+        super().do(frame, *_, **__)
+        frame.data = toolbox.turn_binary(frame.data)
+        return frame

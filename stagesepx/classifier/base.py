@@ -277,11 +277,9 @@ class BaseClassifier(object):
     def _classify_frame(self, frame: VideoFrame, *args, **kwargs) -> str:
         """ must be implemented by sub class """
 
-    def _apply_hook(
-        self, frame_id: int, frame: np.ndarray, *args, **kwargs
-    ) -> np.ndarray:
+    def _apply_hook(self, frame: VideoFrame, *args, **kwargs) -> VideoFrame:
         for each_hook in self._hook_list:
-            frame = each_hook.do(frame_id, frame, *args, **kwargs)
+            frame = each_hook.do(frame, *args, **kwargs)
         return frame
 
     def classify(
@@ -334,7 +332,7 @@ class BaseClassifier(object):
                     continue
 
             # hook
-            frame.data = self._apply_hook(frame.frame_id, frame.data, *args, **kwargs)
+            frame = self._apply_hook(frame, *args, **kwargs)
 
             result = self._classify_frame(frame, *args, **kwargs)
             logger.debug(

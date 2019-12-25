@@ -5,7 +5,7 @@ from loguru import logger
 from stagesepx import toolbox
 from stagesepx.cutter.cut_range import VideoCutRange
 from stagesepx.cutter.cut_result import VideoCutResult
-from stagesepx.video import VideoObject
+from stagesepx.video import VideoObject, VideoFrame
 from stagesepx.hook import BaseHook, GreyHook, CompressHook
 
 
@@ -60,11 +60,9 @@ class VideoCutter(object):
             result += sub_block
         return result
 
-    def _apply_hook(
-        self, frame_id: int, frame: np.ndarray, *args, **kwargs
-    ) -> np.ndarray:
+    def _apply_hook(self, frame: VideoFrame, *args, **kwargs) -> VideoFrame:
         for each_hook in self._hook_list:
-            frame = each_hook.do(frame_id, frame, *args, **kwargs)
+            frame = each_hook.do(frame, *args, **kwargs)
         return frame
 
     def _convert_video_into_range_list(
@@ -80,7 +78,7 @@ class VideoCutter(object):
         next_frame = video_operator.get_frame_by_id(1 + self.step)
 
         # hook
-        cur_frame.data = self._apply_hook(cur_frame.frame_id, cur_frame.data)
+        cur_frame = self._apply_hook(cur_frame)
 
         # check block
         if not block:
@@ -88,9 +86,7 @@ class VideoCutter(object):
 
         while True:
             # hook
-            next_frame.data = self._apply_hook(
-                next_frame.frame_id, next_frame.data, *args, **kwargs
-            )
+            next_frame = self._apply_hook(next_frame, *args, **kwargs)
 
             logger.debug(
                 f"computing {cur_frame.frame_id}({cur_frame.timestamp}) & {next_frame.frame_id}({next_frame.timestamp}) ..."
