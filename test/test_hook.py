@@ -9,11 +9,8 @@ from stagesepx.hook import (
     RefineHook,
     InterestPointHook,
     TemplateCompareHook,
-    BinaryHook,
     InvalidFrameDetectHook,
     _AreaBaseHook,
-    change_origin,
-    BaseHook,
 )
 
 import os
@@ -32,26 +29,21 @@ def test_others():
     except DeprecationWarning:
         pass
 
-    fake_frame = "abc"
-    fake_hook = lambda *args, **kwargs: None
-    assert change_origin(fake_hook)(BaseHook(True), 1, fake_frame) == fake_frame
-
 
 def test_hook():
     # init hook
     hook = ExampleHook()
-    hook1 = ExampleHook(overwrite=True)
-    hook2 = IgnoreHook(size=(0.5, 0.5), overwrite=True)
+    hook1 = ExampleHook()
+    hook2 = IgnoreHook(size=(0.5, 0.5))
     frame_home = os.path.join(PROJECT_PATH, "frame_save_dir")
     hook3 = FrameSaveHook(frame_home)
-    hook4 = CropHook(size=(0.5, 0.5), offset=(0.0, 0.5), overwrite=True)
+    hook4 = CropHook(size=(0.5, 0.5), offset=(0.0, 0.5))
     hook5 = RefineHook()
     hook6 = InterestPointHook()
     hook7 = TemplateCompareHook({"amazon": IMAGE_PATH})
-    hook8 = BinaryHook()
 
     # --- cutter ---
-    cutter = VideoCutter(compress_rate=0.8)
+    cutter = VideoCutter(compress_rate=0.9)
     # add hook
     cutter.add_hook(hook)
     cutter.add_hook(hook1)
@@ -61,7 +53,6 @@ def test_hook():
     cutter.add_hook(hook5)
     cutter.add_hook(hook6)
     cutter.add_hook(hook7)
-    cutter.add_hook(hook8)
 
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
