@@ -205,7 +205,9 @@ class FrameSaveHook(BaseHook):
 
     def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
         super().do(frame, *_, **__)
-        target_path = os.path.join(self.target_dir, f"{frame.frame_id}.png")
+        safe_timestamp = str(frame.timestamp).replace(".", "_")
+        frame_name = f"{frame.frame_id}({safe_timestamp}).png"
+        target_path = os.path.join(self.target_dir, frame_name)
         cv2.imwrite(target_path, frame.data)
         logger.debug(f"frame saved to {target_path}")
         return frame
