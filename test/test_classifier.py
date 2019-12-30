@@ -86,3 +86,14 @@ def test_keep_data():
     # todo findit bug here
     image_object = toolbox.imread(IMAGE_PATH)[0:20, 0:20]
     assert classify_result.data[0].contain_image(image_object=image_object)
+
+def test_result():
+    cl = SVMClassifier()
+    cl.load_model(MODEL_PATH)
+    stable, _ = cutter_res.get_range()
+    classify_result = cl.classify(VIDEO_PATH, stable, keep_data=True)
+    
+    assert classify_result.to_dict()
+    classify_result.mark_range(1, 3, "0")
+    classify_result.mark_range_unstable(1, 3)
+    classify_result.get_important_frame_list()

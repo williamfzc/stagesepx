@@ -82,6 +82,22 @@ class ClassifierResult(object):
     def get_stage_set(self) -> typing.Set[str]:
         return set(self.get_stage_list())
 
+    def get_important_frame_list(self) -> typing.List[SingleClassifierResult]:
+        # save the first frame
+        result = [self.data[0]]
+
+        prev = self.data[0]
+        for cur in self.data[1:]:
+            if cur.stage != prev.stage:
+                result.append(prev)
+                result.append(cur)
+            prev = cur
+
+        # save the latest frame
+        if result[-1] != self.data[-1]:
+            result.append(self.data[-1])
+        return result
+
     def get_offset(self) -> float:
         # timestamp offset between frames
         return self.data[1].timestamp - self.data[0].timestamp
