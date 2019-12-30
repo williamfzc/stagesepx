@@ -57,6 +57,20 @@
 - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
 - [官方文档](https://williamfzc.github.io/stagesepx/)
 
+## 安装
+
+标准版（pypi）
+
+```bash
+pip install stagesepx
+```
+
+预览版（github）：
+
+```bash
+pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
+```
+
 ## 常见问题
 
 最终我还是决定通过 issue 面板维护所有的 Q&A ，毕竟问题的提出与回复是一个强交互过程。如果在查看下列链接之后你的问题依旧没有得到解答：
