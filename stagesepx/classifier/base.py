@@ -314,25 +314,25 @@ class BaseClassifier(object):
         operator = video.get_operator()
         frame = operator.get_frame_by_id(1)
         while frame is not None:
-            if limit_range:
-                if not any([each.contain(frame.frame_id) for each in limit_range]):
-                    logger.debug(
-                        f"frame {frame.frame_id} ({frame.timestamp}) not in target range, skip"
-                    )
-                    final_result.append(
-                        SingleClassifierResult(
-                            video.path,
-                            frame.frame_id,
-                            frame.timestamp,
-                            constants.IGNORE_FLAG,
-                            frame.data if keep_data else None,
-                        )
-                    )
-                    frame = operator.get_frame_by_id(frame.frame_id + step)
-                    continue
-
             # hook
             frame = self._apply_hook(frame, *args, **kwargs)
+
+            # ignore some ranges
+            if limit_range and not any([each.contain(frame.frame_id) for each in limit_range]):
+                logger.debug(
+                    f"frame {frame.frame_id} ({frame.timestamp}) not in target range, skip"
+                )
+                final_result.append(
+                    SingleClassifierResult(
+                        video.path,
+                        frame.frame_id,
+                        frame.timestamp,
+                        constants.IGNORE_FLAG,
+                        frame.data if keep_data else None,
+                    )
+                )
+                frame = operator.get_frame_by_id(frame.frame_id + step)
+                continue
 
             result = self._classify_frame(frame, *args, **kwargs)
             logger.debug(
