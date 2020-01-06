@@ -21,6 +21,8 @@
 
 ---
 
+> [English README here](./README_en.md)
+
 这段视频展示了一个应用的完整启动过程：
 
 ![video_readme.gif](https://i.loli.net/2019/09/01/tXRhB6ai9jAZFmc.gif)
