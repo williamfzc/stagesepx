@@ -6,13 +6,13 @@ import typing
 import numpy as np
 from sklearn.svm import LinearSVC
 
-from stagesepx.classifier.base import BaseClassifier
+from stagesepx.classifier.base import BaseModelClassifier
 from stagesepx import toolbox
 from stagesepx.video import VideoFrame
 from stagesepx import constants
 
 
-class SVMClassifier(BaseClassifier):
+class SVMClassifier(BaseModelClassifier):
     FEATURE_DICT = {
         "hog": toolbox.turn_hog_desc,
         "lbp": toolbox.turn_lbp_desc,
@@ -91,11 +91,6 @@ class SVMClassifier(BaseClassifier):
         # joblib raise an error ( i have no idea about how to fix it ) here, so use pickle instead
         with open(model_path, "rb") as f:
             self._model = pickle.load(f)
-
-    def read_from_list(
-        self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__
-    ):
-        raise NotImplementedError("svm classifier only support loading data from files")
 
     def train(self):
         """

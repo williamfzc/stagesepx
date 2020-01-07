@@ -334,7 +334,9 @@ class BaseClassifier(object):
             frame = self._apply_hook(frame, *args, **kwargs)
 
             # ignore some ranges
-            if limit_range and not any([each.contain(frame.frame_id) for each in limit_range]):
+            if limit_range and not any(
+                [each.contain(frame.frame_id) for each in limit_range]
+            ):
                 logger.debug(
                     f"frame {frame.frame_id} ({frame.timestamp}) not in target range, skip"
                 )
@@ -366,3 +368,30 @@ class BaseClassifier(object):
             )
             frame = operator.get_frame_by_id(frame.frame_id + step)
         return ClassifierResult(final_result)
+
+
+class BaseModelClassifier(BaseClassifier):
+    # model
+    def save_model(self, model_path: str, overwrite: bool = None):
+        raise NotImplemented
+
+    def load_model(self, model_path: str, overwrite: bool = None):
+        raise NotImplemented
+
+    def clean_model(self):
+        raise NotImplemented
+
+    # actions
+    def train(self):
+        raise NotImplemented
+
+    def predict(self, pic_path: str) -> str:
+        raise NotImplemented
+
+    def predict_with_object(self, frame: np.ndarray) -> str:
+        raise NotImplemented
+
+    def read_from_list(
+        self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__
+    ):
+        raise ValueError("model-like classifier only support loading data from files")
