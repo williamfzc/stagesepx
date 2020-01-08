@@ -382,7 +382,7 @@ class BaseModelClassifier(BaseClassifier):
         raise NotImplemented
 
     # actions
-    def train(self):
+    def train(self, *_, **__):
         raise NotImplemented
 
     def predict(self, pic_path: str) -> str:
