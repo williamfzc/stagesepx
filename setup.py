@@ -39,5 +39,6 @@ setup(
         "Jinja2>=2.10.1",
         "fire>=0.2.1",
     ],
+    extras_require={"keras": ["keras", "tensorflow"]},
     entry_points={"console_scripts": ["stagesepx = stagesepx.cli:main"]},
 )

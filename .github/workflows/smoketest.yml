@@ -22,6 +22,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           pip install .
+          pip install .[keras]
       - name: Download test resource
         run: |
           curl -o demo.mp4 https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4
