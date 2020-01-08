@@ -82,7 +82,7 @@ class VideoCutter(object):
 
         # check block
         if not block:
-            block = 2
+            block = 3
 
         while True:
             # hook
