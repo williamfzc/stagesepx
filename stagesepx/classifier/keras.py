@@ -43,6 +43,8 @@ class KerasClassifier(BaseModelClassifier):
 
         logger.debug(f"score threshold: {self.score_threshold}")
         logger.debug(f"data size: {self.data_size}")
+        logger.debug(f"nb train samples: {self.nb_train_samples}")
+        logger.debug(f"nb validation samples: {self.nb_validation_samples}")
         logger.debug(f"epochs: {self.epochs}")
         logger.debug(f"batch size: {self.batch_size}")
 
@@ -86,9 +88,9 @@ class KerasClassifier(BaseModelClassifier):
         self._model = self.create_model()
         self._model.load_weights(model_path)
 
-    def create_model(self, class_num: int) -> Sequential:
+    def create_model(self) -> Sequential:
         """ model structure. you can overwrite this method to build your own model """
-        logger.info(f"creating keras sequential model with class_num == {class_num}")
+        logger.info(f"creating keras sequential model")
         if K.image_data_format() == "channels_first":
             input_shape = (1, *self.data_size)
         else:
@@ -100,21 +102,21 @@ class KerasClassifier(BaseModelClassifier):
         model.add(MaxPooling2D(pool_size=(2, 2)))
 
         model.add(Conv2D(32, (3, 3)))
-        model.add(Activation('relu'))
+        model.add(Activation("relu"))
         model.add(MaxPooling2D(pool_size=(2, 2)))
 
         model.add(Conv2D(64, (3, 3)))
-        model.add(Activation('relu'))
+        model.add(Activation("relu"))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Flatten())
         model.add(Dense(64))
-        model.add(Activation('relu'))
+        model.add(Activation("relu"))
         model.add(Dropout(0.5))
-        model.add(Dense(class_num))
-        model.add(Activation('softmax'))
+        model.add(Dense(6))
+        model.add(Activation("softmax"))
 
         model.compile(
-            loss="categorical_crossentropy",
+            loss="sparse_categorical_crossentropy",
             optimizer="rmsprop",
             metrics=["accuracy"],
         )
@@ -129,8 +131,7 @@ class KerasClassifier(BaseModelClassifier):
         """
         if not self._model:
             logger.debug("no model can be used. build a new one.")
-            class_num = len(os.listdir(data_path))
-            self._model = self.create_model(class_num)
+            self._model = self.create_model()
         else:
             logger.debug("model found")
 
@@ -143,7 +144,7 @@ class KerasClassifier(BaseModelClassifier):
             target_size=self.data_size,
             batch_size=self.batch_size,
             color_mode="grayscale",
-            class_mode="categorical",
+            class_mode="sparse",
             subset="training",
         )
 
@@ -152,7 +153,7 @@ class KerasClassifier(BaseModelClassifier):
             target_size=self.data_size,
             batch_size=self.batch_size,
             color_mode="grayscale",
-            class_mode="categorical",
+            class_mode="sparse",
             subset="validation",
         )
 
