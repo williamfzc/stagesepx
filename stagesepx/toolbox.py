@@ -122,10 +122,10 @@ def turn_grey(old: np.ndarray) -> np.ndarray:
 
 
 def turn_binary(old: np.ndarray) -> np.ndarray:
-    # TODO not always work
-    grey = turn_grey(old)
-    thresh = threshold_otsu(grey)
-    return (grey > thresh).astype(np.uint8)
+    grey = turn_grey(old).astype("uint8")
+    return cv2.adaptiveThreshold(
+        grey, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+    )
 
 
 def turn_hog_desc(old: np.ndarray) -> np.ndarray:
