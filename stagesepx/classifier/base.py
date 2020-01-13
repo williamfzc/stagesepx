@@ -156,6 +156,9 @@ class ClassifierResult(object):
             cur = next_one
             cur_index += 1
 
+        # issue #90
+        assert len(result) > 0, "video seems to only contain one stage"
+
         last = self.data[-1]
         if result[-1][-1] != last:
             result.append(self.data[cur.frame_id - 1 : last.frame_id - 1 + 1])
@@ -165,7 +168,7 @@ class ClassifierResult(object):
         return len(self.data)
 
     def calc_changing_cost(
-        self
+        self,
     ) -> typing.Dict[str, typing.Tuple[SingleClassifierResult, SingleClassifierResult]]:
         """ calc time cost between stages """
         # add changing cost
