@@ -295,6 +295,7 @@ class BaseClassifier(object):
 
     def _classify_frame(self, frame: VideoFrame, *args, **kwargs) -> str:
         """ must be implemented by sub class """
+        raise NotImplementedError
 
     def _apply_hook(self, frame: VideoFrame, *args, **kwargs) -> VideoFrame:
         for each_hook in self._hook_list:
@@ -376,23 +377,23 @@ class BaseClassifier(object):
 class BaseModelClassifier(BaseClassifier):
     # model
     def save_model(self, model_path: str, overwrite: bool = None):
-        raise NotImplemented
+        raise NotImplementedError
 
     def load_model(self, model_path: str, overwrite: bool = None):
-        raise NotImplemented
+        raise NotImplementedError
 
     def clean_model(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     # actions
     def train(self, *_, **__):
-        raise NotImplemented
+        raise NotImplementedError
 
     def predict(self, pic_path: str) -> str:
-        raise NotImplemented
+        raise NotImplementedError
 
     def predict_with_object(self, frame: np.ndarray) -> str:
-        raise NotImplemented
+        raise NotImplementedError
 
     def read_from_list(
         self, data: typing.List[int], video_cap: cv2.VideoCapture = None, *_, **__
