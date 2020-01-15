@@ -18,6 +18,8 @@ pip install .
 
 ## 快速开始
 
+> 如果你只是想落地，可以先看看 [实际应用的例子](https://github.com/williamfzc/work_with_stagesepx)
+
 ### 命令行方式
 
 stagesepx支持直接从命令行启动。在此模式下，你无需编写任何代码。
