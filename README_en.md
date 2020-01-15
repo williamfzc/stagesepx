@@ -61,6 +61,10 @@ As you can see, its result is very close to the timer.
 - Configurable for different scenes
 - All you need is a video!
 
+## Structure
+
+![structure](./docs/pics/stagesepx.svg)
+
 ## Quick Start
 
 - [30 lines demo](example/mini.py)

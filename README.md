@@ -51,6 +51,10 @@
 - 支持与其他框架结合，融入你的业务
 - 所有你需要的，只是一个视频
 
+## 架构
+
+![structure](./docs/pics/stagesepx.svg)
+
 ## 快速开始
 
 - [用30行代码快速跑一个demo](example/mini.py)
