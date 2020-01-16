@@ -67,7 +67,10 @@ As you can see, its result is very close to the timer.
 
 ## Quick Start
 
+> Translation is working in progress. But not ready. You can use something like google translate instead for now. Feel free to leave me a issue when you are confused.
+
 - [30 lines demo](example/mini.py)
+- [how to use it in production (in Chinese)](https://github.com/williamfzc/stagesepx/blob/master/README_en.md)
 - [demo with all the features (in Chinese)](example/cut_and_classify.py)
 - [i have some questions](https://github.com/williamfzc/stagesepx/issues/new)
 
