@@ -302,6 +302,7 @@ class VideoCutResult(object):
         frame_count: int,
         to_dir: str = None,
         prune: float = None,
+        meaningful_name: bool = None,
         # in kwargs
         # compress_rate: float = None,
         # target_size: typing.Tuple[int, int] = None,
@@ -316,6 +317,7 @@ class VideoCutResult(object):
         :param frame_count: default to 3, and finally you will get 3 frames for each range
         :param to_dir: will saved to this path
         :param prune: float, 0-1. if set it 0.9, some stages which are too similar (ssim > 0.9) will be removed
+        :param meaningful_name: bool, False by default. if true, image names will become meaningful (with timestamp/id or something else)
         :param args:
         :param kwargs:
         :return:
@@ -342,8 +344,24 @@ class VideoCutResult(object):
             each_stage_dir = os.path.join(to_dir, str(each_stage_id))
             os.makedirs(each_stage_dir, exist_ok=True)
 
+            # create image files
             for each_frame_object in each_frame_list:
-                each_frame_path = os.path.join(each_stage_dir, f"{uuid.uuid4()}.png")
+                if meaningful_name:
+                    # - video name
+                    # - frame id
+                    # - frame timestamp
+                    image_name = (
+                        f"{os.path.basename(os.path.splitext(self.video.path)[0])}"
+                        f"_"
+                        f"{each_frame_object.frame_id}"
+                        f"_"
+                        f"{each_frame_object.timestamp}"
+                        f".png"
+                    )
+                else:
+                    image_name = f"{uuid.uuid4()}.png"
+
+                each_frame_path = os.path.join(each_stage_dir, image_name)
                 compressed = toolbox.compress_frame(each_frame_object.data, **kwargs)
                 cv2.imwrite(each_frame_path, compressed)
                 logger.debug(

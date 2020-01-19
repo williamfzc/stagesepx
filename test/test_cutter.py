@@ -58,6 +58,10 @@ def test_prune():
     data_home = res.pick_and_save(stable, 5, prune=0.99)
     assert os.path.isdir(data_home), "result dir not existed"
 
+    # meaningful name
+    data_home = res.pick_and_save(stable, 3, meaningful_name=True)
+    assert data_home
+
 
 def test_cut_range():
     cutter = VideoCutter()
