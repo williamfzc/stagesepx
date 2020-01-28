@@ -1,6 +1,7 @@
 from stagesepx.cutter import VideoCutter, VideoCutResult
 from stagesepx.video import VideoObject
 import os
+import shutil
 import numpy as np
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
@@ -17,6 +18,7 @@ def test_default():
     stable, unstable = res.get_range()
     assert len(stable) == 3, "count of stable range is not correct"
 
+    shutil.rmtree(RESULT_DIR)
     data_home = res.pick_and_save(stable, 5, to_dir=RESULT_DIR)
     assert data_home == RESULT_DIR
     assert os.path.isdir(data_home), "result dir not existed"
