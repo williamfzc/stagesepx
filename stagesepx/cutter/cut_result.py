@@ -337,7 +337,7 @@ class VideoCutResult(object):
         # create parent dir
         if not to_dir:
             to_dir = toolbox.get_timestamp_str()
-        os.makedirs(to_dir, exist_ok=True)
+        os.makedirs(to_dir)
 
         for each_stage_id, each_frame_list in stage_list:
             # create sub dir
