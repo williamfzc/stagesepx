@@ -18,7 +18,9 @@ def test_default():
     stable, unstable = res.get_range()
     assert len(stable) == 3, "count of stable range is not correct"
 
-    shutil.rmtree(RESULT_DIR)
+    if os.path.exists(RESULT_DIR):
+        shutil.rmtree(RESULT_DIR)
+
     data_home = res.pick_and_save(stable, 5, to_dir=RESULT_DIR)
     assert data_home == RESULT_DIR
     assert os.path.isdir(data_home), "result dir not existed"
