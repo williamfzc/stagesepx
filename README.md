@@ -94,6 +94,7 @@ pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
 - [分类结果如何定制？](https://github.com/williamfzc/stagesepx/issues/48)
 - [算出来的结果不准确 / 跟传统方式有差距](https://github.com/williamfzc/stagesepx/issues/46)
 - [出现 OutOfMemoryError](https://github.com/williamfzc/stagesepx/issues/86)
+- [工具没法满足我的业务需要](https://github.com/williamfzc/stagesepx/issues/93)
 - ...
 
 不仅是问题，如果有任何建议与交流想法，同样可以通过 issue 面板找到我。我们每天都会查看 issue 面板，无需担心跟进不足。
