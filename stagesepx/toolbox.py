@@ -144,14 +144,6 @@ def turn_hog_desc(old: np.ndarray) -> np.ndarray:
     return fd
 
 
-def turn_surf_desc(old: np.ndarray, hessian: int = None) -> np.ndarray:
-    if not hessian:
-        hessian = 200
-    surf = cv2.xfeatures2d.SURF_create(hessian)
-    _, desc = surf.detectAndCompute(old, None)
-    return desc
-
-
 def turn_lbp_desc(old: np.ndarray, radius: int = None) -> np.ndarray:
     if not radius:
         radius = 3

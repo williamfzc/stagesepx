@@ -27,11 +27,6 @@ def test_turn_binary():
     toolbox.turn_binary(image)
 
 
-def test_turn_surf_desc():
-    image = toolbox.imread(IMAGE_PATH)
-    toolbox.turn_surf_desc(image)
-
-
 def test_turn_lbp_desc():
     image = toolbox.imread(IMAGE_PATH)
     toolbox.turn_lbp_desc(image)
