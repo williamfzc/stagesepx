@@ -99,6 +99,12 @@ pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
 
 不仅是问题，如果有任何建议与交流想法，同样可以通过 issue 面板找到我。我们每天都会查看 issue 面板，无需担心跟进不足。
 
+## 相关文章
+
+- [图像分类、AI 与全自动性能测试](https://testerhome.com/topics/19978)
+- [全自动化的抖音启动速度测试](https://testerhome.com/topics/22215)
+- [(MTSC2019) 基于图像分类的下一代速度类测试解决方案](https://testerhome.com/topics/21874)
+
 ## 参与项目
 
 项目发展至今，基础需求已经逐步进入稳定与可用阶段。接下来的工作主要分为下面几个部分：
