@@ -8,7 +8,6 @@ import os
 import numpy as np
 import subprocess
 from base64 import b64encode
-from skimage.filters import threshold_otsu
 from skimage.metrics import structural_similarity as origin_compare_ssim
 from skimage.metrics import normalized_root_mse as compare_nrmse
 from skimage.metrics import peak_signal_noise_ratio as compare_psnr
