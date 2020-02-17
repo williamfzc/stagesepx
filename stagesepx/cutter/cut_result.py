@@ -337,11 +337,16 @@ class VideoCutResult(object):
         # create parent dir
         if not to_dir:
             to_dir = toolbox.get_timestamp_str()
-        os.makedirs(to_dir)
+        logger.debug(f"try to make dirs: {to_dir}")
+        os.makedirs(to_dir, exist_ok=True)
 
         for each_stage_id, each_frame_list in stage_list:
             # create sub dir
             each_stage_dir = os.path.join(to_dir, str(each_stage_id))
+
+            if os.path.isdir(each_stage_dir):
+                logger.warning(f"sub dir [{each_stage_dir}] already existed")
+                logger.warning("NOTICE: make sure your data will not be polluted by accident")
             os.makedirs(each_stage_dir, exist_ok=True)
 
             # create image files

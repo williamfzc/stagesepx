@@ -24,6 +24,14 @@ def test_default():
     data_home = res.pick_and_save(stable, 5, to_dir=RESULT_DIR)
     assert data_home == RESULT_DIR
     assert os.path.isdir(data_home), "result dir not existed"
+
+    # run again to test covering result
+    data_home = res.pick_and_save(stable, 5, to_dir=RESULT_DIR)
+    assert data_home == RESULT_DIR
+    assert os.path.isdir(data_home), "result dir not existed"
+
+    sub_dir_0 = os.path.join(data_home, "0")
+    assert len(os.listdir(sub_dir_0)) == 10
     return res
 
 
