@@ -14,4 +14,8 @@ def test_cli():
     logger.info("checking one_step ...")
     subprocess.check_call(["stagesepx", "one_step", VIDEO_PATH])
     subprocess.check_call(["stagesepx", "one_step", VIDEO_PATH, "output"])
+
+    logger.info("checking keras trainer ...")
+    subprocess.check_call(["stagesepx", "train", "output", "output.h5"])
+
     shutil.rmtree("output")

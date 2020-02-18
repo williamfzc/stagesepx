@@ -175,3 +175,28 @@ def _classify(
         cl.load(data_home)
         cl.train()
     return cl.classify(video, limit_range=limit_range)
+
+
+def keras_train(
+    train_data_path: str,
+    model_path: str,
+    # options
+    epochs: int = 10,
+    target_size: str = "600x800",
+    overwrite: bool = False,
+    **kwargs,
+):
+    from stagesepx.classifier.keras import KerasClassifier
+
+    # handle args
+    target_size: typing.Sequence[int] = [int(each) for each in target_size.split("x")]
+
+    cl = KerasClassifier(
+        # 轮数
+        epochs=epochs,
+        # 保证数据集的分辨率统一性
+        target_size=target_size,
+        **kwargs,
+    )
+    cl.train(train_data_path)
+    cl.save_model(model_path, overwrite=overwrite)

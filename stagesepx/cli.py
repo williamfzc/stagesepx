@@ -16,6 +16,7 @@ class TerminalCli(object):
     # this layer was built for (pre) controlling args and kwargs
     # or, some translations, default value, and so on
     one_step = staticmethod(api.one_step)
+    train = staticmethod(api.keras_train)
 
 
 def main():
