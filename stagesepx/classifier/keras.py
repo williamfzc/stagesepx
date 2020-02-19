@@ -3,6 +3,10 @@ import os
 import cv2
 import typing
 import numpy as np
+try:
+    import tensorflow
+except ImportError:
+    raise ImportError("KerasClassifier requires tensorflow. install it first.")
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D

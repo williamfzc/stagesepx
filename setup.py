@@ -38,7 +38,7 @@ setup(
         "findit>=0.5.8",
         "Jinja2>=2.10.1",
         "fire>=0.2.1",
+        "keras>=2.3.1",
     ],
-    extras_require={"keras": ["keras", "tensorflow"]},
     entry_points={"console_scripts": ["stagesepx = stagesepx.cli:main"]},
 )
