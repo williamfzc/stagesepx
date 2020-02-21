@@ -102,7 +102,7 @@ class Reporter(object):
         y_axis = list()
         offset = result.get_offset()
         for each_stage_name in x_axis:
-            each_stage = result.get_specific_stage(each_stage_name)
+            each_stage = result.get_specific_stage_range(each_stage_name)
             # last frame - first frame
             time_cost = each_stage[-1].timestamp - each_stage[0].timestamp + offset
             y_axis.append(time_cost)

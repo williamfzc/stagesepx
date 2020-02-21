@@ -346,7 +346,9 @@ class VideoCutResult(object):
 
             if os.path.isdir(each_stage_dir):
                 logger.warning(f"sub dir [{each_stage_dir}] already existed")
-                logger.warning("NOTICE: make sure your data will not be polluted by accident")
+                logger.warning(
+                    "NOTICE: make sure your data will not be polluted by accident"
+                )
             os.makedirs(each_stage_dir, exist_ok=True)
 
             # create image files

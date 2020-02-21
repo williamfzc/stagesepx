@@ -99,6 +99,8 @@ def test_result():
     classify_result.mark_range(1, 3, "0")
     classify_result.mark_range_unstable(1, 3)
     classify_result.get_important_frame_list()
+    assert classify_result.first("1").frame_id == 20
+    assert classify_result.last("1").frame_id == 21
 
 
 def test_keras():

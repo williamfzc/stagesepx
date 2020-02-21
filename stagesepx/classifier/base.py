@@ -79,6 +79,19 @@ class ClassifierResult(object):
     def get_stage_list(self) -> typing.List[str]:
         return [each.stage for each in self.data]
 
+    def get_length(self) -> int:
+        return len(self.data)
+
+    def first(self, stage_name: str) -> SingleClassifierResult:
+        for each in self.data:
+            if each.stage == stage_name:
+                return each
+
+    def last(self, stage_name: str) -> SingleClassifierResult:
+        for each in self.data[::-1]:
+            if each.stage == stage_name:
+                return each
+
     def get_stage_set(self) -> typing.Set[str]:
         return set(self.get_stage_list())
 
@@ -102,7 +115,7 @@ class ClassifierResult(object):
         # timestamp offset between frames
         return self.data[1].timestamp - self.data[0].timestamp
 
-    def get_specific_stage(
+    def get_specific_stage_range(
         self, stage_name: str
     ) -> typing.List[SingleClassifierResult]:
         """ get specific stage range by stage name """
@@ -129,7 +142,7 @@ class ClassifierResult(object):
 
         d = OrderedDict()
         for each_stage in stage_list:
-            d[each_stage] = self.get_specific_stage(each_stage)
+            d[each_stage] = self.get_specific_stage_range(each_stage)
         return d
 
     def get_stage_range(self) -> typing.List[typing.List[SingleClassifierResult]]:
@@ -163,9 +176,6 @@ class ClassifierResult(object):
         if result[-1][-1] != last:
             result.append(self.data[cur.frame_id - 1 : last.frame_id - 1 + 1])
         return result
-
-    def get_length(self) -> int:
-        return len(self.data)
 
     def calc_changing_cost(
         self,
