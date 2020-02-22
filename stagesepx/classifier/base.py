@@ -86,11 +86,13 @@ class ClassifierResult(object):
         for each in self.data:
             if each.stage == stage_name:
                 return each
+        logger.warning(f"no stage named {stage_name} found")
 
     def last(self, stage_name: str) -> SingleClassifierResult:
         for each in self.data[::-1]:
             if each.stage == stage_name:
                 return each
+        logger.warning(f"no stage named {stage_name} found")
 
     def get_stage_set(self) -> typing.Set[str]:
         return set(self.get_stage_list())
