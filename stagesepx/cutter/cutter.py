@@ -1,4 +1,5 @@
 import typing
+import time
 import numpy as np
 from loguru import logger
 
@@ -151,6 +152,7 @@ class VideoCutter(object):
         :param kwargs: parameters of toolbox.compress_frame can be used here
         :return:
         """
+        start_time = time.time()
         if isinstance(video, str):
             video = VideoObject(video)
 
@@ -161,6 +163,8 @@ class VideoCutter(object):
         # [Range(1-2), Range(2-3), Range(3-4) ... Range(99-100)]
         range_list = self._convert_video_into_range_list(video, *args, **kwargs)
         logger.info(f"cut finished: {video}")
+        end_time = time.time()
+        logger.debug(f"cutter cost: {end_time - start_time}")
 
         # TODO other analysis results can be added to VideoCutResult, such as AI cutter?
         return VideoCutResult(video, range_list, cut_kwargs=kwargs)

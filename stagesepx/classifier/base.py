@@ -2,6 +2,7 @@ import pathlib
 import typing
 from collections import OrderedDict
 import cv2
+import time
 import numpy as np
 from loguru import logger
 
@@ -348,6 +349,7 @@ class BaseClassifier(object):
         :return:
         """
         logger.debug(f"classify with {self.__class__.__name__}")
+        start_time = time.time()
 
         if not step:
             step = 1
@@ -396,6 +398,8 @@ class BaseClassifier(object):
                 )
             )
             frame = operator.get_frame_by_id(frame.frame_id + step)
+        end_time = time.time()
+        logger.debug(f"classifier cost: {end_time - start_time}")
         return ClassifierResult(final_result)
 
 
