@@ -163,7 +163,7 @@ class ClassifierResult(object):
     ) -> typing.List[typing.List[SingleClassifierResult]]:
         unstable = self.get_specific_stage_range(constants.UNSTABLE_FLAG)
         ignore = self.get_specific_stage_range(constants.IGNORE_FLAG)
-        return sorted(unstable + ignore, key=lambda x: x[0].stage_name)
+        return sorted(unstable + ignore, key=lambda x: x[0].stage)
 
     def mark_range(self, start: int, end: int, target_stage: str):
         for each in self.data[start:end]:
