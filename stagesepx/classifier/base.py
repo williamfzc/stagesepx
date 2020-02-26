@@ -82,56 +82,12 @@ class ClassifierResult(object):
     def get_length(self) -> int:
         return len(self.data)
 
-    def first(self, stage_name: str) -> SingleClassifierResult:
-        for each in self.data:
-            if each.stage == stage_name:
-                return each
-        logger.warning(f"no stage named {stage_name} found")
-
-    def last(self, stage_name: str) -> SingleClassifierResult:
-        for each in self.data[::-1]:
-            if each.stage == stage_name:
-                return each
-        logger.warning(f"no stage named {stage_name} found")
-
-    def get_stage_set(self) -> typing.Set[str]:
-        return set(self.get_stage_list())
-
-    def get_important_frame_list(self) -> typing.List[SingleClassifierResult]:
-        # save the first frame
-        result = [self.data[0]]
-
-        prev = self.data[0]
-        for cur in self.data[1:]:
-            if cur.stage != prev.stage:
-                result.append(prev)
-                result.append(cur)
-            prev = cur
-
-        # save the latest frame
-        if result[-1] != self.data[-1]:
-            result.append(self.data[-1])
-        return result
-
     def get_offset(self) -> float:
         # timestamp offset between frames
         return self.data[1].timestamp - self.data[0].timestamp
 
-    def get_specific_stage_range(
-        self, stage_name: str
-    ) -> typing.List[SingleClassifierResult]:
-        """ get specific stage range by stage name """
-        return sorted(
-            [i for i in self.data if i.stage == stage_name], key=lambda x: x.frame_id
-        )
-
-    def mark_range(self, start: int, end: int, target_stage: str):
-        for each in self.data[start:end]:
-            each.stage = target_stage
-        logger.debug(f"range {start} to {end} has been marked as {target_stage}")
-
-    def mark_range_unstable(self, start: int, end: int):
-        self.mark_range(start, end, constants.UNSTABLE_FLAG)
+    def get_stage_set(self) -> typing.Set[str]:
+        return set(self.get_stage_list())
 
     def to_dict(self) -> typing.Dict[str, typing.List[SingleClassifierResult]]:
         stage_list = list(self.get_stage_set())
@@ -147,11 +103,23 @@ class ClassifierResult(object):
             d[each_stage] = self.get_specific_stage_range(each_stage)
         return d
 
+    def first(self, stage_name: str) -> SingleClassifierResult:
+        for each in self.data:
+            if each.stage == stage_name:
+                return each
+        logger.warning(f"no stage named {stage_name} found")
+
+    def last(self, stage_name: str) -> SingleClassifierResult:
+        for each in self.data[::-1]:
+            if each.stage == stage_name:
+                return each
+        logger.warning(f"no stage named {stage_name} found")
+
     def get_stage_range(self) -> typing.List[typing.List[SingleClassifierResult]]:
         """
         return a range list.
         if your video has 30 frames, with 3 stages, this list can be:
-        [(0, 11), (12, 20), (21, 30)]
+        [(0, 1, ... 11), (12, 13 ... 20), (21, 22 ... 30)]
 
         :return:
         """
@@ -177,6 +145,51 @@ class ClassifierResult(object):
         last = self.data[-1]
         if result[-1][-1] != last:
             result.append(self.data[cur.frame_id - 1 : last.frame_id - 1 + 1])
+        return result
+
+    def get_specific_stage_range(
+        self, stage_name: str
+    ) -> typing.List[typing.List[SingleClassifierResult]]:
+        """ get specific stage range by stage name (maybe contains some partition """
+        ret = list()
+        for each_range in self.get_stage_range():
+            cur = each_range[0]
+            if cur.stage == stage_name:
+                ret.append(each_range)
+        return ret
+
+    def get_not_stable_stage_range(
+        self
+    ) -> typing.List[typing.List[SingleClassifierResult]]:
+        unstable = self.get_specific_stage_range(constants.UNSTABLE_FLAG)
+        ignore = self.get_specific_stage_range(constants.IGNORE_FLAG)
+        return sorted(unstable + ignore, key=lambda x: x[0].stage_name)
+
+    def mark_range(self, start: int, end: int, target_stage: str):
+        for each in self.data[start:end]:
+            each.stage = target_stage
+        logger.debug(f"range {start} to {end} has been marked as {target_stage}")
+
+    def mark_range_unstable(self, start: int, end: int):
+        self.mark_range(start, end, constants.UNSTABLE_FLAG)
+
+    def mark_range_ignore(self, start: int, end: int):
+        self.mark_range(start, end, constants.IGNORE_FLAG)
+
+    def get_important_frame_list(self) -> typing.List[SingleClassifierResult]:
+        # save the first frame
+        result = [self.data[0]]
+
+        prev = self.data[0]
+        for cur in self.data[1:]:
+            if cur.stage != prev.stage:
+                result.append(prev)
+                result.append(cur)
+            prev = cur
+
+        # save the latest frame
+        if result[-1] != self.data[-1]:
+            result.append(self.data[-1])
         return result
 
     def calc_changing_cost(

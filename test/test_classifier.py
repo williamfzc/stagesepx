@@ -99,6 +99,9 @@ def test_result():
     classify_result.mark_range(1, 3, "0")
     classify_result.mark_range_unstable(1, 3)
     classify_result.get_important_frame_list()
+    classify_result.get_stage_range()
+    classify_result.get_specific_stage_range("0")
+    classify_result.get_not_stable_stage_range()
     assert classify_result.first("1").frame_id == 20
     assert classify_result.last("1").frame_id == 21
 
