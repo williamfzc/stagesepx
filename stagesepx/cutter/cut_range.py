@@ -134,7 +134,7 @@ class VideoCutRange(object):
         # IMPORTANT function!
         # it decided whether a range is stable => everything is based on it!
         if not threshold:
-            threshold = 0.95
+            threshold = 0.98
 
         # ssim
         res = np.mean(self.ssim) > threshold
