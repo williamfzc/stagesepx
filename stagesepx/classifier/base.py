@@ -126,27 +126,33 @@ class ClassifierResult(object):
         """
         result: typing.List[typing.List[SingleClassifierResult]] = []
 
+        # real data
         cur = self.data[0]
-        cur_index = 1
+        # frame id = index + 1
+        cur_index = cur.frame_id - 1
+        # init pointer
+        ptr = cur_index
         length = self.get_length()
-        while cur_index < length:
-            next_one = self.data[cur_index]
+        while ptr < length:
+            # next frame
+            next_one = self.data[ptr]
+            # is continuous?
             if cur.stage == next_one.stage:
-                cur_index += 1
+                ptr += 1
                 continue
             # +1 because:
             # [1,2,3,4,5][1:3] == [2,3]
-            result.append(self.data[cur.frame_id - 1 : cur_index - 1 + 1])
+            result.append(self.data[cur_index: ptr + 1])
             cur = next_one
-            cur_index += 1
+            cur_index = cur.frame_id - 1
 
         # issue #90
         assert len(result) > 0, "video seems to only contain one stage"
 
-        last = self.data[-1]
+        last_data = self.data[-1]
         last_result = result[-1][-1]
-        if last_result != last:
-            result.append(self.data[last_result.frame_id - 1: last.frame_id - 1 + 1])
+        if last_result != last_data:
+            result.append(self.data[last_result.frame_id - 1: last_data.frame_id - 1 + 1])
         return result
 
     def get_specific_stage_range(
