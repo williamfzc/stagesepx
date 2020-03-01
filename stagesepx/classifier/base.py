@@ -144,8 +144,9 @@ class ClassifierResult(object):
         assert len(result) > 0, "video seems to only contain one stage"
 
         last = self.data[-1]
-        if result[-1][-1] != last:
-            result.append(self.data[cur.frame_id - 1 : last.frame_id - 1 + 1])
+        last_result = result[-1][-1]
+        if last_result != last:
+            result.append(self.data[last_result.frame_id - 1: last.frame_id - 1 + 1])
         return result
 
     def get_specific_stage_range(
