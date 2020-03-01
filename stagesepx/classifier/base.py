@@ -142,9 +142,12 @@ class ClassifierResult(object):
                 continue
             # +1 because:
             # [1,2,3,4,5][1:3] == [2,3]
-            result.append(self.data[cur_index: ptr + 1])
+            # -1 because:
+            # current ptr is the next frame
+            logger.warning(f"bingo: {cur_index}, {ptr}")
+            result.append(self.data[cur_index: ptr + 1 - 1] or [self.data[cur_index]])
             cur = next_one
-            cur_index = next_one.frame_id
+            cur_index = next_one.frame_id - 1
 
         # issue #90
         assert len(result) > 0, "video seems to only contain one stage"
@@ -152,7 +155,7 @@ class ClassifierResult(object):
         last_data = self.data[-1]
         last_result = result[-1][-1]
         if last_result != last_data:
-            result.append(self.data[last_result.frame_id - 1: last_data.frame_id - 1 + 1])
+            result.append(self.data[last_result.frame_id - 1 + 1: last_data.frame_id - 1 + 1])
         return result
 
     def get_specific_stage_range(
