@@ -144,7 +144,7 @@ class ClassifierResult(object):
             # [1,2,3,4,5][1:3] == [2,3]
             result.append(self.data[cur_index: ptr + 1])
             cur = next_one
-            cur_index = cur.frame_id - 1
+            cur_index = next_one.frame_id
 
         # issue #90
         assert len(result) > 0, "video seems to only contain one stage"
