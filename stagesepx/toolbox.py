@@ -32,11 +32,14 @@ def video_capture(video_path: str):
 def video_jump(video_cap: cv2.VideoCapture, frame_id: int):
     # IMPORTANT:
     # - frame is a range actually
-    # - frame 1 's timestamp is the end of this frame
+    # - frame 1 's timestamp is the beginning of this frame
     #
-    # video_jump(cap, 1) means: moving the pointer to the start point of frame 1 => the end point of frame 0
+    # video_jump(cap, 2) means: moving the pointer to the start point of frame 2 => the end point of frame 1
 
-    video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1)
+    # -1 for moving to the beginning
+    # another -1 for re-read
+    video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1 - 1)
+    video_cap.read()
     logger.debug(
         f"current pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})"
     )
@@ -78,12 +81,12 @@ def get_frame_time(
     video_cap: cv2.VideoCapture, frame_id: int, recover: bool = None
 ) -> float:
     cur = get_current_frame_id(video_cap)
-    video_jump(video_cap, frame_id + 1)
+    video_jump(video_cap, frame_id)
     result = get_current_frame_time(video_cap)
     logger.debug(f"frame {frame_id} -> {result}")
 
     if recover:
-        video_jump(video_cap, cur + 1)
+        video_jump(video_cap, cur)
     return result
 
 
@@ -109,7 +112,7 @@ def get_frame(
     assert ret, f"read frame failed, frame id: {frame_id}"
 
     if recover:
-        video_jump(video_cap, cur + 1)
+        video_jump(video_cap, cur)
     return frame
 
 
