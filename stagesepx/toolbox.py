@@ -36,12 +36,11 @@ def video_jump(video_cap: cv2.VideoCapture, frame_id: int):
     #
     # video_jump(cap, 2) means: moving the pointer to the start point of frame 2 => the end point of frame 1
 
-    # -1 for moving to the beginning
     # another -1 for re-read
     video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1 - 1)
     video_cap.read()
     logger.debug(
-        f"current pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})"
+        f"previous pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})"
     )
 
 
@@ -64,10 +63,15 @@ def multi_compare_ssim(
 
 
 def get_current_frame_id(video_cap: cv2.VideoCapture) -> int:
+    # IMPORTANT:
+    # this id is the frame which has already been grabbed
+    # we jump to 5, which means the next frame will be 5
+    # so the current frame id is: 5 - 1 = 4
     return int(video_cap.get(cv2.CAP_PROP_POS_FRAMES))
 
 
 def get_current_frame_time(video_cap: cv2.VideoCapture) -> float:
+    # same as get_current_frame_id, take good care of them
     return video_cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
 
 
@@ -86,7 +90,7 @@ def get_frame_time(
     logger.debug(f"frame {frame_id} -> {result}")
 
     if recover:
-        video_jump(video_cap, cur)
+        video_jump(video_cap, cur + 1)
     return result
 
 
@@ -112,7 +116,7 @@ def get_frame(
     assert ret, f"read frame failed, frame id: {frame_id}"
 
     if recover:
-        video_jump(video_cap, cur)
+        video_jump(video_cap, cur + 1)
     return frame
 
 
