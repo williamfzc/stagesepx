@@ -207,8 +207,11 @@ class Reporter(object):
         # mark range
         for each in unstable_ranges:
             classifier_result.mark_range_unstable(each.start, each.end)
+
         offset = classifier_result.get_offset()
-        for each in classifier_result.get_stage_range():
+        stage_range = classifier_result.get_stage_range()
+        for cur_index in range(len(stage_range)):
+            each = stage_range[cur_index]
             middle = each[len(each) // 2]
             if middle.is_stable():
                 label = "stable"
@@ -217,12 +220,13 @@ class Reporter(object):
                 )
             else:
                 label = "unstable"
+                # add a frame
                 frame = np.hstack(
                     [
                         toolbox.compress_frame(
                             i.get_data(), compress_rate=compress_rate
                         )
-                        for i in each
+                        for i in [*each, stage_range[cur_index + 1][0]]
                     ]
                 )
 
