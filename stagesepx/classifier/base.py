@@ -158,6 +158,7 @@ class ClassifierResult(object):
                 self.data[last_result.frame_id - 1 + 1 : last_data.frame_id - 1 + 1]
                 or [self.data[last_result.frame_id - 1]]
             )
+        logger.debug(f"get stage range: {result}")
         return result
 
     def get_specific_stage_range(
