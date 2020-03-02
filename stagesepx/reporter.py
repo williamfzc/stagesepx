@@ -221,12 +221,16 @@ class Reporter(object):
             else:
                 label = "unstable"
                 # add a frame
+                if cur_index + 1 < len(stage_range):
+                    new_each = [*each, stage_range[cur_index + 1][0]]
+                else:
+                    new_each = each
                 frame = np.hstack(
                     [
                         toolbox.compress_frame(
                             i.get_data(), compress_rate=compress_rate
                         )
-                        for i in [*each, stage_range[cur_index + 1][0]]
+                        for i in new_each
                     ]
                 )
 
