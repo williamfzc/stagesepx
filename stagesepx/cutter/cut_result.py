@@ -124,12 +124,10 @@ class VideoCutResult(object):
         """
         unstable_range_list = self.get_unstable_range(unstable_limit, **kwargs)
 
-        # it is not a real frame (not existed)
-        # just take it as a beginning
-        # real frame id is started with 1, with non-zero timestamp
-        video_start_frame_id = 0
+        # start point
+        video_start_frame_id = 1
         video_start_timestamp = 0.0
-
+        # end point
         video_end_frame_id = self.range_list[-1].end
         video_end_timestamp = self.range_list[-1].end_time
 
@@ -212,9 +210,9 @@ class VideoCutResult(object):
                 range_start_id, range_end_id = range_end_id, range_start_id
 
             range_list.append(
-                # IMPORTANT: frame's timestamp => end time of this frame
-                # because frame 0's timestamp is 0.0
-                # frame {range_start_id} end time - frame {range_end_id} end time
+                # IMPORTANT: frame's timestamp => start time of this frame
+                # because frame 1's timestamp is 0.0
+                # frame {range_start_id} start time - frame {range_end_id} start time
                 VideoCutRange(
                     self.video,
                     range_start_id,
@@ -222,8 +220,8 @@ class VideoCutResult(object):
                     [1.0],
                     [0.0],
                     [0.0],
-                    self.get_target_range_by_id(range_start_id).end_time,
-                    self.get_target_range_by_id(range_end_id).end_time,
+                    self.get_target_range_by_id(range_start_id).start_time,
+                    self.get_target_range_by_id(range_end_id).start_time,
                 )
             )
 
