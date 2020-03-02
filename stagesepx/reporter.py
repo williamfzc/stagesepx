@@ -228,7 +228,7 @@ class Reporter(object):
 
             first, last = each[0], each[-1]
             self.add_thumbnail(
-                f"{label} range {first.frame_id}({first.timestamp - offset}) - {last.frame_id}({last.timestamp}), "
+                f"{label} range {first.frame_id}({first.timestamp}) - {last.frame_id}({last.timestamp + offset}), "
                 f"duration: {last.timestamp - first.timestamp + offset}",
                 frame,
             )
