@@ -107,12 +107,14 @@ class ClassifierResult(object):
     def first(self, stage_name: str) -> SingleClassifierResult:
         for each in self.data:
             if each.stage == stage_name:
+                logger.debug(f"first frame of {stage_name}: {each}")
                 return each
         logger.warning(f"no stage named {stage_name} found")
 
     def last(self, stage_name: str) -> SingleClassifierResult:
         for each in self.data[::-1]:
             if each.stage == stage_name:
+                logger.debug(f"last frame of {stage_name}: {each}")
                 return each
         logger.warning(f"no stage named {stage_name} found")
 
@@ -189,6 +191,9 @@ class ClassifierResult(object):
 
     def mark_range_ignore(self, start: int, end: int):
         self.mark_range(start, end, constants.IGNORE_FLAG)
+
+    def time_cost_between(self, start_stage: str, end_stage: str) -> float:
+        return self.first(end_stage).timestamp - self.last(start_stage).timestamp
 
     def get_important_frame_list(self) -> typing.List[SingleClassifierResult]:
         # save the first frame
