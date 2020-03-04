@@ -70,6 +70,7 @@ stagesepx 最强大的特性是允许用户利用自己的训练集进行模型�
 - [用30行代码快速跑一个demo](example/mini.py)
 - [30行代码怎么没有注释？](example/cut_and_classify.py)
 - [我想看看实际落地方案，最好有把饭喂嘴里的例子](https://github.com/williamfzc/work_with_stagesepx)
+- [太麻烦了，有没有开箱即用、简单配置下可以落地的工具](https://github.com/williamfzc/sepmachine)
 - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
 - [官方文档](https://williamfzc.github.io/stagesepx/)
 
