@@ -90,7 +90,7 @@ class ClassifierResult(object):
     def get_stage_set(self) -> typing.Set[str]:
         return set(self.get_stage_list())
 
-    def to_dict(self) -> typing.Dict[str, typing.List[SingleClassifierResult]]:
+    def to_dict(self) -> typing.Dict[str, typing.List[typing.List[SingleClassifierResult]]]:
         stage_list = list(self.get_stage_set())
         try:
             int(stage_list[0])
