@@ -106,6 +106,8 @@ pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
 - [算出来的结果不准确 / 跟传统方式有差距](https://github.com/williamfzc/stagesepx/issues/46)
 - [出现 OutOfMemoryError](https://github.com/williamfzc/stagesepx/issues/86)
 - [工具没法满足我的业务需要](https://github.com/williamfzc/stagesepx/issues/93)
+- [为什么报告中的时间戳跟实际不一样？](https://github.com/williamfzc/stagesepx/issues/75)
+- [自定义模型的分类结果不准确，跟我提供的训练集对不上](https://github.com/williamfzc/stagesepx/issues/100)
 - ...
 
 不仅是问题，如果有任何建议与交流想法，同样可以通过 issue 面板找到我。我们每天都会查看 issue 面板，无需担心跟进不足。
