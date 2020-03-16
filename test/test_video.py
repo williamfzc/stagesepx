@@ -1,15 +1,26 @@
 from stagesepx.video import VideoObject, VideoFrame
 import os
+import pathlib
 
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
+VIDEO_PATHLIB_PATH = pathlib.Path(VIDEO_PATH)
 IMAGE_NAME = "demo.jpg"
 IMAGE_PATH = os.path.join(PROJECT_PATH, IMAGE_NAME)
 
 
 def test_read_from_file():
     v = VideoObject(VIDEO_PATH)
+    count = 0
+    for f in v:
+        assert isinstance(f, VideoFrame)
+        count += 1
+    assert count == 30
+
+
+def test_pathlib_path():
+    v = VideoObject(VIDEO_PATHLIB_PATH)
     count = 0
     for f in v:
         assert isinstance(f, VideoFrame)

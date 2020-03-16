@@ -96,7 +96,7 @@ class VideoObject(object):
             toolbox.fps_convert(fps, self.path, video_path, constants.FFMPEG)
             self.path = video_path
 
-        with toolbox.video_capture(path) as cap:
+        with toolbox.video_capture(self.path) as cap:
             self.frame_count = toolbox.get_frame_count(cap)
             self.frame_size = toolbox.get_frame_size(cap)
 
