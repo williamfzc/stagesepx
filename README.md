@@ -47,7 +47,7 @@
 
 ![accuracy.png](https://i.loli.net/2019/10/02/Cboj743UwRQmgPS.png)
 
-可以看到，与秒表的表现几乎没有差异。
+可以看到，与秒表的表现几乎没有差异。**请注意，这里的准确度指的是 stagesepx 能够精确还原视频本身的数据与表现。而对于现象（例如某某时间点出现什么状态）而言，准确度很大程度上取决于视频本身，如fps/分辨率等。关于结果不准确的问题请参考 [#46](https://github.com/williamfzc/stagesepx/issues/46) 。**
 
 ## 完整自动化支持
 
