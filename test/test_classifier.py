@@ -1,5 +1,6 @@
 from stagesepx.classifier import SSIMClassifier, SVMClassifier
 from stagesepx.classifier.keras import KerasClassifier
+from stagesepx.classifier.base import ClassifierResult
 from stagesepx.reporter import Reporter
 from stagesepx.cutter import VideoCutResult
 from stagesepx import toolbox
@@ -106,6 +107,18 @@ def test_result():
     classify_result.time_cost_between("0", "1")
     assert classify_result.first("1").frame_id == 20
     assert classify_result.last("1").frame_id == 21
+
+
+def test_dump_and_load():
+    cl = SVMClassifier()
+    cl.load_model(MODEL_PATH)
+    classify_result = cl.classify(VIDEO_PATH)
+
+    json_path = "classify_result.json"
+    classify_result.dump(json_path)
+
+    res_from_file = ClassifierResult.load(json_path)
+    assert classify_result.dumps() == res_from_file.dumps()
 
 
 def test_keras():
