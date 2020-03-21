@@ -26,6 +26,15 @@ def get_template() -> str:
 
 
 class Reporter(object):
+    # 3 status:
+    # - `stable` means nothing happened (nearly) during this period
+    # - `unstable` means something happened
+    # - `unspecific` means your model has no idea about `which class this frame should be` (lower than threshold)
+    LABEL_STABLE: str = "stable"
+    LABEL_UNSTABLE: str = "unstable"
+    # unknown stage actually
+    LABEL_UNSPECIFIC: str = "unspecific"
+
     def __init__(self):
         self.thumbnail_list: typing.List[typing.Tuple[str, str]] = list()
         self.extra_dict: typing.Dict[str, str] = dict()
@@ -214,12 +223,16 @@ class Reporter(object):
             each = stage_range[cur_index]
             middle = each[len(each) // 2]
             if middle.is_stable():
-                label = "stable"
+                label = self.LABEL_STABLE
                 frame = toolbox.compress_frame(
                     middle.get_data(), compress_rate=compress_rate
                 )
             else:
-                label = "unstable"
+                # todo: looks not good enough. `unspecific` looks a little weird but I have no idea now
+                if middle.stage == constants.UNKNOWN_STAGE_FLAG:
+                    label = self.LABEL_UNSPECIFIC
+                else:
+                    label = self.LABEL_UNSTABLE
                 # add a frame
                 if cur_index + 1 < len(stage_range):
                     new_each = [*each, stage_range[cur_index + 1][0]]
