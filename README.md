@@ -120,6 +120,8 @@ pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
 
 ## 参与项目
 
+### 规划
+
 项目发展至今，基础需求已经逐步进入稳定与可用阶段。接下来的工作主要分为下面几个部分：
 
 - 更好的业务落地方案
@@ -139,6 +141,14 @@ pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
 
 - 邮箱：`fengzc@vip.qq.com`
 - QQ：`178894043`
+
+### 贡献代码
+
+欢迎感兴趣的同学为这个项目添砖加瓦，三个必备步骤：
+
+- （小修改可忽略）请在开始编码前留个 issue 告知你想完成的功能，因为可能这个功能已经在开发中或者已有；
+- commit规范我们严格遵守 [约定式提交](https://www.conventionalcommits.org/zh-hans/)；
+- 该repo有较为完善的单测与CI以保障整个项目的质量，在过去的迭代中发挥了巨大的作用。所以请为你新增的代码同步新增单元测试（具体写法请参考 tests 中的已有用例）。
 
 ## License
 
