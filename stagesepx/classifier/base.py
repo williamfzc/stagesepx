@@ -1,6 +1,8 @@
 import pathlib
 import typing
 from collections import OrderedDict
+import os
+import json
 import cv2
 import time
 import numpy as np
@@ -237,6 +239,29 @@ class ClassifierResult(object):
             else:
                 i += 1
         return cost_dict
+
+    def dumps(self) -> str:
+        # for np.ndarray
+        def _handler(obj: object):
+            if isinstance(obj, np.ndarray):
+                # ignore
+                return "<np.ndarray object>"
+            return obj.__dict__
+
+        return json.dumps(self, sort_keys=True, default=_handler)
+
+    def dump(self, json_path: str, **kwargs):
+        logger.debug(f"dump result to {json_path}")
+        assert not os.path.exists(json_path), f"{json_path} already existed"
+        with open(json_path, "w+", **kwargs) as f:
+            f.write(self.dumps())
+
+    @classmethod
+    def load(cls, from_file: str) -> "ClassifierResult":
+        assert os.path.isfile(from_file), f"file {from_file} not existed"
+        with open(from_file, encoding=constants.CHARSET) as f:
+            content = json.load(f)
+        return ClassifierResult([SingleClassifierResult(**each) for each in content])
 
 
 class BaseClassifier(object):
