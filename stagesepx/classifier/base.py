@@ -256,6 +256,13 @@ class ClassifierResult(object):
         with open(json_path, "w+", **kwargs) as f:
             f.write(self.dumps())
 
+    @classmethod
+    def load(cls, from_file: str) -> "ClassifierResult":
+        assert os.path.isfile(from_file), f"file {from_file} not existed"
+        with open(from_file, encoding=constants.CHARSET) as f:
+            content = json.load(f)
+        return ClassifierResult([SingleClassifierResult(**each) for each in content])
+
 
 class BaseClassifier(object):
     def __init__(
