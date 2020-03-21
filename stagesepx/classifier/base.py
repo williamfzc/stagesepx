@@ -72,6 +72,9 @@ class SingleClassifierResult(object):
 
 
 class ClassifierResult(object):
+    LABEL_DATA: str = "data"
+    LABEL_VIDEO_PATH: str = "video_path"
+
     def __init__(self, data: typing.List[SingleClassifierResult]):
         self.video_path: str = data[0].video_path
         self.data: typing.List[SingleClassifierResult] = data
@@ -252,7 +255,7 @@ class ClassifierResult(object):
 
     def dump(self, json_path: str, **kwargs):
         logger.debug(f"dump result to {json_path}")
-        assert not os.path.exists(json_path), f"{json_path} already existed"
+        assert not os.path.isfile(json_path), f"{json_path} already existed"
         with open(json_path, "w+", **kwargs) as f:
             f.write(self.dumps())
 
@@ -261,7 +264,9 @@ class ClassifierResult(object):
         assert os.path.isfile(from_file), f"file {from_file} not existed"
         with open(from_file, encoding=constants.CHARSET) as f:
             content = json.load(f)
-        return ClassifierResult([SingleClassifierResult(**each) for each in content])
+
+        data = content[cls.LABEL_DATA]
+        return ClassifierResult([SingleClassifierResult(**each) for each in data])
 
 
 class BaseClassifier(object):
