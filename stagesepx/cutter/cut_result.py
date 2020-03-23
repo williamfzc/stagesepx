@@ -238,6 +238,39 @@ class VideoCutResult(object):
         """ return stable range only """
         return self.get_range(limit, **kwargs)[0]
 
+    def get_range_dynamic(
+        self,
+        stable_num_limit: typing.List[int],
+        threshold: float,
+        step: float = 0.005,
+        max_retry: int = 10,
+        **kwargs,
+    ) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
+        """ this method was designed for supporting flexible threshold range """
+        assert max_retry != 0, f"fail to get range dynamically: {stable_num_limit}"
+        assert len(stable_num_limit) == 2, "num_limit should be something like [1, 3]"
+        assert 0.0 < threshold < 1.0, "threshold out of range"
+
+        stable, unstable = self.get_range(threshold=threshold, **kwargs)
+        cur_num = len(stable)
+        logger.debug(f"current stable range is {cur_num}")
+        if stable_num_limit[0] <= cur_num <= stable_num_limit[1]:
+            logger.debug(f"range num is fine")
+            return stable, unstable
+
+        # too fewer stages
+        if cur_num < stable_num_limit[0]:
+            logger.debug("too fewer stages")
+            threshold += step
+        # too many
+        elif cur_num > stable_num_limit[1]:
+            logger.debug("too many stages")
+            threshold -= step
+
+        return self.get_range_dynamic(
+            stable_num_limit, threshold=threshold, max_retry=max_retry - 1, **kwargs,
+        )
+
     def thumbnail(
         self,
         target_range: VideoCutRange,

@@ -93,3 +93,6 @@ def test_cut_result():
     assert isinstance(res.thumbnail(stable[0]), np.ndarray)
     assert isinstance(res.thumbnail(stable[0], is_vertical=True), np.ndarray)
     assert isinstance(res.thumbnail(stable[0], to_dir="somewhere"), np.ndarray)
+
+    res.get_range_dynamic([4, 5], threshold=0.95)
+    res.get_range_dynamic([1, 2], threshold=0.85)
