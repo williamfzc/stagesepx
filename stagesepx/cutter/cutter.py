@@ -67,41 +67,50 @@ class VideoCutter(object):
         return frame
 
     def _convert_video_into_range_list(
-        self, video: VideoObject, block: int = None, *args, **kwargs
+        self, video: VideoObject, block: int, window_size: int, window_coefficient: int
     ) -> typing.List[VideoCutRange]:
 
-        range_list: typing.List[VideoCutRange] = list()
-        logger.info(f"total frame count: {video.frame_count}, size: {video.frame_size}")
+        step = self.step
+        video_length = video.frame_count
 
-        # load the first two frames
-        video_operator = video.get_operator()
-        cur_frame = video_operator.get_frame_by_id(1)
-        next_frame = video_operator.get_frame_by_id(1 + self.step)
+        class _Window(object):
+            def __init__(self):
+                self.start = 1
+                self.size = window_size
+                self.end = self.start + window_size * step
 
-        # hook
-        cur_frame = self._apply_hook(cur_frame)
+            def load_data(self) -> typing.List[VideoFrame]:
+                cur = self.start
+                result = []
+                video_operator = video.get_operator()
+                while cur <= self.end:
+                    frame = video_operator.get_frame_by_id(cur)
+                    result.append(frame)
+                    cur += step
+                return result
 
-        # check block
-        if not block:
-            block = 3
+            def shift(self) -> bool:
+                logger.debug(f"window before: {self.start}, {self.end}")
+                self.start += step
+                self.end += step
+                if self.start >= video_length:
+                    # out of range
+                    return False
+                # window end
+                if self.end >= video_length:
+                    self.end = video_length
+                logger.debug(f"window after: {self.start}, {self.end}")
+                return True
 
-        while True:
-            # hook
-            next_frame = self._apply_hook(next_frame, *args, **kwargs)
-
-            logger.debug(
-                f"computing {cur_frame.frame_id}({cur_frame.timestamp}) & {next_frame.frame_id}({next_frame.timestamp}) ..."
-            )
-            start_part_list = self.pic_split(cur_frame.data, block)
-            end_part_list = self.pic_split(next_frame.data, block)
-
+        def _compare_frame_list(
+            src: typing.List[np.ndarray], target: typing.List[np.ndarray]
+        ) -> typing.List[float]:
             # find the min ssim and the max mse / psnr
             ssim = 1.0
             mse = 0.0
             psnr = 0.0
-            for part_index, (each_start, each_end) in enumerate(
-                zip(start_part_list, end_part_list)
-            ):
+
+            for part_index, (each_start, each_end) in enumerate(zip(src, target)):
                 part_ssim = toolbox.compare_ssim(each_start, each_end)
                 if part_ssim < ssim:
                     ssim = part_ssim
@@ -117,41 +126,95 @@ class VideoCutter(object):
                 logger.debug(
                     f"part {part_index}: ssim={part_ssim}; mse={part_mse}; psnr={part_psnr}"
                 )
-            logger.debug(
-                f"between {cur_frame.frame_id} & {next_frame.frame_id}: ssim={ssim}; mse={mse}; psnr={psnr}"
-            )
+            return [ssim, mse, psnr]
+
+        def _float_merge(float_list: typing.List[float]) -> float:
+            # the first, the largest.
+            length = len(float_list)
+            result = 0.0
+            denominator = 0.0
+            for i, each in enumerate(float_list):
+                weight = pow(length - i, window_coefficient)
+                denominator += weight
+                result += each * weight
+                logger.debug(f"calc: {each} x {weight}")
+            final = result / denominator
+            logger.debug(f"calc final: {final} from {result} / {denominator}")
+            return final
+
+        range_list: typing.List[VideoCutRange] = list()
+        logger.info(f"total frame count: {video_length}, size: {video.frame_size}")
+
+        window = _Window()
+        while True:
+            frame_list = window.load_data()
+            frame_list = [self._apply_hook(each) for each in frame_list]
+
+            # window loop
+            ssim_list = []
+            mse_list = []
+            psnr_list = []
+
+            cur_frame = frame_list[0]
+            first_target_frame = frame_list[1]
+            cur_frame_list = self.pic_split(cur_frame.data, block)
+            for each in frame_list[1:]:
+                each_frame_list = self.pic_split(each.data, block)
+                ssim, mse, psnr = _compare_frame_list(cur_frame_list, each_frame_list)
+                ssim_list.append(ssim)
+                mse_list.append(mse)
+                psnr_list.append(psnr)
+                logger.debug(
+                    f"between {cur_frame.frame_id} & {each.frame_id}: ssim={ssim}; mse={mse}; psnr={psnr}"
+                )
+            ssim = _float_merge(ssim_list)
+            mse = _float_merge(mse_list)
+            psnr = _float_merge(psnr_list)
 
             range_list.append(
                 VideoCutRange(
                     video,
                     start=cur_frame.frame_id,
-                    end=next_frame.frame_id,
+                    end=first_target_frame.frame_id,
                     ssim=[ssim],
                     mse=[mse],
                     psnr=[psnr],
                     start_time=cur_frame.timestamp,
-                    end_time=next_frame.timestamp,
+                    end_time=first_target_frame.timestamp,
                 )
             )
-
-            # load the next one
-            cur_frame = next_frame
-            next_frame = video_operator.get_frame_by_id(next_frame.frame_id + self.step)
-            if next_frame is None:
+            continue_flag = window.shift()
+            if not continue_flag:
                 break
 
         return range_list
 
     def cut(
-        self, video: typing.Union[str, VideoObject], *args, **kwargs
+        self,
+        video: typing.Union[str, VideoObject],
+        block: int = None,
+        window_size: int = None,
+        window_coefficient: int = None,
+        *_,
+        **kwargs,
     ) -> VideoCutResult:
         """
         convert video file, into a VideoCutResult
 
         :param video: video file path or VideoObject
-        :param kwargs: parameters of toolbox.compress_frame can be used here
+        :param block: default to 3. when block == 3, frame will be split into 3 * 3 = 9 parts
+        :param window_size:
+        :param window_coefficient:
         :return:
         """
+        # args
+        if not block:
+            block = 3
+        if not window_size:
+            window_size = 1
+        if not window_coefficient:
+            window_coefficient = 2
+
         start_time = time.time()
         if isinstance(video, str):
             video = VideoObject(video)
@@ -161,7 +224,9 @@ class VideoCutter(object):
         # if video contains 100 frames
         # it starts from 1, and length of list is 99, not 100
         # [Range(1-2), Range(2-3), Range(3-4) ... Range(99-100)]
-        range_list = self._convert_video_into_range_list(video, *args, **kwargs)
+        range_list = self._convert_video_into_range_list(
+            video, block, window_size, window_coefficient
+        )
         logger.info(f"cut finished: {video}")
         end_time = time.time()
         logger.debug(f"cutter cost: {end_time - start_time}")

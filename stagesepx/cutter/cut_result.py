@@ -268,7 +268,7 @@ class VideoCutResult(object):
             threshold -= step
 
         return self.get_range_dynamic(
-            stable_num_limit, threshold=threshold, max_retry=max_retry - 1, **kwargs,
+            stable_num_limit, threshold=threshold, max_retry=max_retry - 1, **kwargs
         )
 
     def thumbnail(
