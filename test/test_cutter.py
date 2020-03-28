@@ -48,7 +48,7 @@ def test_step():
     res = cutter.cut(VIDEO_PATH)
     stable, unstable = res.get_range()
     # when limit=3, final stage should be ignored.
-    assert len(stable) == 1, "count of stable range is not correct"
+    assert len(stable) == 2, "count of stable range is not correct"
 
 
 def test_dump_and_load():
@@ -96,3 +96,10 @@ def test_cut_result():
 
     res.get_range_dynamic([4, 5], threshold=0.95)
     res.get_range_dynamic([1, 2], threshold=0.85)
+
+
+def test_window():
+    cutter = VideoCutter()
+    v = VideoObject(VIDEO_PATH)
+    res = cutter.cut(v, window_size=2, window_coefficient=2)
+    assert res
