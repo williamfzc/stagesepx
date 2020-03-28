@@ -87,6 +87,10 @@ class VideoCutter(object):
                     frame = video_operator.get_frame_by_id(cur)
                     result.append(frame)
                     cur += step
+                # at least 2
+                if len(result) < 2:
+                    last = video_operator.get_frame_by_id(self.end)
+                    result.append(last)
                 return result
 
             def shift(self) -> bool:
