@@ -54,13 +54,28 @@
 如果比起报告，更希望亲自处理原始数据，进而进行二次开发，你可以直接将 report 部分去除。如此做，你将得到一个 python 对象供你随意使用。它提供了大量的API，例如转换成字典：
 
 ```text
-OrderedDict([('-3',
-              [<ClassifierResult stage=-3 frame_id=63 timestamp=1.062857142857143>,
-               <ClassifierResult stage=-3 frame_id=64 timestamp=1.0797278911564627>,
-               ...
-             ('0',
-              [<ClassifierResult stage=0 frame_id=1 timestamp=0.01687074829931973>,
-               ...
+{
+	"data": [{
+		"data": null,
+		"frame_id": 1,
+		"stage": "0",
+		"timestamp": 0.0,
+		"video_path": "../demo.mp4"
+	}, {
+		"data": null,
+		"frame_id": 2,
+		"stage": "0",
+		"timestamp": 0.04,
+		"video_path": "../demo.mp4"
+	}, {
+		"data": null,
+		"frame_id": 3,
+		"stage": "0",
+		"timestamp": 0.08,
+		"video_path": "../demo.mp4"
+	}, {
+	
+  ...
 ```
 
 从这个字典中我们可以知道，每一帧分别对应的：
