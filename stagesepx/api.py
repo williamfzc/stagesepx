@@ -3,6 +3,8 @@ high level API
 """
 import os
 import typing
+import uuid
+from loguru import logger
 
 from stagesepx.cutter import VideoCutResult, VideoCutRange, VideoCutter
 from stagesepx.classifier import SVMClassifier, ClassifierResult
@@ -199,4 +201,10 @@ def keras_train(
         **kwargs,
     )
     cl.train(train_data_path)
+
+    # file existed
+    while os.path.isfile(model_path):
+        logger.warning(f"file {model_path} already existed")
+        model_path = f"{uuid.uuid4()}.h5"
+        logger.debug(f"trying to save it to {model_path}")
     cl.save_model(model_path, overwrite=overwrite)
