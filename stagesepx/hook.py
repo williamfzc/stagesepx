@@ -168,9 +168,12 @@ class CropHook(_AreaBaseHook):
         super().do(frame, *_, **__)
 
         height_range, width_range = self.convert_size_and_offset(*frame.data.shape)
-        frame.data = frame.data[
-            height_range[0] : height_range[1], width_range[0] : width_range[1]
-        ]
+        # ignore the rest of this frame
+        # same as IgnoreHook
+        frame.data[: height_range[0]] = 0
+        frame.data[height_range[1] :] = 0
+        frame.data[: width_range[0]] = 0
+        frame.data[width_range[1] :] = 0
         return frame
 
 
