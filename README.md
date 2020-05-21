@@ -21,6 +21,10 @@
 
 ---
 
+> 2020/05/21：目前，该项目已经达到一个较为稳定的状态，并顺利在多家头部公司、团队落地，作为正式工具存在。Bug跟踪与建议请优先通过 [issue](https://github.com/williamfzc/stagesepx/issues) 联系我，感谢所有支持过这个项目的人：）
+
+---
+
 > [English README here](./README_en.md)
 
 这段视频展示了一个应用的完整启动过程：
