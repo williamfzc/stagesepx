@@ -132,3 +132,10 @@ def test_keras():
     stable, _ = cutter_res.get_range()
     classify_result = cl.classify(VIDEO_PATH, stable, keep_data=True)
     assert classify_result.to_dict()
+
+
+def test_boost():
+    cl = SVMClassifier()
+    cl.load_model(MODEL_PATH)
+    classify_result = cl.classify(VIDEO_PATH, boost_mode=True)
+    assert classify_result

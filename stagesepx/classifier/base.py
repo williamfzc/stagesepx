@@ -387,6 +387,7 @@ class BaseClassifier(object):
         limit_range: typing.List[VideoCutRange] = None,
         step: int = None,
         keep_data: bool = None,
+        boost_mode: bool = None,
         *args,
         **kwargs,
     ) -> ClassifierResult:
@@ -397,6 +398,7 @@ class BaseClassifier(object):
         :param limit_range: frames out of these ranges will be ignored
         :param step: step between frames, default to 1
         :param keep_data: default to False. if enabled, all the frames will contain numpy data.
+        :param boost_mode:
         :param args:
         :param kwargs:
         :return:
@@ -413,6 +415,8 @@ class BaseClassifier(object):
 
         operator = video.get_operator()
         frame = operator.get_frame_by_id(1)
+        # for boost
+        prev_result: typing.Optional[str] = None
         while frame is not None:
             # hook
             frame = self._apply_hook(frame, *args, **kwargs)
@@ -424,22 +428,20 @@ class BaseClassifier(object):
                 logger.debug(
                     f"frame {frame.frame_id} ({frame.timestamp}) not in target range, skip"
                 )
-                final_result.append(
-                    SingleClassifierResult(
-                        video.path,
-                        frame.frame_id,
-                        frame.timestamp,
-                        constants.IGNORE_FLAG,
-                        frame.data if keep_data else None,
-                    )
+                result = constants.IGNORE_FLAG
+                # is changing
+                prev_result = None
+            else:
+                # is continuous?
+                if boost_mode and (prev_result is not None):
+                    # do not classify again
+                    result = prev_result
+                # else, do the real job
+                else:
+                    prev_result = result = self._classify_frame(frame, *args, **kwargs)
+                logger.debug(
+                    f"frame {frame.frame_id} ({frame.timestamp}) belongs to {result}"
                 )
-                frame = operator.get_frame_by_id(frame.frame_id + step)
-                continue
-
-            result = self._classify_frame(frame, *args, **kwargs)
-            logger.debug(
-                f"frame {frame.frame_id} ({frame.timestamp}) belongs to {result}"
-            )
 
             final_result.append(
                 SingleClassifierResult(
