@@ -4,6 +4,7 @@ high level API
 import os
 import typing
 import uuid
+import tempfile
 from loguru import logger
 
 from stagesepx.cutter import VideoCutResult, VideoCutRange, VideoCutter
@@ -208,3 +209,40 @@ def keras_train(
         model_path = f"{uuid.uuid4()}.h5"
         logger.debug(f"trying to save it to {model_path}")
     cl.save_model(model_path, overwrite=overwrite)
+
+
+def analyse(
+    video: typing.Union[str, VideoObject],
+    output_path: str,
+    pre_load: bool = True,
+    threshold: float = 0.98,
+    offset: int = 3,
+    boost_mode: bool = True,
+):
+    """ designed for https://github.com/williamfzc/stagesepx/issues/123 """
+
+    if isinstance(video, str):
+        video = VideoObject(video, pre_load=pre_load)
+
+    cutter = VideoCutter()
+    res = cutter.cut(video)
+
+    stable, unstable = res.get_range(threshold=threshold, offset=offset,)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        res.pick_and_save(
+            stable, 5, to_dir=temp_dir,
+        )
+
+        cl = SVMClassifier()
+        cl.load(temp_dir)
+        cl.train()
+        classify_result = cl.classify(video, stable, boost_mode=boost_mode)
+
+    r = Reporter()
+    r.draw(
+        classify_result,
+        report_path=output_path,
+        unstable_ranges=unstable,
+        cut_result=res,
+    )

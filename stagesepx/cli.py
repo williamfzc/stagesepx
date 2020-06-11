@@ -17,6 +17,7 @@ class TerminalCli(object):
     # or, some translations, default value, and so on
     one_step = staticmethod(api.one_step)
     train = staticmethod(api.keras_train)
+    analyse = staticmethod(api.analyse)
 
 
 def main():
