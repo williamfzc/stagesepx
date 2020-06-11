@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 2
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
       - uses: actions/checkout@v1
@@ -46,6 +46,7 @@ jobs:
           cd example
           python cut_and_classify.py
           python mini.py
+          python stable.py
           cd ..
       - name: Test Cli
         run: |
