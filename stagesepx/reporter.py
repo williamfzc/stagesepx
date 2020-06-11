@@ -276,9 +276,17 @@ class Reporter(object):
             version_code=__VERSION__,
         )
 
-        # save to file
+        # no input
         if not report_path:
-            report_path = f"{timestamp}.html"
+            report_path = timestamp
+        # user input is a directory
+        elif os.path.isdir(report_path):
+            report_path = os.path.join(report_path, timestamp)
+        report_path += ".html"
+        # check (nearly impossible but for safety
+        assert not os.path.isfile(report_path), f"{report_path} already existed"
+
+        # write file
         with open(report_path, "w", encoding=constants.CHARSET) as fh:
             fh.write(template_content)
         logger.info(f"save report to {report_path}")
