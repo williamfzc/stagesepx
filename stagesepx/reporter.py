@@ -277,14 +277,16 @@ class Reporter(object):
         )
 
         # no input
+        html_suffix = ".html"
         if not report_path:
             report_path = timestamp
         # user input is a directory
         elif os.path.isdir(report_path):
             report_path = os.path.join(report_path, timestamp)
-        report_path += ".html"
-        # check (nearly impossible but for safety
-        assert not os.path.isfile(report_path), f"{report_path} already existed"
+        # user input does not end with .html
+        elif not report_path.endswith(html_suffix):
+            report_path += html_suffix
+        logger.debug(f"trying to save report to {report_path}")
 
         # write file
         with open(report_path, "w", encoding=constants.CHARSET) as fh:
