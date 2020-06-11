@@ -51,7 +51,7 @@
 
 ![accuracy.png](https://i.loli.net/2019/10/02/Cboj743UwRQmgPS.png)
 
-可以看到，与秒表的表现几乎没有差异。**请注意，这里的准确度指的是 stagesepx 能够精确还原视频本身的数据与表现。而对于现象（例如某某时间点出现什么状态）而言，准确度很大程度上取决于视频本身，如fps/分辨率等。关于结果不准确的问题请参考 [#46](https://github.com/williamfzc/stagesepx/issues/46) 。**
+可以看到，与秒表的表现几乎没有差异。**请注意，这里的准确度指的是 stagesepx 能够精确还原视频本身的数据与表现。而对于现象（例如某某时间点出现什么状态）而言，准确度很大程度上取决于视频本身，如fps/分辨率等。**
 
 ## 彻底解耦 & 可编程
 
@@ -113,7 +113,27 @@
 
 ## 快速开始
 
-> 完整的落地例子另外单独开了一个 repo 存放，[传送门](https://github.com/williamfzc/work_with_stagesepx)
+### 命令行
+
+你可以直接通过命令行使用，而无需编写脚本：
+
+```bash
+stagesepx analyse your_video.mp4 report.html
+```
+
+基于此，你可以非常方便地利用 shell 建立工作流。以 android 为例：
+
+```bash
+adb shell screenrecord --time-limit 10 /sdcard/demo.mp4
+adb pull /sdcard/demo.mp4 .
+stagesepx analyse demo.mp4 report.html
+```
+
+关于结果不准确的问题请参考 [#46](https://github.com/williamfzc/stagesepx/issues/46)。
+
+### 正式使用
+
+> 在正式落地时，推荐使用 完整的python脚本 而不是命令行，以保证更高的可编程性。完整的落地例子另外单独开了一个 repo 存放，[传送门](https://github.com/williamfzc/work_with_stagesepx)。
 
 - [用30行代码快速跑一个demo](example/mini.py)
 - [30行代码怎么没有注释](example/stable.py)
