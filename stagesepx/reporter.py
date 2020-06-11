@@ -276,16 +276,14 @@ class Reporter(object):
             version_code=__VERSION__,
         )
 
-        # no input
-        html_suffix = ".html"
+        # default: write to current dir
+        default_name = f"{timestamp}.html"
         if not report_path:
-            report_path = timestamp
-        # user input is a directory
+            report_path = default_name
+        # somewhere specific
+        # existed dir?
         elif os.path.isdir(report_path):
-            report_path = os.path.join(report_path, timestamp)
-        # user input does not end with .html
-        elif not report_path.endswith(html_suffix):
-            report_path += html_suffix
+            report_path = os.path.join(report_path, default_name)
         logger.debug(f"trying to save report to {report_path}")
 
         # write file

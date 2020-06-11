@@ -96,7 +96,7 @@ class ClassifierResult(object):
         return set(self.get_stage_list())
 
     def to_dict(
-        self
+        self,
     ) -> typing.Dict[str, typing.List[typing.List[SingleClassifierResult]]]:
         stage_list = list(self.get_stage_set())
         try:
@@ -182,7 +182,7 @@ class ClassifierResult(object):
         return ret
 
     def get_not_stable_stage_range(
-        self
+        self,
     ) -> typing.List[typing.List[SingleClassifierResult]]:
         unstable = self.get_specific_stage_range(constants.UNSTABLE_FLAG)
         ignore = self.get_specific_stage_range(constants.IGNORE_FLAG)

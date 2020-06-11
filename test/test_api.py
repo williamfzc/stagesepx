@@ -35,9 +35,7 @@ def test_cut_and_classify():
         cut_result=res,
     )
     r.draw(
-        classify_result_1,
-        report_path=os.path.join(data_home, report_name),
-        cut_result=res,
+        classify_result_1, report_path=data_home, cut_result=res,
     )
 
 
