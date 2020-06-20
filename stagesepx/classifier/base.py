@@ -418,9 +418,6 @@ class BaseClassifier(object):
         # for boost
         prev_result: typing.Optional[str] = None
         while frame is not None:
-            # hook
-            frame = self._apply_hook(frame, *args, **kwargs)
-
             # ignore some ranges
             if limit_range and not any(
                 [each.contain(frame.frame_id) for each in limit_range]
@@ -438,6 +435,8 @@ class BaseClassifier(object):
                     result = prev_result
                 # else, do the real job
                 else:
+                    # hook
+                    frame = self._apply_hook(frame, *args, **kwargs)
                     prev_result = result = self._classify_frame(frame, *args, **kwargs)
                 logger.debug(
                     f"frame {frame.frame_id} ({frame.timestamp}) belongs to {result}"
