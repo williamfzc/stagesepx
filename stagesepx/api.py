@@ -17,7 +17,7 @@ from stagesepx.video import VideoObject
 def one_step(
     video: typing.Union[str, VideoObject],
     output_path: str = None,
-    threshold: float = 0.95,
+    threshold: float = constants.DEFAULT_THRESHOLD,
     frame_count: int = 5,
     compress_rate: float = 0.2,
     target_size: typing.Tuple[int, int] = None,
@@ -29,7 +29,7 @@ def one_step(
 
     :param video: video path or object
     :param output_path: output path (dir)
-    :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
+    :param threshold: float, 0-1, default to 0.98. decided whether a range is stable. larger => more unstable ranges
     :param frame_count: default to 5, and finally you will get 5 frames for each range
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
     :param target_size: (100, 200)
@@ -83,7 +83,7 @@ def one_step(
 def _cut(
     video: typing.Union[str, VideoObject],
     output_path: str = None,
-    threshold: float = 0.95,
+    threshold: float = constants.DEFAULT_THRESHOLD,
     frame_count: int = 5,
     compress_rate: float = 0.2,
     target_size: typing.Tuple[int, int] = None,
@@ -95,7 +95,7 @@ def _cut(
 
     :param video: video path or object
     :param output_path: output path (dir)
-    :param threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
+    :param threshold: float, 0-1, default to 0.98. decided whether a range is stable. larger => more unstable ranges
     :param frame_count: default to 5, and finally you will get 5 frames for each range
     :param compress_rate: before_pic * compress_rate = after_pic. default to 0.2
     :param target_size: (100, 200)

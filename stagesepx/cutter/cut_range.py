@@ -4,6 +4,7 @@ import numpy as np
 from loguru import logger
 
 from stagesepx import toolbox
+from stagesepx import constants
 from stagesepx.video import VideoObject, VideoFrame
 
 
@@ -132,7 +133,7 @@ class VideoCutRange(object):
         # IMPORTANT function!
         # it decided whether a range is stable => everything is based on it!
         if not threshold:
-            threshold = 0.98
+            threshold = constants.DEFAULT_THRESHOLD
 
         # ssim
         res = np.mean(self.ssim) > threshold
@@ -144,7 +145,7 @@ class VideoCutRange(object):
 
     def is_loop(self, threshold: float = None, **_) -> bool:
         if not threshold:
-            threshold = 0.95
+            threshold = constants.DEFAULT_THRESHOLD
         operator = self.video.get_operator()
         start_frame = operator.get_frame_by_id(self.start)
         end_frame = operator.get_frame_by_id(self.end)

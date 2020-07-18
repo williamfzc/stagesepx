@@ -96,7 +96,7 @@ class VideoCutResult(object):
         :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
         :param unstable_limit: ignore some ranges which are too short, 5 means ignore unstable ranges which length < 5
         :param kwargs:
-            threshold: float, 0-1, default to 0.95. decided whether a range is stable. larger => more unstable ranges
+            threshold: float, 0-1, default to 0.98. decided whether a range is stable. larger => more unstable ranges
             range_threshold:
                 same as threshold, but it decided whether a merged range is stable.
                 see https://github.com/williamfzc/stagesepx/issues/17 for details

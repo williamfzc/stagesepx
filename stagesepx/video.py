@@ -79,7 +79,7 @@ class FileFrameOperator(_BaseFrameOperator):
 class VideoObject(object):
     def __init__(
         self,
-        path: typing.Union[bytes, str, os.PathLike],
+        path: typing.Union[str, os.PathLike],
         pre_load: bool = None,
         fps: int = None,
         *_,

@@ -11,5 +11,8 @@ UNSTABLE_FLAG = r"-1"
 UNKNOWN_STAGE_FLAG = r"-2"
 IGNORE_FLAG = r"-3"
 
+# config
+DEFAULT_THRESHOLD = 0.98
+
 # ext
 FFMPEG = r"ffmpeg"
