@@ -1,4 +1,5 @@
 from stagesepx.video import VideoObject, VideoFrame
+from stagesepx.hook import ExampleHook
 import os
 import pathlib
 
@@ -65,3 +66,10 @@ def test_contain_image():
     v.load_frames()
     ret = v.data[0].contain_image(image_path=IMAGE_PATH)
     assert ret["ok"]
+
+
+def test_preload_with_hook():
+    v = VideoObject(VIDEO_PATH)
+    hook = ExampleHook()
+    v.add_preload_hook(hook)
+    v.load_frames()

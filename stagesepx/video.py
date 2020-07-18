@@ -8,6 +8,9 @@ import tempfile
 from stagesepx import toolbox
 from stagesepx import constants
 
+if typing.TYPE_CHECKING:
+    from stagesepx.hook import BaseHook
+
 
 class VideoFrame(object):
     def __init__(self, frame_id: int, timestamp: float, data: np.ndarray):
@@ -88,6 +91,7 @@ class VideoObject(object):
         assert os.path.isfile(path), f"video [{path}] not existed"
         self.path: str = str(path)
         self.data: typing.Optional[typing.Tuple[VideoFrame]] = tuple()
+        self._hook_list: typing.List["BaseHook"] = []
 
         self.fps: int = fps
         if fps:
@@ -108,19 +112,27 @@ class VideoObject(object):
 
     __repr__ = __str__
 
+    def add_preload_hook(self, new_hook: "BaseHook"):
+        """ this hook only will be executed when preload """
+        self._hook_list.append(new_hook)
+
     def clean_frames(self):
         self.data = tuple()
 
-    def load_frames(self):
-        # TODO full frames list can be very huge, for some devices
+    def load_frames(self, *args, **kwargs):
         logger.info(f"start loading {self.path} to memory ...")
 
         data: typing.List[VideoFrame] = []
         with toolbox.video_capture(self.path) as cap:
+            # the first
             success, frame = cap.read()
             while success:
                 frame_object = VideoFrame.init(cap, frame)
+                # apply hooks
+                for each_hook in self._hook_list:
+                    frame_object = each_hook.do(frame_object, *args, **kwargs)
                 data.append(frame_object)
+                # read the next one
                 success, frame = cap.read()
 
         # calculate memory cost
