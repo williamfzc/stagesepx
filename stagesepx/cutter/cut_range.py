@@ -1,9 +1,7 @@
-import os
 import typing
 import random
 import numpy as np
 from loguru import logger
-from findit import FindIt
 
 from stagesepx import toolbox
 from stagesepx.video import VideoObject, VideoFrame
