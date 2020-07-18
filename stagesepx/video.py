@@ -106,6 +106,9 @@ class VideoObject(object):
 
         if pre_load:
             self.load_frames()
+        logger.info(
+            f"video object generated, length: {self.frame_count}, size: {self.frame_size}"
+        )
 
     def __str__(self):
         return f"<VideoObject path={self.path}>"
@@ -140,14 +143,16 @@ class VideoObject(object):
         logger.debug(f"single frame cost: {each_cost} bytes")
         total_cost = each_cost * self.frame_count
         logger.debug(f"total frame cost: {total_cost} bytes")
-        logger.info(
-            f"frames loaded. frame count: {self.frame_count}. memory cost: {total_cost} bytes"
-        )
 
         # lock the order
         self.data = tuple(data)
         # fix the length ( the last frame may be broken sometimes )
         self.frame_count = len(data)
+        # and size
+        self.frame_size = data[0].data.shape
+        logger.info(
+            f"frames loaded. frame count: {self.frame_count}, size: {self.frame_size}, memory cost: {total_cost} bytes"
+        )
 
     def _read_from_file(self) -> typing.Generator[VideoFrame, None, None]:
         with toolbox.video_capture(self.path) as cap:
