@@ -148,8 +148,8 @@ class VideoObject(object):
         self.data = tuple(data)
         # fix the length ( the last frame may be broken sometimes )
         self.frame_count = len(data)
-        # and size
-        self.frame_size = data[0].data.shape
+        # and size (reversed, see: https://github.com/williamfzc/stagesepx/issues/132)
+        self.frame_size = data[0].data.shape[::-1]
         logger.info(
             f"frames loaded. frame count: {self.frame_count}, size: {self.frame_size}, memory cost: {total_cost} bytes"
         )
