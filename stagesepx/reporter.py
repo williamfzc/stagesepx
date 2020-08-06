@@ -179,6 +179,7 @@ class Reporter(object):
         unstable_ranges: typing.List[VideoCutRange] = None,
         cut_result: VideoCutResult = None,
         compress_rate: float = None,
+        target_size: typing.Tuple[int, int] = None,
         *_,
         **__,
     ):
@@ -190,6 +191,7 @@ class Reporter(object):
         :param unstable_ranges: for marking unstable ranges
         :param cut_result: more charts would be built
         :param compress_rate:
+        :param target_size:
         :return:
         """
         # default: compress_rate
@@ -214,40 +216,48 @@ class Reporter(object):
             page.add(sim_line)
 
         # mark range
-        for each in unstable_ranges:
-            classifier_result.mark_range_unstable(each.start, each.end)
+        for each_range in unstable_ranges:
+            classifier_result.mark_range_unstable(each_range.start, each_range.end)
 
         offset = classifier_result.get_offset()
         stage_range = classifier_result.get_stage_range()
         for cur_index in range(len(stage_range)):
-            each = stage_range[cur_index]
-            middle = each[len(each) // 2]
+            each_range = stage_range[cur_index]
+            middle = each_range[len(each_range) // 2]
+            # which means this range is stable
             if middle.is_stable():
                 label = self.LABEL_STABLE
                 frame = toolbox.compress_frame(
-                    middle.get_data(), compress_rate=compress_rate
+                    middle.get_data(),
+                    compress_rate=compress_rate,
+                    target_size=target_size,
                 )
+            # not stable
             else:
                 # todo: looks not good enough. `unspecific` looks a little weird but I have no idea now
                 if middle.stage == constants.UNKNOWN_STAGE_FLAG:
                     label = self.LABEL_UNSPECIFIC
                 else:
                     label = self.LABEL_UNSTABLE
-                # add a frame
+                # add a frame for human readable
                 if cur_index + 1 < len(stage_range):
-                    new_each = [*each, stage_range[cur_index + 1][0]]
+                    range_for_display = [*each_range, stage_range[cur_index + 1][0]]
                 else:
-                    new_each = each
+                    range_for_display = each_range
+                # merge these frames into one
+                # note: these frames should have the same size
                 frame = np.hstack(
                     [
                         toolbox.compress_frame(
-                            i.get_data(), compress_rate=compress_rate
+                            i.get_data(),
+                            compress_rate=compress_rate,
+                            target_size=target_size,
                         )
-                        for i in new_each
+                        for i in range_for_display
                     ]
                 )
 
-            first, last = each[0], each[-1]
+            first, last = each_range[0], each_range[-1]
             self.add_thumbnail(
                 f"{label} range {first.frame_id}({first.timestamp}) - {last.frame_id}({last.timestamp + offset}), "
                 f"duration: {last.timestamp - first.timestamp + offset}",

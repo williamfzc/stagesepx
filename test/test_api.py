@@ -56,6 +56,23 @@ def test_boost():
         cut_result=res,
     )
 
+    # test compressing
+    r = Reporter()
+    r.draw(
+        classify_result,
+        report_path=os.path.join(data_home, "report.html"),
+        cut_result=res,
+        compress_rate=0.1,
+    )
+
+    r = Reporter()
+    r.draw(
+        classify_result,
+        report_path=os.path.join(data_home, "report.html"),
+        cut_result=res,
+        target_size=(600, 800),
+    )
+
 
 def test_analyse():
     with tempfile.NamedTemporaryFile(suffix=".html", mode="w") as f:
