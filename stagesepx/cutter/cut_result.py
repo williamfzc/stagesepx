@@ -131,6 +131,13 @@ class VideoCutResult(object):
         video_end_frame_id = self.range_list[-1].end
         video_end_timestamp = self.range_list[-1].end_time
 
+        # default values
+        _default = {
+            "ssim": [1.0],
+            "mse": [0.0],
+            "psnr": [0.0],
+        }
+
         # stable all the time
         if len(unstable_range_list) == 0:
             logger.warning(
@@ -140,14 +147,12 @@ class VideoCutResult(object):
                 # stable
                 [
                     VideoCutRange(
-                        self.video,
-                        video_start_frame_id,
-                        video_end_frame_id,
-                        [1.0],
-                        [0.0],
-                        [0.0],
-                        video_start_timestamp,
-                        video_end_timestamp,
+                        video=self.video,
+                        start=video_start_frame_id,
+                        end=video_end_frame_id,
+                        start_time=video_start_timestamp,
+                        end_time=video_end_timestamp,
+                        **_default,
                     )
                 ],
                 # unstable
@@ -167,14 +172,14 @@ class VideoCutResult(object):
             logger.debug(f"stable start")
             range_list.append(
                 VideoCutRange(
-                    self.video,
-                    video_start_frame_id,
-                    first_stable_range_end_id,
-                    [1.0],
-                    [0.0],
-                    [0.0],
-                    video_start_timestamp,
-                    self.get_target_range_by_id(first_stable_range_end_id).end_time,
+                    video=self.video,
+                    start=video_start_frame_id,
+                    end=first_stable_range_end_id,
+                    start_time=video_start_timestamp,
+                    end_time=self.get_target_range_by_id(
+                        first_stable_range_end_id
+                    ).end_time,
+                    **_default,
                 )
             )
         # unstable start
@@ -186,14 +191,14 @@ class VideoCutResult(object):
             logger.debug("stable end")
             range_list.append(
                 VideoCutRange(
-                    self.video,
-                    end_stable_range_start_id,
-                    video_end_frame_id,
-                    [1.0],
-                    [0.0],
-                    [0.0],
-                    self.get_target_range_by_id(end_stable_range_start_id).end_time,
-                    video_end_timestamp,
+                    video=self.video,
+                    start=end_stable_range_start_id,
+                    end=video_end_frame_id,
+                    start_time=self.get_target_range_by_id(
+                        end_stable_range_start_id
+                    ).end_time,
+                    end_time=video_end_timestamp,
+                    **_default,
                 )
             )
         # unstable end
@@ -214,14 +219,12 @@ class VideoCutResult(object):
                 # because frame 1's timestamp is 0.0
                 # frame {range_start_id} start time - frame {range_end_id} start time
                 VideoCutRange(
-                    self.video,
-                    range_start_id,
-                    range_end_id,
-                    [1.0],
-                    [0.0],
-                    [0.0],
-                    self.get_target_range_by_id(range_start_id).start_time,
-                    self.get_target_range_by_id(range_end_id).start_time,
+                    video=self.video,
+                    start=range_start_id,
+                    end=range_end_id,
+                    start_time=self.get_target_range_by_id(range_start_id).start_time,
+                    end_time=self.get_target_range_by_id(range_end_id).start_time,
+                    **_default,
                 )
             )
 
