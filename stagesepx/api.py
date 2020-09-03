@@ -5,13 +5,110 @@ import os
 import typing
 import uuid
 import tempfile
+import json
+import pathlib
 from loguru import logger
+from pydantic import BaseModel
 
 from stagesepx.cutter import VideoCutResult, VideoCutRange, VideoCutter
 from stagesepx.classifier import SVMClassifier, ClassifierResult
 from stagesepx.reporter import Reporter
 from stagesepx import constants
 from stagesepx.video import VideoObject
+
+
+def run(config_file: str):
+    class _CutterUserConfig(BaseModel):
+        threshold: float = constants.DEFAULT_THRESHOLD
+        frame_count: int = 5
+        offset: int = 3
+        limit: int = None
+
+    class _ClassifierUserConfig(BaseModel):
+        classifier_type: str = "svm"
+        data_home: str = None
+        model: str = None
+        boost_mode: bool = True
+
+    class UserConfig(BaseModel):
+        video: str
+        output: str
+        compress_rate: float = 0.2
+        target_size: typing.Tuple[int, int] = None
+        cutter: _CutterUserConfig = _CutterUserConfig()
+        classifier: _ClassifierUserConfig = _ClassifierUserConfig()
+
+    def _parse() -> UserConfig:
+        p = pathlib.Path(config_file)
+        assert p.is_file(), f"no config file found in {p}"
+
+        # todo: support different types in the future
+        assert p.as_posix().endswith(".json"), "config file should be json format"
+        with open(p, encoding=constants.CHARSET) as f:
+            return UserConfig(**json.load(f))
+
+    def _run():
+        config = _parse()
+        cutter = VideoCutter()
+        res = cutter.cut(config.video)
+
+        stable, unstable = res.get_range(
+            threshold=config.cutter.threshold,
+            offset=config.cutter.offset,
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            res.pick_and_save(
+                stable, config.cutter.frame_count, to_dir=temp_dir,
+            )
+
+            cl = SVMClassifier()
+            cl.load(temp_dir)
+            cl.train()
+            classify_result = cl.classify(
+                config.video, stable, boost_mode=config.classifier.boost_mode
+            )
+
+        r = Reporter()
+        r.draw(
+            classify_result,
+            report_path=config.output,
+            unstable_ranges=unstable,
+            cut_result=res,
+        )
+
+    return _run()
+
+
+def keras_train(
+    train_data_path: str,
+    model_path: str,
+    # options
+    epochs: int = 10,
+    target_size: str = "600x800",
+    overwrite: bool = False,
+    **kwargs,
+):
+    from stagesepx.classifier.keras import KerasClassifier
+
+    # handle args
+    target_size: typing.Sequence[int] = [int(each) for each in target_size.split("x")]
+
+    cl = KerasClassifier(
+        # 轮数
+        epochs=epochs,
+        # 保证数据集的分辨率统一性
+        target_size=target_size,
+        **kwargs,
+    )
+    cl.train(train_data_path)
+
+    # file existed
+    while os.path.isfile(model_path):
+        logger.warning(f"file {model_path} already existed")
+        model_path = f"{uuid.uuid4()}.h5"
+        logger.debug(f"trying to save it to {model_path}")
+    cl.save_model(model_path, overwrite=overwrite)
 
 
 def one_step(
@@ -178,37 +275,6 @@ def _classify(
         cl.load(data_home)
         cl.train()
     return cl.classify(video, limit_range=limit_range)
-
-
-def keras_train(
-    train_data_path: str,
-    model_path: str,
-    # options
-    epochs: int = 10,
-    target_size: str = "600x800",
-    overwrite: bool = False,
-    **kwargs,
-):
-    from stagesepx.classifier.keras import KerasClassifier
-
-    # handle args
-    target_size: typing.Sequence[int] = [int(each) for each in target_size.split("x")]
-
-    cl = KerasClassifier(
-        # 轮数
-        epochs=epochs,
-        # 保证数据集的分辨率统一性
-        target_size=target_size,
-        **kwargs,
-    )
-    cl.train(train_data_path)
-
-    # file existed
-    while os.path.isfile(model_path):
-        logger.warning(f"file {model_path} already existed")
-        model_path = f"{uuid.uuid4()}.h5"
-        logger.debug(f"trying to save it to {model_path}")
-    cl.save_model(model_path, overwrite=overwrite)
 
 
 def analyse(

@@ -19,6 +19,9 @@ class TerminalCli(object):
     train = staticmethod(api.keras_train)
     analyse = staticmethod(api.analyse)
 
+    # new version api
+    run = staticmethod(api.run)
+
 
 def main():
     fire.Fire(TerminalCli)

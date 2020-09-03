@@ -40,6 +40,7 @@ setup(
         "Jinja2>=2.10.1",
         "fire>=0.2.1",
         "keras>=2.3.1",
+        "pydantic>=0.32.2",
     ],
     entry_points={"console_scripts": ["stagesepx = stagesepx.cli:main"]},
 )
