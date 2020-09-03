@@ -88,7 +88,7 @@ class VideoObject(object):
         *_,
         **__,
     ):
-        assert os.path.isfile(path), f"video [{path}] not existed"
+        assert os.path.isfile(path), f"video {path} not existed"
         self.path: str = str(path)
         self.data: typing.Optional[typing.Tuple[VideoFrame]] = tuple()
         self._hook_list: typing.List["BaseHook"] = []
