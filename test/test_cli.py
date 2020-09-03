@@ -25,3 +25,7 @@ def test_cli():
     # new
     subprocess.check_call(["stagesepx", "analyse", VIDEO_PATH, "output"])
     shutil.rmtree("output")
+
+
+def test_with_config():
+    subprocess.check_call(["stagesepx", "run", "test/run_config.json"])
