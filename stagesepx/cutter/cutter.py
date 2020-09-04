@@ -66,6 +66,41 @@ class VideoCutter(object):
             frame = each_hook.do(frame, *args, **kwargs)
         return frame
 
+    def compare_frame_list(
+        self, src: typing.List[np.ndarray], target: typing.List[np.ndarray]
+    ) -> typing.List[float]:
+        """
+        core method about how to compare two lists of ndarray and get their ssim/mse/psnr
+        you can overwrite this method to implement your own algo
+        see https://github.com/williamfzc/stagesepx/issues/136
+
+        :param src:
+        :param target:
+        :return:
+        """
+        # find the min ssim and the max mse / psnr
+        ssim = 1.0
+        mse = 0.0
+        psnr = 0.0
+
+        for part_index, (each_start, each_end) in enumerate(zip(src, target)):
+            part_ssim = toolbox.compare_ssim(each_start, each_end)
+            if part_ssim < ssim:
+                ssim = part_ssim
+
+            # mse is very sensitive
+            part_mse = toolbox.calc_mse(each_start, each_end)
+            if part_mse > mse:
+                mse = part_mse
+
+            part_psnr = toolbox.calc_psnr(each_start, each_end)
+            if part_psnr > psnr:
+                psnr = part_psnr
+            logger.debug(
+                f"part {part_index}: ssim={part_ssim}; mse={part_mse}; psnr={part_psnr}"
+            )
+        return [ssim, mse, psnr]
+
     def _convert_video_into_range_list(
         self, video: VideoObject, block: int, window_size: int, window_coefficient: int
     ) -> typing.List[VideoCutRange]:
@@ -106,32 +141,6 @@ class VideoCutter(object):
                 logger.debug(f"window after: {self.start}, {self.end}")
                 return True
 
-        def _compare_frame_list(
-            src: typing.List[np.ndarray], target: typing.List[np.ndarray]
-        ) -> typing.List[float]:
-            # find the min ssim and the max mse / psnr
-            ssim = 1.0
-            mse = 0.0
-            psnr = 0.0
-
-            for part_index, (each_start, each_end) in enumerate(zip(src, target)):
-                part_ssim = toolbox.compare_ssim(each_start, each_end)
-                if part_ssim < ssim:
-                    ssim = part_ssim
-
-                # mse is very sensitive
-                part_mse = toolbox.calc_mse(each_start, each_end)
-                if part_mse > mse:
-                    mse = part_mse
-
-                part_psnr = toolbox.calc_psnr(each_start, each_end)
-                if part_psnr > psnr:
-                    psnr = part_psnr
-                logger.debug(
-                    f"part {part_index}: ssim={part_ssim}; mse={part_mse}; psnr={part_psnr}"
-                )
-            return [ssim, mse, psnr]
-
         def _float_merge(float_list: typing.List[float]) -> float:
             # the first, the largest.
             length = len(float_list)
@@ -164,7 +173,9 @@ class VideoCutter(object):
             cur_frame_list = self.pic_split(cur_frame.data, block)
             for each in frame_list[1:]:
                 each_frame_list = self.pic_split(each.data, block)
-                ssim, mse, psnr = _compare_frame_list(cur_frame_list, each_frame_list)
+                ssim, mse, psnr = self.compare_frame_list(
+                    cur_frame_list, each_frame_list
+                )
                 ssim_list.append(ssim)
                 mse_list.append(mse)
                 psnr_list.append(psnr)
