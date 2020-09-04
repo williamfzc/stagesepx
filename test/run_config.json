@@ -1,4 +1,6 @@
 {
-  "video": "demo.mp4",
+  "video": {
+    "path": "demo.mp4"
+  },
   "output": "."
 }

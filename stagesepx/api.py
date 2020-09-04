@@ -25,6 +25,11 @@ def run(config: typing.Union[dict, str]):
     :return:
     """
 
+    class _VideoUserConfig(BaseModel):
+        path: str
+        pre_load: bool = None
+        fps: int = None
+
     class _CutterUserConfig(BaseModel):
         threshold: float = None
         frame_count: int = None
@@ -32,14 +37,20 @@ def run(config: typing.Union[dict, str]):
         limit: int = None
         block: int = None
 
-    class _ClassifierUserConfig(BaseModel):
-        boost_mode: bool = False
-
-    class UserConfig(BaseModel):
-        video: str
-        output: str
+        # common
         compress_rate: float = None
         target_size: typing.Tuple[int, int] = None
+
+    class _ClassifierUserConfig(BaseModel):
+        boost_mode: bool = None
+
+        # common
+        compress_rate: float = None
+        target_size: typing.Tuple[int, int] = None
+
+    class UserConfig(BaseModel):
+        output: str
+        video: _VideoUserConfig
         cutter: _CutterUserConfig = _CutterUserConfig()
         classifier: _ClassifierUserConfig = _ClassifierUserConfig()
 
@@ -56,31 +67,50 @@ def run(config: typing.Union[dict, str]):
     logger.info(f"config: {config}")
 
     # main flow
-    video = VideoObject(config.video)
+    video = VideoObject(config.video.path)
     video.load_frames()
 
+    # cut
     cutter = VideoCutter(
-        compress_rate=config.compress_rate, target_size=config.target_size,
+        # fmt: off
+        compress_rate=config.cutter.compress_rate,
+        target_size=config.cutter.target_size,
     )
-    res = cutter.cut(video=video, block=config.cutter.block,)
+    res = cutter.cut(
+        # fmt: off
+        video=video,
+        block=config.cutter.block,
+    )
     stable, unstable = res.get_range(
-        threshold=config.cutter.threshold, offset=config.cutter.offset,
+        # fmt: off
+        threshold=config.cutter.threshold,
+        offset=config.cutter.offset,
     )
 
     with tempfile.TemporaryDirectory() as temp_dir:
         res.pick_and_save(
-            stable, frame_count=config.cutter.frame_count, to_dir=temp_dir,
+            # fmt: off
+            stable,
+            frame_count=config.cutter.frame_count,
+            to_dir=temp_dir,
         )
 
+        # classify
         cl = SVMClassifier(
-            compress_rate=config.compress_rate, target_size=config.target_size,
+            # fmt: off
+            compress_rate=config.classifier.compress_rate,
+            target_size=config.classifier.target_size,
         )
         cl.load(temp_dir)
         cl.train()
         classify_result = cl.classify(
-            video, stable, boost_mode=config.classifier.boost_mode,
+            # fmt: off
+            video,
+            stable,
+            boost_mode=config.classifier.boost_mode,
         )
 
+        # draw
         r = Reporter()
         r.draw(
             classify_result, report_path=config.output,

@@ -80,5 +80,11 @@ def test_analyse():
 
 
 def test_run():
-    config = {"video": VIDEO_PATH, "output": "."}
+    config = {
+        # fmt: off
+        "video": {
+            "path": VIDEO_PATH,
+        },
+        "output": ".",
+    }
     run(config)
