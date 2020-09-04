@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from stagesepx.api import _cut, _classify, one_step, _train, analyse
+from stagesepx.api import _cut, _classify, one_step, _train, analyse, run
 from stagesepx.reporter import Reporter
 from stagesepx.video import VideoObject
 
@@ -77,3 +77,8 @@ def test_boost():
 def test_analyse():
     with tempfile.NamedTemporaryFile(suffix=".html", mode="w") as f:
         analyse(VIDEO_PATH, f.name)
+
+
+def test_run():
+    config = {"video": VIDEO_PATH, "output": "."}
+    run(config)

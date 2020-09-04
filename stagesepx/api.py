@@ -17,67 +17,74 @@ from stagesepx import constants
 from stagesepx.video import VideoObject
 
 
-def run(config_file: str):
+def run(config: typing.Union[dict, str]):
+    """
+    run with config
+
+    :param config: config file path, or a preload dict
+    :return:
+    """
+
     class _CutterUserConfig(BaseModel):
-        threshold: float = constants.DEFAULT_THRESHOLD
-        frame_count: int = 5
-        offset: int = 3
+        threshold: float = None
+        frame_count: int = None
+        offset: int = None
         limit: int = None
+        block: int = None
 
     class _ClassifierUserConfig(BaseModel):
-        classifier_type: str = "svm"
-        data_home: str = None
-        model: str = None
-        boost_mode: bool = True
+        boost_mode: bool = False
 
     class UserConfig(BaseModel):
         video: str
         output: str
-        compress_rate: float = 0.2
+        compress_rate: float = None
         target_size: typing.Tuple[int, int] = None
         cutter: _CutterUserConfig = _CutterUserConfig()
         classifier: _ClassifierUserConfig = _ClassifierUserConfig()
 
-    def _parse() -> UserConfig:
-        p = pathlib.Path(config_file)
+    if isinstance(config, str):
+        # path
+        p = pathlib.Path(config)
         assert p.is_file(), f"no config file found in {p}"
 
         # todo: support different types in the future
         assert p.as_posix().endswith(".json"), "config file should be json format"
         with open(p, encoding=constants.CHARSET) as f:
-            return UserConfig(**json.load(f))
+            config = json.load(f)
+    config = UserConfig(**config)
+    logger.info(f"config: {config}")
 
-    def _run():
-        config = _parse()
-        cutter = VideoCutter()
-        res = cutter.cut(config.video)
+    # main flow
+    video = VideoObject(config.video)
+    video.load_frames()
 
-        stable, unstable = res.get_range(
-            threshold=config.cutter.threshold,
-            offset=config.cutter.offset,
+    cutter = VideoCutter(
+        compress_rate=config.compress_rate, target_size=config.target_size,
+    )
+    res = cutter.cut(video=video, block=config.cutter.block,)
+    stable, unstable = res.get_range(
+        threshold=config.cutter.threshold, offset=config.cutter.offset,
+    )
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        res.pick_and_save(
+            stable, frame_count=config.cutter.frame_count, to_dir=temp_dir,
         )
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            res.pick_and_save(
-                stable, config.cutter.frame_count, to_dir=temp_dir,
-            )
-
-            cl = SVMClassifier()
-            cl.load(temp_dir)
-            cl.train()
-            classify_result = cl.classify(
-                config.video, stable, boost_mode=config.classifier.boost_mode
-            )
+        cl = SVMClassifier(
+            compress_rate=config.compress_rate, target_size=config.target_size,
+        )
+        cl.load(temp_dir)
+        cl.train()
+        classify_result = cl.classify(
+            video, stable, boost_mode=config.classifier.boost_mode,
+        )
 
         r = Reporter()
         r.draw(
-            classify_result,
-            report_path=config.output,
-            unstable_ranges=unstable,
-            cut_result=res,
+            classify_result, report_path=config.output,
         )
-
-    return _run()
 
 
 def keras_train(
