@@ -48,21 +48,28 @@ def run(config: typing.Union[dict, str]):
         compress_rate: float = None
         target_size: typing.Tuple[int, int] = None
 
+    class _ExtraUserConfig(BaseModel):
+        save_train_set: str = None
+
     class UserConfig(BaseModel):
         output: str
         video: _VideoUserConfig
         cutter: _CutterUserConfig = _CutterUserConfig()
         classifier: _ClassifierUserConfig = _ClassifierUserConfig()
+        extras: _ExtraUserConfig = _ExtraUserConfig()
 
     if isinstance(config, str):
         # path
-        p = pathlib.Path(config)
-        assert p.is_file(), f"no config file found in {p}"
+        config_path = pathlib.Path(config)
+        assert config_path.is_file(), f"no config file found in {config_path}"
 
         # todo: support different types in the future
-        assert p.as_posix().endswith(".json"), "config file should be json format"
-        with open(p, encoding=constants.CHARSET) as f:
+        assert config_path.as_posix().endswith(
+            ".json"
+        ), "config file should be json format"
+        with open(config_path, encoding=constants.CHARSET) as f:
             config = json.load(f)
+
     config = UserConfig(**config)
     logger.info(f"config: {config}")
 
@@ -88,11 +95,14 @@ def run(config: typing.Union[dict, str]):
     )
 
     with tempfile.TemporaryDirectory() as temp_dir:
+        train_set_dir = config.extras.save_train_set or temp_dir
+        os.makedirs(train_set_dir, exist_ok=True)
+
         res.pick_and_save(
             # fmt: off
             stable,
             frame_count=config.cutter.frame_count,
-            to_dir=temp_dir,
+            to_dir=train_set_dir,
         )
 
         # classify
@@ -101,7 +111,7 @@ def run(config: typing.Union[dict, str]):
             compress_rate=config.classifier.compress_rate,
             target_size=config.classifier.target_size,
         )
-        cl.load(temp_dir)
+        cl.load(train_set_dir)
         cl.train()
         classify_result = cl.classify(
             # fmt: off
@@ -113,7 +123,9 @@ def run(config: typing.Union[dict, str]):
         # draw
         r = Reporter()
         r.draw(
-            classify_result, report_path=config.output,
+            # fmt: off
+            classify_result,
+            report_path=config.output,
         )
 
 

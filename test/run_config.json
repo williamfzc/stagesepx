@@ -2,5 +2,8 @@
   "video": {
     "path": "demo.mp4"
   },
-  "output": "."
+  "output": ".",
+  "extras": {
+    "save_train_set": "./ok"
+  }
 }
