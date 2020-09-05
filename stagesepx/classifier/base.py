@@ -408,6 +408,8 @@ class BaseClassifier(object):
 
         if not step:
             step = 1
+        if not boost_mode:
+            boost_mode = True
 
         final_result: typing.List[SingleClassifierResult] = list()
         if isinstance(video, str):
