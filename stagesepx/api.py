@@ -145,9 +145,8 @@ def run(config: typing.Union[dict, str]):
                 frame_count=config.cutter.frame_count,
                 to_dir=train_set_dir,
             )
+            cl.train(data_path=train_set_dir)
 
-            cl.load(train_set_dir)
-            cl.train()
     # start classifying
     classify_result = cl.classify(
         # fmt: off

@@ -128,7 +128,7 @@ class KerasClassifier(BaseModelClassifier):
         logger.info("model created")
         return model
 
-    def train(self, data_path: str, *_, **__):
+    def train(self, data_path: str = None, *_, **__):
         """
         train your classifier with data. must be called before prediction
 

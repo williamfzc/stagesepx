@@ -1,7 +1,6 @@
 from loguru import logger
 import subprocess
 import os
-import shutil
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
@@ -30,6 +29,9 @@ def test_train():
     )
 
 
-def test_with_config():
+def test_with_min_config():
     subprocess.check_call(["stagesepx", "run", "test/min_run_config.json"])
+
+
+def test_with_fat_config():
     subprocess.check_call(["stagesepx", "run", "test/run_config.json"])

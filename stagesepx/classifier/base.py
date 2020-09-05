@@ -476,7 +476,7 @@ class BaseModelClassifier(BaseClassifier):
         raise NotImplementedError
 
     # actions
-    def train(self, *_, **__):
+    def train(self, data_path: str = None, *_, **__):
         raise NotImplementedError
 
     def predict(self, pic_path: str) -> str:

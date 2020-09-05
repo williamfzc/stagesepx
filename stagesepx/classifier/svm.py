@@ -92,7 +92,7 @@ class SVMClassifier(BaseModelClassifier):
         with open(model_path, "rb") as f:
             self._model = pickle.load(f)
 
-    def train(self):
+    def train(self, data_path: str = None, *_, **__):
         """
         train your classifier with data. must be called before prediction
 
@@ -103,6 +103,9 @@ class SVMClassifier(BaseModelClassifier):
             self._model = LinearSVC()
         else:
             logger.debug("already have a trained model. train on this model.")
+
+        if data_path:
+            self.load(data_path)
 
         train_data = list()
         train_label = list()
