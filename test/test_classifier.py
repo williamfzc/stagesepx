@@ -34,19 +34,13 @@ def test_default():
     cl.load(CUTTER_RESULT_DIR)
     cl.train()
     cl.save_model(MODEL_PATH, overwrite=True)
-    classify_result = cl.classify(VIDEO_PATH)
-
-    # --- draw ---
-    _draw_report(classify_result)
+    cl.classify(VIDEO_PATH)
 
 
 def test_ssim_classifier():
     cl = SSIMClassifier()
     cl.load(CUTTER_RESULT_DIR)
-    classify_result = cl.classify(VIDEO_PATH)
-
-    # --- draw ---
-    _draw_report(classify_result)
+    cl.classify(VIDEO_PATH)
 
 
 def test_work_with_cutter():
@@ -76,7 +70,6 @@ def test_save_and_load():
         assert i.to_dict() == j.to_dict()
 
     assert isinstance(reporter.get_stable_stage_sample(classify_result), np.ndarray)
-    reporter.draw(classify_result)
 
 
 def test_keep_data():
