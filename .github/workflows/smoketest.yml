@@ -48,8 +48,3 @@ jobs:
           python mini.py
           python stable.py
           cd ..
-      - name: Test Cli
-        run: |
-          stagesepx one_step ./demo.mp4
-          stagesepx one_step ./demo.mp4 ./output
-          rm -rf ./output
