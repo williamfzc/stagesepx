@@ -13,8 +13,8 @@ def test_analyse():
 
 
 def test_run():
-    trainset = "./trainset"
-    mod = "./a.mod"
+    trainset = os.path.join(PROJECT_PATH, "trainset")
+    mod = os.path.join(PROJECT_PATH, "a.mod")
     config = {
         # fmt: off
         "video": {
