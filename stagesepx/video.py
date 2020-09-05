@@ -104,6 +104,8 @@ class VideoObject(object):
             self.frame_count = toolbox.get_frame_count(cap)
             self.frame_size = toolbox.get_frame_size(cap)
 
+        if pre_load is None:
+            pre_load = True
         if pre_load:
             self.load_frames()
         logger.info(
