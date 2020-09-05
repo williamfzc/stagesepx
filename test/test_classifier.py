@@ -34,13 +34,13 @@ def test_default():
     cl.load(CUTTER_RESULT_DIR)
     cl.train()
     cl.save_model(MODEL_PATH, overwrite=True)
-    cl.classify(VIDEO_PATH)
+    cl.classify(VIDEO_PATH, boost_mode=False)
 
 
 def test_ssim_classifier():
     cl = SSIMClassifier()
     cl.load(CUTTER_RESULT_DIR)
-    cl.classify(VIDEO_PATH)
+    cl.classify(VIDEO_PATH, boost_mode=False)
 
 
 def test_work_with_cutter():
@@ -56,7 +56,7 @@ def test_work_with_cutter():
 def test_save_and_load():
     cl = SVMClassifier()
     cl.load_model(MODEL_PATH)
-    classify_result = cl.classify(VIDEO_PATH)
+    classify_result = cl.classify(VIDEO_PATH, boost_mode=False)
 
     result_file = "save.json"
     reporter = Reporter()
@@ -105,7 +105,7 @@ def test_result():
 def test_dump_and_load():
     cl = SVMClassifier()
     cl.load_model(MODEL_PATH)
-    classify_result = cl.classify(VIDEO_PATH)
+    classify_result = cl.classify(VIDEO_PATH, boost_mode=False)
 
     json_path = "classify_result.json"
     classify_result.dump(json_path)
@@ -125,10 +125,3 @@ def test_keras():
     stable, _ = cutter_res.get_range()
     classify_result = cl.classify(VIDEO_PATH, stable, keep_data=True)
     assert classify_result.to_dict()
-
-
-def test_boost():
-    cl = SVMClassifier()
-    cl.load_model(MODEL_PATH)
-    classify_result = cl.classify(VIDEO_PATH, boost_mode=True)
-    assert classify_result

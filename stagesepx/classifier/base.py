@@ -384,7 +384,7 @@ class BaseClassifier(object):
     def classify(
         self,
         video: typing.Union[str, VideoObject],
-        limit_range: typing.List[VideoCutRange] = None,
+        valid_range: typing.List[VideoCutRange] = None,
         step: int = None,
         keep_data: bool = None,
         boost_mode: bool = None,
@@ -395,7 +395,7 @@ class BaseClassifier(object):
         start classification
 
         :param video: path to target video or VideoObject
-        :param limit_range: frames out of these ranges will be ignored
+        :param valid_range: frames out of these ranges will be ignored
         :param step: step between frames, default to 1
         :param keep_data: default to False. if enabled, all the frames will contain numpy data.
         :param boost_mode:
@@ -406,10 +406,15 @@ class BaseClassifier(object):
         logger.debug(f"classify with {self.__class__.__name__}")
         start_time = time.time()
 
+        # default
         if not step:
             step = 1
-        if not boost_mode:
+        if boost_mode is None:
             boost_mode = True
+        # check
+        assert (boost_mode and valid_range) or (
+            not (boost_mode or valid_range)
+        ), "boost_mode required valid_range"
 
         final_result: typing.List[SingleClassifierResult] = list()
         if isinstance(video, str):
@@ -423,8 +428,8 @@ class BaseClassifier(object):
             # hook
             frame = self._apply_hook(frame, *args, **kwargs)
             # ignore some ranges
-            if limit_range and not any(
-                [each.contain(frame.frame_id) for each in limit_range]
+            if valid_range and not any(
+                [each.contain(frame.frame_id) for each in valid_range]
             ):
                 logger.debug(
                     f"frame {frame.frame_id} ({frame.timestamp}) not in target range, skip"
