@@ -182,7 +182,7 @@ def one_step(
     :param offset:
         it will change the way to decided whether two ranges can be merged
         before: first_range.end == second_range.start
-        after: first_range.end + offset >= secord_range.start
+        after: first_range.end + offset >= second_range.start
     :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
     :return:
     """
@@ -248,7 +248,7 @@ def _cut(
     :param offset:
         it will change the way to decided whether two ranges can be merged
         before: first_range.end == second_range.start
-        after: first_range.end + offset >= secord_range.start
+        after: first_range.end + offset >= second_range.start
     :param limit: ignore some ranges which are too short, 5 means ignore stable ranges which length < 5
 
     :return: tuple, (VideoCutResult, data_home)
