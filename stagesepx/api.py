@@ -132,7 +132,7 @@ def run(config: typing.Union[dict, str]):
         if config.classifier.model:
             # no need to retrain
             model_path = pathlib.Path(config.classifier.model)
-            assert model_path.is_file()
+            assert model_path.is_file(), f"file {model_path} not existed"
             cl.load_model(model_path)
         else:
             # train a new model
