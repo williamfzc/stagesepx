@@ -1,9 +1,31 @@
 {
-  "video": {
-    "path": "demo.mp4"
-  },
   "output": ".",
+  "video": {
+    "path": "demo.mp4",
+    "pre_load": true,
+    "fps": 30
+  },
+  "cutter": {
+    "threshold": 0.95,
+    "frame_count": 3,
+    "offset": 3,
+    "limit": null,
+    "block": 3,
+    "compress_rate": 0.2,
+    "target_size": [
+      600,
+      800
+    ]
+  },
+  "classifier": {
+    "boost_mode": true,
+    "compress_rate": 0.2,
+    "target_size": [
+      600,
+      800
+    ]
+  },
   "extras": {
-    "save_train_set": "./ok"
+    "save_train_set": "./trainset"
   }
 }

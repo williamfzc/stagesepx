@@ -28,4 +28,5 @@ def test_cli():
 
 
 def test_with_config():
+    subprocess.check_call(["stagesepx", "run", "test/min_run_config.json"])
     subprocess.check_call(["stagesepx", "run", "test/run_config.json"])
