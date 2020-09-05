@@ -1,0 +1,10 @@
+{
+    "video": {
+        "path": "demo.mp4"
+    },
+    "classifier": {
+        "classifier_type": "keras",
+        "model": "output.h5"
+    },
+    "output": "."
+}

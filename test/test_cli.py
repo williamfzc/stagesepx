@@ -24,9 +24,12 @@ def test_analyse():
 
 
 def test_train():
+    mod = "output.h5"
     subprocess.check_call(
-        ["stagesepx", "train", CUTTER_RESULT_DIR, "output.h5", "--epochs", "1"]
+        ["stagesepx", "train", CUTTER_RESULT_DIR, mod, "--epochs", "1"]
     )
+    # predict
+    subprocess.check_call(["stagesepx", "run", "test/run_config_with_model.json"])
 
 
 def test_with_min_config():
