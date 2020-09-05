@@ -6,20 +6,28 @@ import shutil
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
 
+from test_cutter import test_default as cutter_default
+from test_cutter import RESULT_DIR as CUTTER_RESULT_DIR
+
+# prepare
+cutter_default()
+
 
 def test_cli():
     logger.info("checking main")
-    subprocess.check_call(["python", "-m", "stagesepx.cli"])
+    subprocess.check_call(["python3", "-m", "stagesepx.cli"])
 
-    logger.info("checking keras trainer ...")
-    subprocess.check_call(["stagesepx", "train", "output", "output.h5"])
-    # try to train
+
+def test_analyse():
+    output = "output.html"
+    subprocess.check_call(["stagesepx", "analyse", VIDEO_PATH, output])
+    os.remove(output)
+
+
+def test_train():
     subprocess.check_call(
-        ["stagesepx", "train", "output", "output.h5", "--epochs", "1"]
+        ["stagesepx", "train", CUTTER_RESULT_DIR, "output.h5", "--epochs", "1"]
     )
-
-    subprocess.check_call(["stagesepx", "analyse", VIDEO_PATH, "output"])
-    shutil.rmtree("output")
 
 
 def test_with_config():
