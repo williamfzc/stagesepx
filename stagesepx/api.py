@@ -74,8 +74,12 @@ def run(config: typing.Union[dict, str]):
     logger.info(f"config: {config}")
 
     # main flow
-    video = VideoObject(config.video.path)
-    video.load_frames()
+    video = VideoObject(
+        # fmt: off
+        path=config.video.path,
+        pre_load=config.video.pre_load,
+        fps=config.video.fps,
+    )
 
     # cut
     cutter = VideoCutter(
