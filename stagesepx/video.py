@@ -104,10 +104,8 @@ class VideoObject(object):
             self.frame_count = toolbox.get_frame_count(cap)
             self.frame_size = toolbox.get_frame_size(cap)
 
-        if pre_load is None:
-            pre_load = True
-        if pre_load:
-            self.load_frames()
+        if pre_load is not None:
+            logger.warning(f"`pre_load` has been deprecated. use `video.load_frames()` instead")
         logger.info(
             f"video object generated, length: {self.frame_count}, size: {self.frame_size}"
         )

@@ -87,9 +87,10 @@ def run(config: typing.Union[dict, str]):
     video = VideoObject(
         # fmt: off
         path=config.video.path,
-        pre_load=config.video.pre_load,
         fps=config.video.fps,
     )
+    if config.video.pre_load:
+        video.load_frames()
 
     # cut
     cutter = VideoCutter(

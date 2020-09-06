@@ -40,7 +40,6 @@ def test_read_from_mem():
         count += 1
     assert count == 30
 
-    v = VideoObject(VIDEO_PATH, pre_load=True)
     v.clean_frames()
     assert not v.data
 
