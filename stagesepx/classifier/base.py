@@ -111,6 +111,9 @@ class ClassifierResult(object):
             d[each_stage] = self.get_specific_stage_range(each_stage)
         return d
 
+    def contain(self, stage_name: str) -> bool:
+        return stage_name in self.get_stage_set()
+
     def first(self, stage_name: str) -> SingleClassifierResult:
         for each in self.data:
             if each.stage == stage_name:
