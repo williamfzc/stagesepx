@@ -29,5 +29,22 @@
   },
   "extras": {
     "save_train_set": "./trainset"
+  },
+  "calc": {
+    "output": "some2.json",
+    "operators": [
+      {
+        "name": "calc_between_0_1",
+        "calc_type": "between",
+        "args": {
+          "from_stage": "0",
+          "to_stage": "1"
+        }
+      },
+      {
+        "name": "display everything",
+        "calc_type": "display"
+      }
+    ]
   }
 }

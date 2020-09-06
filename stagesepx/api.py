@@ -31,7 +31,7 @@ def run(config: typing.Union[dict, str]):
 
     class _VideoUserConfig(BaseModel):
         path: str
-        pre_load: bool = None
+        pre_load: bool = True
         fps: int = None
 
     class _CutterUserConfig(BaseModel):
@@ -58,6 +58,19 @@ def run(config: typing.Union[dict, str]):
         compress_rate: float = None
         target_size: typing.Tuple[int, int] = None
 
+    class _CalcOperatorType(Enum):
+        BETWEEN = "between"
+        DISPLAY = "display"
+
+    class _CalcOperator(BaseModel):
+        name: str
+        calc_type: _CalcOperatorType
+        args: dict = dict()
+
+    class _CalcUserConfig(BaseModel):
+        output: str = None
+        operators: typing.List[_CalcOperator] = None
+
     class _ExtraUserConfig(BaseModel):
         save_train_set: str = None
 
@@ -66,6 +79,7 @@ def run(config: typing.Union[dict, str]):
         video: _VideoUserConfig
         cutter: _CutterUserConfig = _CutterUserConfig()
         classifier: _ClassifierUserConfig = _ClassifierUserConfig()
+        calc: _CalcUserConfig = _CalcUserConfig()
         extras: _ExtraUserConfig = _ExtraUserConfig()
 
     if isinstance(config, str):
@@ -155,6 +169,46 @@ def run(config: typing.Union[dict, str]):
         stable,
         boost_mode=config.classifier.boost_mode,
     )
+
+    # calc
+    def _calc_display() -> dict:
+        # jsonify
+        return json.loads(classify_result.dumps())
+
+    def _calc_between(*, from_stage: str = None, to_stage: str = None) -> dict:
+        assert classify_result.contain(
+            from_stage
+        ), f"no stage {from_stage} found in result"
+        assert classify_result.contain(to_stage), f"no stage {to_stage} found in result"
+        from_frame = classify_result.last(from_stage)
+        to_frame = classify_result.first(to_stage)
+        cost = to_frame.timestamp - from_frame.timestamp
+        return {
+            "from": from_frame.frame_id,
+            "to": to_frame.frame_id,
+            "cost": cost,
+        }
+
+    _calc_func_dict = {
+        _CalcOperatorType.BETWEEN: _calc_between,
+        _CalcOperatorType.DISPLAY: _calc_display,
+    }
+    calc_output = config.calc.output
+    if calc_output:
+        output_path = pathlib.Path(calc_output)
+        assert not output_path.is_file(), f"file {output_path} already existed"
+        result = []
+        for each_calc in config.calc.operators:
+            func = _calc_func_dict[each_calc.calc_type]
+            func_ret = func(**each_calc.args)
+            calc_ret = {
+                "name": each_calc.name,
+                "type": each_calc.calc_type.value,
+                "result": func_ret,
+            }
+            result.append(calc_ret)
+        with open(output_path, "w", encoding=constants.CHARSET) as f:
+            json.dump(result, f)
 
     # draw
     r = Reporter()
