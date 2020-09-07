@@ -225,6 +225,7 @@ def keras_train(
 ):
     from stagesepx.classifier.keras import KerasClassifier
 
+    assert not os.path.isfile(model_path), f"file {model_path} already existed"
     # handle args
     target_size: typing.Sequence[int] = [int(each) for each in target_size.split("x")]
 
@@ -236,12 +237,6 @@ def keras_train(
         **kwargs,
     )
     cl.train(train_data_path)
-
-    # file existed
-    while os.path.isfile(model_path):
-        logger.warning(f"file {model_path} already existed")
-        model_path = f"{uuid.uuid4()}.h5"
-        logger.debug(f"trying to save it to {model_path}")
     cl.save_model(model_path, overwrite=overwrite)
 
 

@@ -15,11 +15,12 @@ def test_analyse():
 
 def test_train():
     trainset = os.path.join(PROJECT_PATH, "trainset")
-    mod = os.path.join(PROJECT_PATH, "a.mod")
+    mod = os.path.join(PROJECT_PATH, "a.h5")
     config = {
         # fmt: off
         "video": {
             "path": VIDEO_PATH,
+            "fps": 30,
         },
         "output": ".",
         "extras": {
@@ -29,8 +30,6 @@ def test_train():
     run(config)
 
     # train
-    keras_train(trainset, model_path=mod, epochs=1)
-    # again (for coverage)
     keras_train(trainset, model_path=mod, epochs=1)
 
     # todo: weird. it did not work in github actions
