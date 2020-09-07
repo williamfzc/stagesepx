@@ -26,9 +26,6 @@ def run(config: typing.Union[dict, str]):
     :return:
     """
 
-    class APIRuntimeError(RuntimeError):
-        pass
-
     class _VideoUserConfig(BaseModel):
         path: str
         pre_load: bool = True
@@ -139,10 +136,8 @@ def run(config: typing.Union[dict, str]):
                 compress_rate=config.classifier.compress_rate,
                 target_size=config.classifier.target_size,
             )
-        else:
-            raise APIRuntimeError(
-                f"classifier_type should be: {_ClassifierType.enum_members}"
-            )
+        # validation has been applied by pydantic
+        # so no `else`
 
         if config.classifier.model:
             # no need to retrain
