@@ -1,5 +1,6 @@
 import os
 import tempfile
+import uuid
 from pydantic import ValidationError
 
 from stagesepx.api import analyse, run, keras_train
@@ -8,13 +9,17 @@ PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 VIDEO_PATH = os.path.join(PROJECT_PATH, "demo.mp4")
 
 
+def _get_random_str():
+    return str(uuid.uuid4())
+
+
 def test_analyse():
     with tempfile.NamedTemporaryFile(suffix=".html", mode="w") as f:
         analyse(VIDEO_PATH, f.name)
 
 
 def test_train():
-    trainset = os.path.join(PROJECT_PATH, "trainset")
+    trainset = os.path.join(PROJECT_PATH, _get_random_str())
     mod = os.path.join(PROJECT_PATH, "a.h5")
     config = {
         # fmt: off
@@ -74,7 +79,7 @@ def test_run_validation():
         },
         "output": ".",
         "calc": {
-            "output": "some1.json",
+            "output": f"{_get_random_str()}.json",
             "operators": [
                 {
                     "name": "error_test",
@@ -90,6 +95,30 @@ def test_run_validation():
     else:
         raise TypeError("should raise an error if calc_type is unexpected")
 
+    config = {
+        # fmt: off
+        "video": {
+            "path": VIDEO_PATH,
+        },
+        "output": ".",
+        "calc": {
+            "output": f"{_get_random_str()}.json",
+            "ignore_error": True,
+            "operators": [
+                {
+                    "name": "error_test",
+                    "calc_type": "between",
+                    "args": {
+                        "from_stage": "0",
+                        # unexpected stage
+                        "to_stage": "999",
+                    }
+                },
+            ]
+        }
+    }
+    run(config)
+
 
 def test_run_calc():
     config = {
@@ -99,7 +128,7 @@ def test_run_calc():
         },
         "output": ".",
         "calc": {
-            "output": "some1.json",
+            "output": f"{_get_random_str()}.json",
             "operators": [
                 {
                     "name": "calc_between_0_1",

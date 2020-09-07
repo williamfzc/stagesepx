@@ -3,7 +3,7 @@ high level API
 """
 import os
 import typing
-import uuid
+import traceback
 import tempfile
 import json
 import pathlib
@@ -66,6 +66,7 @@ def run(config: typing.Union[dict, str]):
 
     class _CalcUserConfig(BaseModel):
         output: str = None
+        ignore_error: bool = None
         operators: typing.List[_CalcOperator] = None
 
     class _ExtraUserConfig(BaseModel):
@@ -195,7 +196,13 @@ def run(config: typing.Union[dict, str]):
         result = []
         for each_calc in config.calc.operators:
             func = _calc_func_dict[each_calc.calc_type]
-            func_ret = func(**each_calc.args)
+            try:
+                func_ret = func(**each_calc.args)
+            except Exception as e:
+                if not config.calc.ignore_error:
+                    raise
+                logger.warning(e)
+                func_ret = traceback.format_exc()
             calc_ret = {
                 "name": each_calc.name,
                 "type": each_calc.calc_type.value,

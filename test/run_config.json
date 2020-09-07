@@ -3,7 +3,7 @@
   "video": {
     "path": "demo.mp4",
     "pre_load": true,
-    "fps": 30
+    "fps": null
   },
   "cutter": {
     "threshold": 0.95,
@@ -28,10 +28,11 @@
     ]
   },
   "extras": {
-    "save_train_set": "./trainset"
+    "save_train_set": "./trainset_run_config"
   },
   "calc": {
     "output": "some2.json",
+    "ignore_error": false,
     "operators": [
       {
         "name": "calc_between_0_1",
