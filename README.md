@@ -131,6 +131,28 @@ stagesepx analyse demo.mp4 report.html
 
 关于结果不准确的问题请参考 [#46](https://github.com/williamfzc/stagesepx/issues/46)。
 
+### 配置化运行（0.15.0）
+
+当然，通常因为场景差异，我们需要对参数进行修改使其达到更好的效果。这使得用户需要投入一些精力在脚本编写上。在 0.15.0 之后，配置化运行的加入使用户能够在不需要编写脚本的情况下直接使用所有能力，大大降低了接入门槛。
+
+```json
+{
+  "output": ".",
+  "video": {
+    "path": "./PATH_TO_YOUR/VIDEO.mp4",
+    "fps": 30
+  }
+}
+```
+
+命令行运行：
+
+```bash
+stagesepx run YOUR_CONFIG.json
+```
+
+即可达到与脚本相同的效果。其他的配置项可以参考：[work_with_stagesepx](https://github.com/williamfzc/work_with_stagesepx/tree/master/run_with_config)
+
 ### 正式使用
 
 > 在正式落地时，推荐使用 完整的python脚本 而不是命令行，以保证更高的可编程性。完整的落地例子另外单独开了一个 repo 存放，[传送门](https://github.com/williamfzc/work_with_stagesepx)。
