@@ -263,11 +263,16 @@ def analyse(
     cutter = VideoCutter()
     res = cutter.cut(video)
 
-    stable, unstable = res.get_range(threshold=threshold, offset=offset,)
+    stable, unstable = res.get_range(
+        threshold=threshold,
+        offset=offset,
+    )
 
     with tempfile.TemporaryDirectory() as temp_dir:
         res.pick_and_save(
-            stable, 5, to_dir=temp_dir,
+            stable,
+            5,
+            to_dir=temp_dir,
         )
 
         cl = SVMClassifier()
