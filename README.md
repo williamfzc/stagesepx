@@ -243,6 +243,10 @@ pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
 - 邮箱：`fengzc@vip.qq.com`
 - QQ：`178894043`
 
+## Thanks
+
+Thank you [JetBrains](https://www.jetbrains.com/) for supporting the project with free product licenses.
+
 ## License
 
 [MIT](LICENSE)
