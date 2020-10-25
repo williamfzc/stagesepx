@@ -250,5 +250,3 @@ Thank you [JetBrains](https://www.jetbrains.com/) for supporting the project wit
 ## License
 
 [MIT](LICENSE)
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwilliamfzc%2Fstagesepx.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwilliamfzc%2Fstagesepx?ref=badge_large)
