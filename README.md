@@ -157,14 +157,18 @@ stagesepx run YOUR_CONFIG.json
 
 > 在正式落地时，推荐使用 完整的python脚本 而不是命令行，以保证更高的可编程性。完整的落地例子另外单独开了一个 repo 存放，[传送门](https://github.com/williamfzc/work_with_stagesepx)。
 
-- [用30行代码快速跑一个demo](example/mini.py)
-- [30行代码怎么没有注释](example/stable.py)
-- [还有更多配置吗](example/cut_and_classify.py)
-- [我想看看实际落地方案，最好有把饭喂嘴里的例子](https://github.com/williamfzc/work_with_stagesepx)
-- [我们的app很复杂，能搞定吗](https://testerhome.com/topics/22215)
-- [太麻烦了，有没有开箱即用、简单配置下可以落地的工具](https://github.com/williamfzc/sepmachine)
-- [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
-- [官方文档](https://williamfzc.github.io/stagesepx/)
+- 配置：
+    - [用30行代码快速跑一个demo](example/mini.py)
+    - [30行代码怎么没有注释](example/stable.py)
+    - [还有更多配置吗](example/cut_and_classify.py)
+- 应用：
+    - [我想结合真实场景理解这个项目的原理](https://github.com/150109514/stagesepx_with_keras)
+    - [我想看看实际落地方案，最好有把饭喂嘴里的例子](https://github.com/williamfzc/work_with_stagesepx)
+    - [我们的app很复杂，能搞定吗](https://testerhome.com/topics/22215)
+    - [太麻烦了，有没有开箱即用、简单配置下可以落地的工具](https://github.com/williamfzc/sepmachine)
+- 其他：
+    - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
+    - [官方文档](https://williamfzc.github.io/stagesepx/)
 
 ## 安装
 
