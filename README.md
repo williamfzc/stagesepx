@@ -37,7 +37,7 @@
 
 你可以据此得到每个阶段对应的精确耗时。
 
-## 跨端运作
+### 跨端运作
 
 当然，它是天然跨端的，例如web端。甚至，任何端：
 
@@ -45,7 +45,7 @@
 
 ![sugar](https://i.loli.net/2019/11/23/DCpbdlNftcQ3v2w.png)
 
-## 高准确度
+### 高准确度
 
 与视频一致的高准确度。以秒表为例：
 
@@ -53,7 +53,7 @@
 
 可以看到，与秒表的表现几乎没有差异。**请注意，这里的准确度指的是 stagesepx 能够精确还原视频本身的数据与表现。而对于现象（例如某某时间点出现什么状态）而言，准确度很大程度上取决于视频本身，如fps/分辨率等。**
 
-## 彻底解耦 & 可编程
+### 彻底解耦 & 可编程
 
 如果比起报告，更希望亲自处理原始数据，进而进行二次开发，你可以直接将 report 部分去除。如此做，你将得到一个 python 对象供你随意使用。它提供了大量的API，例如转换成字典：
 
@@ -91,7 +91,7 @@
 
 用户可以随意处理这些数据，无论是保存或是交给下一段代码。
 
-## 完整自动化支持
+### 完整自动化支持
 
 - 既然它是可编程的，那么它必然是朝着彻底替代人力的方向演进的。这也是它最强大的特性；
 - 它允许用户利用自己的训练集进行模型训练，利用神经网络进行规模化、全自动化的特定阶段耗时计算；
@@ -107,15 +107,29 @@
 - 支持与其他框架结合，融入你的业务
 - 所有你需要的，只是一个视频
 
-## 架构
+## 开始
 
-![structure](./docs/pics/stagesepx.svg)
+### 正式使用
 
-## 快速开始
+> 在正式落地时，推荐使用 完整的python脚本 而不是命令行，以保证更高的可编程性。完整的落地例子另外单独开了一个 repo 存放，[传送门](https://github.com/williamfzc/work_with_stagesepx)。
+> 请一定配合 [这篇文章](https://blog.csdn.net/wsc106/article/details/107351675) 使用，基本能解决90%的问题。
+
+- 配置：
+    - [用30行代码快速跑一个demo](example/mini.py)
+    - [30行代码怎么没有注释](example/stable.py)
+    - [还有更多配置吗](example/cut_and_classify.py)
+- 应用：
+    - [我想结合真实场景理解这个项目的原理](https://github.com/150109514/stagesepx_with_keras)
+    - [我想看看实际落地方案，最好有把饭喂嘴里的例子](https://github.com/williamfzc/work_with_stagesepx)
+    - [我们的app很复杂，能搞定吗](https://testerhome.com/topics/22215)
+    - [太麻烦了，有没有开箱即用、简单配置下可以落地的工具](https://github.com/williamfzc/sepmachine)
+- 其他：
+    - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
+    - [官方文档](https://williamfzc.github.io/stagesepx/)
 
 ### 命令行
 
-你可以直接通过命令行使用，而无需编写脚本：
+你也可以直接通过命令行使用，而无需编写脚本：
 
 ```bash
 stagesepx analyse your_video.mp4 report.html
@@ -152,23 +166,6 @@ stagesepx run YOUR_CONFIG.json
 ```
 
 即可达到与脚本相同的效果。其他的配置项可以参考：[work_with_stagesepx](https://github.com/williamfzc/work_with_stagesepx/tree/master/run_with_config)
-
-### 正式使用
-
-> 在正式落地时，推荐使用 完整的python脚本 而不是命令行，以保证更高的可编程性。完整的落地例子另外单独开了一个 repo 存放，[传送门](https://github.com/williamfzc/work_with_stagesepx)。
-
-- 配置：
-    - [用30行代码快速跑一个demo](example/mini.py)
-    - [30行代码怎么没有注释](example/stable.py)
-    - [还有更多配置吗](example/cut_and_classify.py)
-- 应用：
-    - [我想结合真实场景理解这个项目的原理](https://github.com/150109514/stagesepx_with_keras)
-    - [我想看看实际落地方案，最好有把饭喂嘴里的例子](https://github.com/williamfzc/work_with_stagesepx)
-    - [我们的app很复杂，能搞定吗](https://testerhome.com/topics/22215)
-    - [太麻烦了，有没有开箱即用、简单配置下可以落地的工具](https://github.com/williamfzc/sepmachine)
-- 其他：
-    - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
-    - [官方文档](https://williamfzc.github.io/stagesepx/)
 
 ## 安装
 
@@ -213,6 +210,10 @@ pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
 - [图像分类、AI 与全自动性能测试](https://testerhome.com/topics/19978)
 - [全自动化的抖音启动速度测试](https://testerhome.com/topics/22215)
 - [(MTSC2019) 基于图像分类的下一代速度类测试解决方案](https://testerhome.com/topics/21874)
+
+## 架构
+
+![structure](./docs/pics/stagesepx.svg)
 
 ## 参与项目
 
