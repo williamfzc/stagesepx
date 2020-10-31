@@ -41,10 +41,10 @@ class KerasClassifier(BaseModelClassifier):
         # settings
         self.score_threshold: float = score_threshold or 0.0
         self.data_size: typing.Sequence[int] = data_size or (200, 200)
-        self.nb_train_samples: int = nb_train_samples or 500
-        self.nb_validation_samples: int = nb_validation_samples or 500
+        self.nb_train_samples: int = nb_train_samples or 64
+        self.nb_validation_samples: int = nb_validation_samples or 64
         self.epochs: int = epochs or 20
-        self.batch_size: int = batch_size or 32
+        self.batch_size: int = batch_size or 4
 
         logger.debug(f"score threshold: {self.score_threshold}")
         logger.debug(f"data size: {self.data_size}")
@@ -162,12 +162,10 @@ class KerasClassifier(BaseModelClassifier):
             subset="validation",
         )
 
-        self._model.fit_generator(
+        self._model.fit(
             train_generator,
-            steps_per_epoch=self.nb_train_samples // self.batch_size,
             epochs=self.epochs,
             validation_data=validation_generator,
-            validation_steps=self.nb_validation_samples // self.batch_size,
         )
 
         logger.debug("train finished")
