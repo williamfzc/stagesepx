@@ -3,6 +3,7 @@ import os
 import cv2
 import typing
 import numpy as np
+import pathlib
 
 try:
     import tensorflow
@@ -134,6 +135,18 @@ class KerasClassifier(BaseModelClassifier):
 
         :return:
         """
+
+        def _data_verify(p: str):
+            p = pathlib.Path(p)
+            assert p.is_dir(), f"{p} is not a valid directory"
+            # validate: at least two classes
+            number_of_dir = len([each for each in os.listdir(p) if (p / each).is_dir()])
+            assert (
+                number_of_dir > 1
+            ), f"dataset only contains one class. maybe some path errors happened: {p}?"
+
+        _data_verify(data_path)
+
         if not self._model:
             logger.debug("no model can be used. build a new one.")
             self._model = self.create_model()
