@@ -260,7 +260,8 @@ class Reporter(object):
             first, last = each_range[0], each_range[-1]
             self.add_thumbnail(
                 f"{label} range {first.frame_id}({first.timestamp}) - {last.frame_id}({last.timestamp + offset}), "
-                f"duration: {last.timestamp - first.timestamp + offset}",
+                f"duration: {last.timestamp - first.timestamp + offset}, "
+                f"stage: {first.stage}",
                 frame,
             )
         # calc time cost
