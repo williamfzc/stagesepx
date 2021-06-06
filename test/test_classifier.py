@@ -114,6 +114,12 @@ def test_dump_and_load():
     res_from_file = ClassifierResult.load(json_path)
     assert classify_result.dumps() == res_from_file.dumps()
 
+    # test diff
+    assert classify_result.diff(res_from_file).ok()
+
+    diffobj = classify_result.diff(res_from_file)
+    diffobj.get_data()
+
 
 def test_keras():
     # set epochs to 1 for quickly training (test only)

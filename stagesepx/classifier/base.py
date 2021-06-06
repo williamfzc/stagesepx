@@ -6,6 +6,7 @@ import json
 import cv2
 import time
 import numpy as np
+import difflib
 from loguru import logger
 
 from stagesepx.cutter import VideoCutRange
@@ -71,6 +72,30 @@ class SingleClassifierResult(object):
     __repr__ = __str__
 
 
+class DiffResult(object):
+    def __init__(
+        self, origin_data: "ClassifierResult", another_data: "ClassifierResult"
+    ):
+        self.origin_data = origin_data
+        self.another_data = another_data
+
+    @property
+    def origin_stage_list(self):
+        return self.origin_data.get_ordered_stage_set()
+
+    @property
+    def another_stage_list(self):
+        return self.another_data.get_ordered_stage_set()
+
+    def ok(self) -> bool:
+        return self.origin_stage_list == self.another_stage_list
+
+    def get_data(self):
+        return difflib.Differ().compare(
+            self.origin_stage_list, self.another_stage_list
+        )
+
+
 class ClassifierResult(object):
     LABEL_DATA: str = "data"
     LABEL_VIDEO_PATH: str = "video_path"
@@ -91,6 +116,18 @@ class ClassifierResult(object):
     def get_offset(self) -> float:
         # timestamp offset between frames
         return self.data[1].timestamp - self.data[0].timestamp
+
+    def get_ordered_stage_set(self) -> typing.List[str]:
+        ret = list()
+        for each in self.get_stage_list():
+            # first element
+            if not ret:
+                ret.append(each)
+                continue
+            if each == ret[-1]:
+                continue
+            ret.append(each)
+        return ret
 
     def get_stage_set(self) -> typing.Set[str]:
         return set(self.get_stage_list())
@@ -272,6 +309,9 @@ class ClassifierResult(object):
 
         data = content[cls.LABEL_DATA]
         return ClassifierResult([SingleClassifierResult(**each) for each in data])
+
+    def diff(self, another: "ClassifierResult") -> DiffResult:
+        return DiffResult(self, another)
 
     # alias
     get_frame_length = get_offset
