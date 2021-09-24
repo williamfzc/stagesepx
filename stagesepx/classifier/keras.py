@@ -204,7 +204,7 @@ class KerasClassifier(BaseModelClassifier):
         frame = cv2.resize(frame, dsize=self.data_size)
         frame = np.expand_dims(frame, axis=[0, -1])
 
-        return str(self._model.predict_classes(frame)[0])
+        return str(np.argmax(self._model.predict(frame), axis=1)[0])
 
     def _classify_frame(self, frame: VideoFrame, *_, **__) -> str:
         return self.predict_with_object(frame.data)
