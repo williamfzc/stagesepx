@@ -118,7 +118,10 @@ class KerasClassifier(BaseModelClassifier):
         model.add(Dense(64))
         model.add(Activation("relu"))
         model.add(Dropout(0.5))
+        # lock dense to 6
+        # https://github.com/williamfzc/stagesepx/issues/112
         model.add(Dense(6))
+
         model.add(Activation("softmax"))
 
         model.compile(
@@ -144,6 +147,12 @@ class KerasClassifier(BaseModelClassifier):
             assert (
                 number_of_dir > 1
             ), f"dataset only contains one class. maybe some path errors happened: {p}?"
+
+            # more than 6 classes?
+            assert number_of_dir <= 6, (
+                f"dataset has {number_of_dir} classes (more than 6), please see "
+                f"https://github.com/williamfzc/stagesepx/issues/112 "
+            )
 
         _data_verify(data_path)
 
