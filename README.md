@@ -129,7 +129,7 @@
     - [太麻烦了，有没有开箱即用、简单配置下可以落地的工具](https://github.com/williamfzc/sepmachine)
 - 其他：
     - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
-    - [官方文档](https://williamfzc.github.io/stagesepx/)
+    - [（使用时请参考上面的其他链接，此文档更新不及时）官方文档](https://williamfzc.github.io/stagesepx/)
 
 ### 命令行
 
