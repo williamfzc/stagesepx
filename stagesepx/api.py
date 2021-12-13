@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
+from stagesepx.hook import BaseHook
 from stagesepx.reporter import Reporter
 from stagesepx import constants
 from stagesepx.video import VideoObject
@@ -292,6 +293,7 @@ def analyse(
 def diff(
     video_before: typing.Union[str, VideoObject],
     video_after: typing.Union[str, VideoObject],
+    pre_hooks: typing.List[BaseHook] = None,
 ):
     cutter = VideoCutter()
     if isinstance(video_before, str):
@@ -303,4 +305,4 @@ def diff(
 
     res = cutter.cut(video_before)
     res1 = cutter.cut(video_after)
-    return res.diff(res1)
+    return res.diff(res1, pre_hooks)

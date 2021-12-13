@@ -7,6 +7,7 @@ import numpy as np
 from loguru import logger
 
 from stagesepx import toolbox
+from stagesepx.hook import BaseHook
 from stagesepx.video import VideoObject, VideoFrame
 from stagesepx.cutter.cut_range import VideoCutRange
 
@@ -465,11 +466,17 @@ class VideoCutResult(object):
             return cls.loads(f.read())
 
     def diff(
-        self, another: "VideoCutResult", auto_merge: bool = None, *args, **kwargs
+        self,
+        another: "VideoCutResult",
+        auto_merge: bool = None,
+        pre_hooks: typing.List[BaseHook] = None,
+        *args,
+        **kwargs,
     ) -> "VideoCutResultDiff":
         """
         compare cut result with another one
 
+        :param pre_hooks:
         :param another: another VideoCutResult object
         :param auto_merge: bool, will auto merge diff result and make it simple
         :param args:
@@ -480,6 +487,7 @@ class VideoCutResult(object):
         another_stable, _ = another.get_range(*args, **kwargs)
 
         result = VideoCutResultDiff(self_stable, another_stable)
+        result.apply_diff(pre_hooks)
 
         if auto_merge:
             after = dict()
@@ -496,7 +504,7 @@ class VideoCutResult(object):
         range_list_2: typing.List[VideoCutRange],
         *args,
         **kwargs,
-    ) -> typing.Dict[int, typing.List[float]]:
+    ) -> typing.Dict[int, typing.Dict[int, typing.List[float]]]:
         # 1. stage length compare
         self_stable_range_count = len(range_list_1)
         another_stable_range_count = len(range_list_2)
@@ -519,13 +527,6 @@ class VideoCutResult(object):
 
 
 class VideoCutResultDiff(object):
-    def __init__(self, cur, another):
-        self.cur = cur
-        self.another = another
-        self.data = VideoCutResult.range_diff(cur, another)
-
-
-class VideoCutResultDiff(object):
     """
     assume origin video's stages: 1 -> 2 -> 3 -> 4
     its diff can be:
@@ -543,7 +544,10 @@ class VideoCutResultDiff(object):
     ):
         self.origin = origin
         self.another = another
-        self.data = VideoCutResult.range_diff(origin, another)
+        self.data = None
+
+    def apply_diff(self, pre_hooks: typing.List[BaseHook] = None):
+        self.data = VideoCutResult.range_diff(self.origin, self.another, pre_hooks)
 
     def most_common(self, stage_id: int) -> (int, float):
         assert stage_id in self.data

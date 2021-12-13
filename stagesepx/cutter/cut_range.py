@@ -5,6 +5,7 @@ from loguru import logger
 
 from stagesepx import toolbox
 from stagesepx import constants
+from stagesepx.hook import BaseHook
 from stagesepx.video import VideoObject, VideoFrame
 
 
@@ -151,10 +152,16 @@ class VideoCutRange(object):
         end_frame = operator.get_frame_by_id(self.end)
         return toolbox.compare_ssim(start_frame.data, end_frame.data) > threshold
 
-    def diff(self, another: "VideoCutRange", *args, **kwargs) -> typing.List[float]:
+    def diff(
+        self,
+        another: "VideoCutRange",
+        pre_hooks: typing.List[BaseHook],
+        *args,
+        **kwargs,
+    ) -> typing.List[float]:
         self_picked = self.pick_and_get(*args, **kwargs)
         another_picked = another.pick_and_get(*args, **kwargs)
-        return toolbox.multi_compare_ssim(self_picked, another_picked)
+        return toolbox.multi_compare_ssim(self_picked, another_picked, pre_hooks)
 
     def __str__(self):
         return f"<VideoCutRange [{self.start}({self.start_time})-{self.end}({self.end_time})] ssim={self.ssim}>"

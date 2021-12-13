@@ -50,15 +50,23 @@ def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
 
 
 def multi_compare_ssim(
-    pic1_list: typing.List, pic2_list: typing.List
+    pic1_list: typing.List, pic2_list: typing.List, hooks: typing.List = None
 ) -> typing.List[float]:
     # avoid import loop
     from stagesepx.video import VideoFrame
 
     if isinstance(pic1_list[0], VideoFrame):
+        if hooks:
+            for each in hooks:
+                pic1_list = [each.do(each_frame) for each_frame in pic1_list]
         pic1_list = [i.data for i in pic1_list]
+
     if isinstance(pic2_list[0], VideoFrame):
+        if hooks:
+            for each in hooks:
+                pic2_list = [each.do(each_frame) for each_frame in pic2_list]
         pic2_list = [i.data for i in pic2_list]
+
     return [compare_ssim(a, b) for a, b in zip(pic1_list, pic2_list)]
 
 

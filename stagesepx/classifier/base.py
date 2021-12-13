@@ -91,9 +91,7 @@ class DiffResult(object):
         return self.origin_stage_list == self.another_stage_list
 
     def get_data(self):
-        return difflib.Differ().compare(
-            self.origin_stage_list, self.another_stage_list
-        )
+        return difflib.Differ().compare(self.origin_stage_list, self.another_stage_list)
 
 
 class ClassifierResult(object):
