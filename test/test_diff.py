@@ -2,6 +2,8 @@ from stagesepx.cutter import VideoCutter
 import os
 import pprint
 
+from stagesepx.cutter.cut_result import VideoCutResultDiff
+
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 
 # use same video?
@@ -18,6 +20,6 @@ def test_diff():
         stable, _ = each.get_range()
         res.pick_and_save(stable, 3)
 
-    diff_dict = res.diff(res1, frame_count=5)
-    pprint.pprint(diff_dict)
-    assert diff_dict
+    diff: VideoCutResultDiff = res.diff(res1, frame_count=5)
+    pprint.pprint(diff.data)
+    assert diff.data

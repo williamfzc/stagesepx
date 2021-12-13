@@ -466,7 +466,7 @@ class VideoCutResult(object):
 
     def diff(
         self, another: "VideoCutResult", auto_merge: bool = None, *args, **kwargs
-    ) -> typing.Dict:
+    ) -> "VideoCutResultDiff":
         """
         compare cut result with another one
 
@@ -479,20 +479,16 @@ class VideoCutResult(object):
         self_stable, _ = self.get_range(*args, **kwargs)
         another_stable, _ = another.get_range(*args, **kwargs)
 
-        result = dict()
-        result["self"] = self_stable
-        result["another"] = another_stable
-        result["data"] = self.range_diff(self_stable, another_stable, *args, **kwargs)
+        result = VideoCutResultDiff(self_stable, another_stable)
 
-        if not auto_merge:
-            return result
-
-        after = dict()
-        for self_stage_name, each_result in result["data"].items():
-            max_one = sorted(each_result.items(), key=lambda x: max(x[1]))[-1]
-            max_one = (max_one[0], max(max_one[1]))
-            after[self_stage_name] = max_one
-        return after
+        if auto_merge:
+            after = dict()
+            for self_stage_name, each_result in result.data.items():
+                max_one = sorted(each_result.items(), key=lambda x: max(x[1]))[-1]
+                max_one = (max_one[0], max(max_one[1]))
+                after[self_stage_name] = max_one
+            result.data = after
+        return result
 
     @staticmethod
     def range_diff(
@@ -520,3 +516,10 @@ class VideoCutResult(object):
                 )
             data[self_id] = temp
         return data
+
+
+class VideoCutResultDiff(object):
+    def __init__(self, cur, another):
+        self.cur = cur
+        self.another = another
+        self.data = VideoCutResult.range_diff(cur, another)

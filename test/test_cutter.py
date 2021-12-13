@@ -1,4 +1,5 @@
 from stagesepx.cutter import VideoCutter, VideoCutResult
+from stagesepx.cutter.cut_result import VideoCutResultDiff
 from stagesepx.video import VideoObject
 import os
 import shutil
@@ -89,7 +90,7 @@ def test_cut_result():
     res = cutter.cut(v)
     stable, _ = res.get_range()
     assert len(stable) == len(res.get_stable_range())
-    assert isinstance(res.diff(res, auto_merge=True), dict)
+    assert isinstance(res.diff(res, auto_merge=True), VideoCutResultDiff)
     assert isinstance(res.thumbnail(stable[0]), np.ndarray)
     assert isinstance(res.thumbnail(stable[0], is_vertical=True), np.ndarray)
     assert isinstance(res.thumbnail(stable[0], to_dir="somewhere"), np.ndarray)
