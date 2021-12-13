@@ -496,7 +496,7 @@ class VideoCutResult(object):
         range_list_2: typing.List[VideoCutRange],
         *args,
         **kwargs,
-    ) -> typing.Dict:
+    ) -> typing.Dict[int, typing.List[float]]:
         # 1. stage length compare
         self_stable_range_count = len(range_list_1)
         another_stable_range_count = len(range_list_2)
@@ -523,3 +523,35 @@ class VideoCutResultDiff(object):
         self.cur = cur
         self.another = another
         self.data = VideoCutResult.range_diff(cur, another)
+
+
+class VideoCutResultDiff(object):
+    """
+    assume origin video's stages: 1 -> 2 -> 3 -> 4
+    its diff can be:
+    - stage new    : 1-2-5-3-4
+    - stage replace: 1-5-3-4
+    - stage lost   : 1-3-4
+
+    https://github.com/williamfzc/stagesepx/issues/158
+    """
+
+    threshold: float = 0.9
+
+    def __init__(
+        self, origin: typing.List[VideoCutRange], another: typing.List[VideoCutRange]
+    ):
+        self.origin = origin
+        self.another = another
+        self.data = VideoCutResult.range_diff(origin, another)
+
+    def is_stage_lost(self, stage_id: int) -> bool:
+        # what we care most
+        assert stage_id in self.data
+        for each in self.data[stage_id].values():
+            if (sum(each) / len(each)) > self.threshold:
+                return False
+        return True
+
+    def any_stage_lost(self) -> bool:
+        return all((self.is_stage_lost(each) for each in self.data.keys()))

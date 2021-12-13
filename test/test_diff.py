@@ -23,3 +23,4 @@ def test_diff():
     diff: VideoCutResultDiff = res.diff(res1, frame_count=5)
     pprint.pprint(diff.data)
     assert diff.data
+    assert not diff.any_stage_lost()
