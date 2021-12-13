@@ -25,7 +25,7 @@ class VideoCutResult(object):
         self.cut_kwargs = cut_kwargs or {}
 
     def get_target_range_by_id(self, frame_id: int) -> VideoCutRange:
-        """ get target VideoCutRange by id (which belongs to) """
+        """get target VideoCutRange by id (which belongs to)"""
         for each in self.range_list:
             if each.contain(frame_id):
                 return each
@@ -44,7 +44,7 @@ class VideoCutResult(object):
     def get_unstable_range(
         self, limit: int = None, range_threshold: float = None, **kwargs
     ) -> typing.List[VideoCutRange]:
-        """ return unstable range only """
+        """return unstable range only"""
         change_range_list = sorted(
             [i for i in self.range_list if not i.is_stable(**kwargs)],
             key=lambda x: x.start,
@@ -238,7 +238,7 @@ class VideoCutResult(object):
     def get_stable_range(
         self, limit: int = None, **kwargs
     ) -> typing.List[VideoCutRange]:
-        """ return stable range only """
+        """return stable range only"""
         return self.get_range(limit, **kwargs)[0]
 
     def get_range_dynamic(
@@ -249,7 +249,7 @@ class VideoCutResult(object):
         max_retry: int = 10,
         **kwargs,
     ) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
-        """ this method was designed for supporting flexible threshold range """
+        """this method was designed for supporting flexible threshold range"""
         assert max_retry != 0, f"fail to get range dynamically: {stable_num_limit}"
         assert len(stable_num_limit) == 2, "num_limit should be something like [1, 3]"
         assert 0.0 < threshold < 1.0, "threshold out of range"
@@ -545,13 +545,27 @@ class VideoCutResultDiff(object):
         self.another = another
         self.data = VideoCutResult.range_diff(origin, another)
 
+    def most_common(self, stage_id: int) -> (int, float):
+        assert stage_id in self.data
+        ret_k, ret_v = -1, -1.0
+        for k, v in self.data[stage_id].items():
+            cur = sum(v) / len(v)
+            if cur > ret_v:
+                ret_k = k
+                ret_v = v
+        return ret_k, ret_v
+
     def is_stage_lost(self, stage_id: int) -> bool:
         # what we care most
-        assert stage_id in self.data
-        for each in self.data[stage_id].values():
-            if (sum(each) / len(each)) > self.threshold:
-                return False
-        return True
+        _, v = self.most_common(stage_id)
+        return v < self.threshold
 
     def any_stage_lost(self) -> bool:
         return all((self.is_stage_lost(each) for each in self.data.keys()))
+
+    def stage_swift(self) -> typing.Dict[int, int]:
+        ret = dict()
+        for k, v in self.data.values():
+            new_k, _ = self.most_common(k)
+            ret[k] = new_k
+        return ret
