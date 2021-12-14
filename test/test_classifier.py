@@ -101,6 +101,8 @@ def test_result():
     assert classify_result.contain("1")
     assert classify_result.first("1").frame_id == 20
     assert classify_result.last("1").frame_id == 21
+    assert classify_result.is_order_correct(["0", "1", "2", "3"])
+    assert classify_result.is_order_correct(["0", "2", "3"])
 
 
 def test_dump_and_load():
@@ -118,7 +120,7 @@ def test_dump_and_load():
     assert classify_result.diff(res_from_file).ok()
 
     diffobj = classify_result.diff(res_from_file)
-    diffobj.get_data()
+    diffobj.get_diff_str()
 
 
 def test_keras():
