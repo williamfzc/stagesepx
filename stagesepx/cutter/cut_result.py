@@ -556,7 +556,7 @@ class VideoCutResultDiff(object):
             cur = sum(v) / len(v)
             if cur > ret_v:
                 ret_k = k
-                ret_v = v
+                ret_v = cur
         return ret_k, ret_v
 
     def is_stage_lost(self, stage_id: int) -> bool:
