@@ -5,6 +5,7 @@ import uuid
 import json
 import numpy as np
 from loguru import logger
+import difflib
 
 from stagesepx import toolbox
 from stagesepx.hook import BaseHook
@@ -470,12 +471,14 @@ class VideoCutResult(object):
         another: "VideoCutResult",
         auto_merge: bool = None,
         pre_hooks: typing.List[BaseHook] = None,
+        output_path: str = None,
         *args,
         **kwargs,
     ) -> "VideoCutResultDiff":
         """
         compare cut result with another one
 
+        :param output_path:
         :param pre_hooks:
         :param another: another VideoCutResult object
         :param auto_merge: bool, will auto merge diff result and make it simple
@@ -485,6 +488,8 @@ class VideoCutResult(object):
         """
         self_stable, _ = self.get_range(*args, **kwargs)
         another_stable, _ = another.get_range(*args, **kwargs)
+        self.pick_and_save(self_stable, 3, to_dir=output_path)
+        another.pick_and_save(another_stable, 3, to_dir=output_path)
 
         result = VideoCutResultDiff(self_stable, another_stable)
         result.apply_diff(pre_hooks)
@@ -537,23 +542,27 @@ class VideoCutResultDiff(object):
     https://github.com/williamfzc/stagesepx/issues/158
     """
 
-    threshold: float = 0.9
+    threshold: float = 0.7
+    default_stage_id: int = -1
+    default_score: float = -1.0
 
     def __init__(
         self, origin: typing.List[VideoCutRange], another: typing.List[VideoCutRange]
     ):
         self.origin = origin
         self.another = another
-        self.data = None
+        self.data: typing.Optional[
+            typing.Dict[int, typing.Dict[int, typing.List[float]]]
+        ] = None
 
     def apply_diff(self, pre_hooks: typing.List[BaseHook] = None):
         self.data = VideoCutResult.range_diff(self.origin, self.another, pre_hooks)
 
     def most_common(self, stage_id: int) -> (int, float):
         assert stage_id in self.data
-        ret_k, ret_v = -1, -1.0
+        ret_k, ret_v = self.default_stage_id, self.default_score
         for k, v in self.data[stage_id].items():
-            cur = sum(v) / len(v)
+            cur = max(v)
             if cur > ret_v:
                 ret_k = k
                 ret_v = cur
@@ -567,9 +576,16 @@ class VideoCutResultDiff(object):
     def any_stage_lost(self) -> bool:
         return all((self.is_stage_lost(each) for each in self.data.keys()))
 
-    def stage_swift(self) -> typing.Dict[int, int]:
-        ret = dict()
-        for k, v in self.data.items():
-            new_k, _ = self.most_common(k)
-            ret[k] = new_k
+    def stage_shift(self) -> typing.List[int]:
+        ret = list()
+        for k in self.data.keys():
+            new_k, score = self.most_common(k)
+            if score > self.threshold:
+                ret.append(new_k)
         return ret
+
+    def stage_diff(self):
+        return difflib.Differ().compare(
+            [str(each) for each in self.stage_shift()],
+            [str(each) for each in range(len(self.another))],
+        )
