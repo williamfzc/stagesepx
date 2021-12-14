@@ -149,8 +149,8 @@ def test_run_calc():
 
 
 def test_diff():
-    from stagesepx.api import diff
+    from stagesepx.api import _diff
 
-    diff_object = diff(VIDEO_PATH, VIDEO_PATH)
+    diff_object = _diff(VIDEO_PATH, VIDEO_PATH)
     assert diff_object
     assert not diff_object.any_stage_lost()

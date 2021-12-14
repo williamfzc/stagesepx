@@ -290,7 +290,10 @@ def analyse(
     )
 
 
-def diff(
+# https://github.com/williamfzc/stagesepx/issues/158
+# not a good design, hide this method
+# maybe i am wrong
+def _diff(
     video_before: typing.Union[str, VideoObject],
     video_after: typing.Union[str, VideoObject],
     pre_hooks: typing.List[BaseHook] = None,
