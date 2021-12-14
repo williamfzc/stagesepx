@@ -569,7 +569,7 @@ class VideoCutResultDiff(object):
 
     def stage_swift(self) -> typing.Dict[int, int]:
         ret = dict()
-        for k, v in self.data.values():
+        for k, v in self.data.items():
             new_k, _ = self.most_common(k)
             ret[k] = new_k
         return ret
