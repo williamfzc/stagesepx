@@ -154,3 +154,4 @@ def test_diff():
     diff_object = _diff(VIDEO_PATH, VIDEO_PATH)
     assert diff_object
     assert not diff_object.any_stage_lost()
+    assert diff_object.stage_diff()
