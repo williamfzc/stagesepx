@@ -322,7 +322,7 @@ class ClassifierResult(object):
         # compare
         ptr_should, ptr_cur = 0, 0
         while ptr_cur < len_cur:
-            if cur[ptr_cur] == should_be[ptr_cur]:
+            if cur[ptr_cur] == should_be[ptr_should]:
                 ptr_should += 1
             ptr_cur += 1
             if ptr_should == len_should_be:
