@@ -90,10 +90,8 @@ class DiffResult(object):
     def ok(self) -> bool:
         return self.origin_stage_list == self.another_stage_list
 
-    def get_data(self):
-        return difflib.Differ().compare(
-            self.origin_stage_list, self.another_stage_list
-        )
+    def get_diff_str(self):
+        return difflib.Differ().compare(self.origin_stage_list, self.another_stage_list)
 
 
 class ClassifierResult(object):
@@ -312,6 +310,24 @@ class ClassifierResult(object):
 
     def diff(self, another: "ClassifierResult") -> DiffResult:
         return DiffResult(self, another)
+
+    def is_order_correct(self, should_be: typing.List[str]) -> bool:
+        cur = self.get_ordered_stage_set()
+        len_cur, len_should_be = len(cur), len(should_be)
+        if len_cur == len_should_be:
+            return cur == should_be
+        if len_cur < len_should_be:
+            # some classes lost
+            return False
+        # compare
+        ptr_should, ptr_cur = 0, 0
+        while ptr_cur < len_cur:
+            if cur[ptr_cur] == should_be[ptr_should]:
+                ptr_should += 1
+            ptr_cur += 1
+            if ptr_should == len_should_be:
+                return True
+        return False
 
     # alias
     get_frame_length = get_offset

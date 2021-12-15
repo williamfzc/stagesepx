@@ -5,8 +5,10 @@ import uuid
 import json
 import numpy as np
 from loguru import logger
+import difflib
 
 from stagesepx import toolbox
+from stagesepx.hook import BaseHook
 from stagesepx.video import VideoObject, VideoFrame
 from stagesepx.cutter.cut_range import VideoCutRange
 
@@ -25,7 +27,7 @@ class VideoCutResult(object):
         self.cut_kwargs = cut_kwargs or {}
 
     def get_target_range_by_id(self, frame_id: int) -> VideoCutRange:
-        """ get target VideoCutRange by id (which belongs to) """
+        """get target VideoCutRange by id (which belongs to)"""
         for each in self.range_list:
             if each.contain(frame_id):
                 return each
@@ -44,7 +46,7 @@ class VideoCutResult(object):
     def get_unstable_range(
         self, limit: int = None, range_threshold: float = None, **kwargs
     ) -> typing.List[VideoCutRange]:
-        """ return unstable range only """
+        """return unstable range only"""
         change_range_list = sorted(
             [i for i in self.range_list if not i.is_stable(**kwargs)],
             key=lambda x: x.start,
@@ -238,7 +240,7 @@ class VideoCutResult(object):
     def get_stable_range(
         self, limit: int = None, **kwargs
     ) -> typing.List[VideoCutRange]:
-        """ return stable range only """
+        """return stable range only"""
         return self.get_range(limit, **kwargs)[0]
 
     def get_range_dynamic(
@@ -249,7 +251,7 @@ class VideoCutResult(object):
         max_retry: int = 10,
         **kwargs,
     ) -> typing.Tuple[typing.List[VideoCutRange], typing.List[VideoCutRange]]:
-        """ this method was designed for supporting flexible threshold range """
+        """this method was designed for supporting flexible threshold range"""
         assert max_retry != 0, f"fail to get range dynamically: {stable_num_limit}"
         assert len(stable_num_limit) == 2, "num_limit should be something like [1, 3]"
         assert 0.0 < threshold < 1.0, "threshold out of range"
@@ -465,11 +467,19 @@ class VideoCutResult(object):
             return cls.loads(f.read())
 
     def diff(
-        self, another: "VideoCutResult", auto_merge: bool = None, *args, **kwargs
+        self,
+        another: "VideoCutResult",
+        auto_merge: bool = None,
+        pre_hooks: typing.List[BaseHook] = None,
+        output_path: str = None,
+        *args,
+        **kwargs,
     ) -> "VideoCutResultDiff":
         """
         compare cut result with another one
 
+        :param output_path:
+        :param pre_hooks:
         :param another: another VideoCutResult object
         :param auto_merge: bool, will auto merge diff result and make it simple
         :param args:
@@ -478,8 +488,11 @@ class VideoCutResult(object):
         """
         self_stable, _ = self.get_range(*args, **kwargs)
         another_stable, _ = another.get_range(*args, **kwargs)
+        self.pick_and_save(self_stable, 3, to_dir=output_path)
+        another.pick_and_save(another_stable, 3, to_dir=output_path)
 
         result = VideoCutResultDiff(self_stable, another_stable)
+        result.apply_diff(pre_hooks)
 
         if auto_merge:
             after = dict()
@@ -496,7 +509,7 @@ class VideoCutResult(object):
         range_list_2: typing.List[VideoCutRange],
         *args,
         **kwargs,
-    ) -> typing.Dict:
+    ) -> typing.Dict[int, typing.Dict[int, typing.List[float]]]:
         # 1. stage length compare
         self_stable_range_count = len(range_list_1)
         another_stable_range_count = len(range_list_2)
@@ -519,7 +532,60 @@ class VideoCutResult(object):
 
 
 class VideoCutResultDiff(object):
-    def __init__(self, cur, another):
-        self.cur = cur
+    """
+    assume origin video's stages: 1 -> 2 -> 3 -> 4
+    its diff can be:
+    - stage new    : 1-2-5-3-4
+    - stage replace: 1-5-3-4
+    - stage lost   : 1-3-4
+
+    https://github.com/williamfzc/stagesepx/issues/158
+    """
+
+    threshold: float = 0.7
+    default_stage_id: int = -1
+    default_score: float = -1.0
+
+    def __init__(
+        self, origin: typing.List[VideoCutRange], another: typing.List[VideoCutRange]
+    ):
+        self.origin = origin
         self.another = another
-        self.data = VideoCutResult.range_diff(cur, another)
+        self.data: typing.Optional[
+            typing.Dict[int, typing.Dict[int, typing.List[float]]]
+        ] = None
+
+    def apply_diff(self, pre_hooks: typing.List[BaseHook] = None):
+        self.data = VideoCutResult.range_diff(self.origin, self.another, pre_hooks)
+
+    def most_common(self, stage_id: int) -> (int, float):
+        assert stage_id in self.data
+        ret_k, ret_v = self.default_stage_id, self.default_score
+        for k, v in self.data[stage_id].items():
+            cur = max(v)
+            if cur > ret_v:
+                ret_k = k
+                ret_v = cur
+        return ret_k, ret_v
+
+    def is_stage_lost(self, stage_id: int) -> bool:
+        # what we care most
+        _, v = self.most_common(stage_id)
+        return v < self.threshold
+
+    def any_stage_lost(self) -> bool:
+        return all((self.is_stage_lost(each) for each in self.data.keys()))
+
+    def stage_shift(self) -> typing.List[int]:
+        ret = list()
+        for k in self.data.keys():
+            new_k, score = self.most_common(k)
+            if score > self.threshold:
+                ret.append(new_k)
+        return ret
+
+    def stage_diff(self):
+        return difflib.Differ().compare(
+            [str(each) for each in self.stage_shift()],
+            [str(each) for each in range(len(self.another))],
+        )

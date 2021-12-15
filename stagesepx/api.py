@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from stagesepx.cutter import VideoCutter
 from stagesepx.classifier import SVMClassifier
+from stagesepx.hook import BaseHook
 from stagesepx.reporter import Reporter
 from stagesepx import constants
 from stagesepx.video import VideoObject
@@ -255,7 +256,7 @@ def analyse(
     offset: int = 3,
     boost_mode: bool = True,
 ):
-    """ designed for https://github.com/williamfzc/stagesepx/issues/123 """
+    """designed for https://github.com/williamfzc/stagesepx/issues/123"""
 
     if isinstance(video, str):
         video = VideoObject(video, pre_load=pre_load)
@@ -287,3 +288,26 @@ def analyse(
         unstable_ranges=unstable,
         cut_result=res,
     )
+
+
+# https://github.com/williamfzc/stagesepx/issues/158
+# not a good design, hide this method
+# maybe i am wrong
+def _diff(
+    video_before: typing.Union[str, VideoObject],
+    video_after: typing.Union[str, VideoObject],
+    pre_hooks: typing.List[BaseHook] = None,
+    *args,
+    **kwargs,
+):
+    cutter = VideoCutter()
+    if isinstance(video_before, str):
+        video_before = VideoObject(video_before)
+        video_before.load_frames()
+    if isinstance(video_after, str):
+        video_after = VideoObject(video_after)
+        video_after.load_frames()
+
+    res = cutter.cut(video_before)
+    res1 = cutter.cut(video_after)
+    return res.diff(res1, pre_hooks, *args, **kwargs)
