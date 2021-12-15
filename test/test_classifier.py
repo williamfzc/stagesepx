@@ -101,8 +101,11 @@ def test_result():
     assert classify_result.contain("1")
     assert classify_result.first("1").frame_id == 20
     assert classify_result.last("1").frame_id == 21
-    assert classify_result.is_order_correct(["0", "1", "2", "3"])
-    assert classify_result.is_order_correct(["0", "2", "3"])
+    assert classify_result.is_order_correct(["0", "0", "1", "2"])
+    assert classify_result.is_order_correct(["0", "0", "2"])
+    assert classify_result.is_order_correct(["0", "1"])
+    assert classify_result.is_order_correct(["0", "2"])
+    assert classify_result.is_order_correct(["1", "2"])
 
 
 def test_dump_and_load():
