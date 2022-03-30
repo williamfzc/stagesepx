@@ -38,6 +38,7 @@ setup(
         "pyecharts>=1.3.1",
         "findit>=0.5.8",
         "Jinja2>=2.10.1",
+        "MarkupSafe>=2.0.1",
         "fire>=0.2.1",
         "keras>=2.3.1",
         "pydantic>=0.32.2",
