@@ -2,7 +2,8 @@ import os
 import typing
 import json
 import numpy as np
-from jinja2 import Markup, Template
+from markupsafe import Markup
+from jinja2 import Template
 from pyecharts.charts import Line, Bar, Page
 from pyecharts import options as opts
 from loguru import logger
