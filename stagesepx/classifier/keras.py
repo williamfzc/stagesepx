@@ -10,9 +10,11 @@ try:
 except ImportError:
     raise ImportError("KerasClassifier requires tensorflow. install it first.")
 from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
+
+# https://github.com/tensorflow/models/issues/6177
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D
+from tensorflow.keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
 
 from stagesepx.classifier.base import BaseModelClassifier
@@ -95,7 +97,7 @@ class KerasClassifier(BaseModelClassifier):
         self._model.load_weights(model_path)
 
     def create_model(self) -> Sequential:
-        """ model structure. you can overwrite this method to build your own model """
+        """model structure. you can overwrite this method to build your own model"""
         logger.info(f"creating keras sequential model")
         if K.image_data_format() == "channels_first":
             input_shape = (1, *self.data_size)
@@ -213,7 +215,13 @@ class KerasClassifier(BaseModelClassifier):
         frame = cv2.resize(frame, dsize=self.data_size)
         frame = np.expand_dims(frame, axis=[0, -1])
 
-        return str(np.argmax(self._model.predict(frame), axis=1)[0])
+        result = self._model.predict(frame)
+        tag = str(np.argmax(result, axis=1)[0])
+        confidence = result.max()
+        if confidence < self.score_threshold:
+            logger.warning("confidence lower than threshold")
+            return constants.UNKNOWN_STAGE_FLAG
+        return tag
 
     def _classify_frame(self, frame: VideoFrame, *_, **__) -> str:
         return self.predict_with_object(frame.data)

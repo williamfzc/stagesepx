@@ -113,7 +113,7 @@ class VideoCutRange(object):
     def get_frames(
         self, frame_id_list: typing.List[int], *_, **__
     ) -> typing.List[VideoFrame]:
-        """ return a list of VideoFrame, usually works with pick """
+        """return a list of VideoFrame, usually works with pick"""
         out = list()
         operator = self.video.get_operator()
         for each_id in frame_id_list:

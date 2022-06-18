@@ -118,7 +118,7 @@ class VideoObject(object):
     __repr__ = __str__
 
     def add_preload_hook(self, new_hook: "BaseHook"):
-        """ this hook only will be executed when preload """
+        """this hook only will be executed when preload"""
         self._hook_list.append(new_hook)
 
     def clean_frames(self):

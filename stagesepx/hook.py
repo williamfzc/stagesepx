@@ -26,7 +26,7 @@ class BaseHook(object):
 
 
 class ExampleHook(BaseHook):
-    """ this hook will help you write your own hook class """
+    """this hook will help you write your own hook class"""
 
     def __init__(self, *_, **__):
         """
@@ -96,7 +96,7 @@ class GreyHook(BaseHook):
 
 
 class RefineHook(BaseHook):
-    """ this hook was built for refining the edges of images """
+    """this hook was built for refining the edges of images"""
 
     def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
         super().do(frame, *_, **__)
@@ -162,7 +162,7 @@ class _AreaBaseHook(BaseHook):
 
 
 class CropHook(_AreaBaseHook):
-    """ this hook was built for cropping frames, eg: keep only a half of origin frame """
+    """this hook was built for cropping frames, eg: keep only a half of origin frame"""
 
     def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
         super().do(frame, *_, **__)
@@ -178,7 +178,7 @@ class CropHook(_AreaBaseHook):
 
 
 class IgnoreHook(_AreaBaseHook):
-    """ ignore some area of frames """
+    """ignore some area of frames"""
 
     def do(self, frame: VideoFrame, *_, **__) -> typing.Optional[VideoFrame]:
         super().do(frame, *_, **__)
@@ -195,7 +195,7 @@ class IgnoreHook(_AreaBaseHook):
 
 
 class FrameSaveHook(BaseHook):
-    """ add this hook, and save all the frames you want to specific dir """
+    """add this hook, and save all the frames you want to specific dir"""
 
     def __init__(self, target_dir: str, *_, **__):
         super().__init__(*_, **__)
@@ -217,7 +217,7 @@ class FrameSaveHook(BaseHook):
 
 
 class InterestPointHook(BaseHook):
-    """ use ORB detector to get the number of interest points """
+    """use ORB detector to get the number of interest points"""
 
     def __init__(self, *_, **__):
         super().__init__(*_, **__)

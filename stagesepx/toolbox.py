@@ -84,7 +84,7 @@ def get_current_frame_time(video_cap: cv2.VideoCapture) -> float:
 
 
 def imread(img_path: str, *_, **__) -> np.ndarray:
-    """ wrapper of cv2.imread """
+    """wrapper of cv2.imread"""
     assert os.path.isfile(img_path), f"file {img_path} is not existed"
     return cv2.imread(img_path, *_, **__)
 
@@ -109,7 +109,7 @@ def get_frame_count(video_cap: cv2.VideoCapture) -> int:
 
 
 def get_frame_size(video_cap: cv2.VideoCapture) -> typing.Tuple[int, int]:
-    """ return size of frame: (width, height) """
+    """return size of frame: (width, height)"""
     h = video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
     w = video_cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     return int(w), int(h)

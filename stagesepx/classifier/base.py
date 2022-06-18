@@ -211,7 +211,7 @@ class ClassifierResult(object):
     def get_specific_stage_range(
         self, stage_name: str
     ) -> typing.List[typing.List[SingleClassifierResult]]:
-        """ get specific stage range by stage name (maybe contains some partition """
+        """get specific stage range by stage name (maybe contains some partition"""
         ret = list()
         for each_range in self.get_stage_range():
             cur = each_range[0]
@@ -259,7 +259,7 @@ class ClassifierResult(object):
     def calc_changing_cost(
         self,
     ) -> typing.Dict[str, typing.Tuple[SingleClassifierResult, SingleClassifierResult]]:
-        """ calc time cost between stages """
+        """calc time cost between stages"""
         # add changing cost
         cost_dict: typing.Dict[
             str, typing.Tuple[SingleClassifierResult, SingleClassifierResult]
@@ -432,7 +432,7 @@ class BaseClassifier(object):
         raise DeprecationWarning("this function already deprecated")
 
     def _classify_frame(self, frame: VideoFrame, *args, **kwargs) -> str:
-        """ must be implemented by sub class """
+        """must be implemented by sub class"""
         raise NotImplementedError
 
     def _apply_hook(self, frame: VideoFrame, *args, **kwargs) -> VideoFrame:
