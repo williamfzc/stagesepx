@@ -167,8 +167,10 @@ class SVMClassifier(BaseModelClassifier):
             # class would be predicted
             return self._model.classes_[1 if scores > 0 else 0]
 
+        cur_confidence = max(scores)
+        logger.debug(f"confidence: {cur_confidence}")
         # unknown
-        if max(scores) < self.score_threshold:
+        if cur_confidence < self.score_threshold:
             logger.warning(
                 f"max score is lower than {self.score_threshold}, unknown class"
             )

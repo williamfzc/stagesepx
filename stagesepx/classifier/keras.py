@@ -218,8 +218,11 @@ class KerasClassifier(BaseModelClassifier):
         result = self._model.predict(frame)
         tag = str(np.argmax(result, axis=1)[0])
         confidence = result.max()
+        logger.debug(f"confidence: {confidence}")
         if confidence < self.score_threshold:
-            logger.warning("confidence lower than threshold")
+            logger.warning(
+                f"max score is lower than {self.score_threshold}, unknown class"
+            )
             return constants.UNKNOWN_STAGE_FLAG
         return tag
 
