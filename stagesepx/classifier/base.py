@@ -538,7 +538,7 @@ class BaseModelClassifier(BaseClassifier):
     def train(self, data_path: str = None, *_, **__):
         raise NotImplementedError
 
-    def predict(self, pic_path: str) -> str:
+    def predict(self, pic_path: str, *_, **__) -> str:
         raise NotImplementedError
 
     def predict_with_object(self, frame: np.ndarray) -> str:

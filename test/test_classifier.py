@@ -70,6 +70,7 @@ def test_save_and_load():
         assert i.to_dict() == j.to_dict()
 
     assert isinstance(reporter.get_stable_stage_sample(classify_result), np.ndarray)
+    assert cl.predict(IMAGE_PATH) == "0"
 
 
 def test_keep_data():
@@ -137,3 +138,4 @@ def test_keras():
     stable, _ = cutter_res.get_range()
     classify_result = cl.classify(VIDEO_PATH, stable, keep_data=True)
     assert classify_result.to_dict()
+    assert cl.predict(IMAGE_PATH) == "0"
