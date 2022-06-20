@@ -25,6 +25,8 @@ from stagesepx import constants
 
 class KerasClassifier(BaseModelClassifier):
     UNKNOWN_STAGE_NAME = constants.UNKNOWN_STAGE_FLAG
+    # https://github.com/williamfzc/stagesepx/issues/112
+    MODEL_DENSE = 6
 
     def __init__(
         self,
@@ -120,9 +122,7 @@ class KerasClassifier(BaseModelClassifier):
         model.add(Dense(64))
         model.add(Activation("relu"))
         model.add(Dropout(0.5))
-        # lock dense to 6
-        # https://github.com/williamfzc/stagesepx/issues/112
-        model.add(Dense(6))
+        model.add(Dense(self.MODEL_DENSE))
 
         model.add(Activation("softmax"))
 
@@ -223,7 +223,7 @@ class KerasClassifier(BaseModelClassifier):
             logger.warning(
                 f"max score is lower than {self.score_threshold}, unknown class"
             )
-            return constants.UNKNOWN_STAGE_FLAG
+            return self.UNKNOWN_STAGE_NAME
         return tag
 
     def _classify_frame(self, frame: VideoFrame, *_, **__) -> str:
