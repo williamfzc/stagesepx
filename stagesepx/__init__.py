@@ -34,8 +34,8 @@ SOFTWARE.
 
 __PROJECT_NAME__ = r"stagesepx"
 __AUTHOR__ = r"williamfzc"
-__AUTHOR_EMAIL__ = r"fengzc@vip.qq.com"
+__AUTHOR_EMAIL__ = r"williamfzc@foxmail.com"
 __LICENSE__ = r"MIT"
 __URL__ = r"https://github.com/williamfzc/stagesepx"
-__VERSION__ = r"0.16.2"
+__VERSION__ = r"0.17.0"
 __DESCRIPTION__ = r"detect stages in video automatically"
