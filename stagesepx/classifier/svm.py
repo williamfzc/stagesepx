@@ -129,19 +129,6 @@ class SVMClassifier(BaseModelClassifier):
         self._model.fit(train_data, train_label)
         logger.debug("train finished")
 
-    def predict(self, pic_path: str, *args, **kwargs) -> str:
-        """
-        predict a single picture
-
-        :param pic_path:
-        :return:
-        """
-        pic_object = toolbox.imread(pic_path)
-        # fake VideoFrame for apply_hook
-        fake_frame = VideoFrame(0, 0.0, pic_object)
-        fake_frame = self._apply_hook(fake_frame, *args, **kwargs)
-        return self.predict_with_object(fake_frame.data)
-
     def predict_with_object(self, frame: np.ndarray) -> str:
         """
         predict a single object
