@@ -18,6 +18,7 @@
 | code coverage        | [![codecov](https://codecov.io/gh/williamfzc/stagesepx/branch/master/graph/badge.svg)](https://codecov.io/gh/williamfzc/stagesepx)                                                               |
 | docker build status  | ![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/williamfzc/stagesepx) ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/williamfzc/stagesepx) |
 | code style           | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)                                                                                 |
+| stat           | [![Downloads](https://pepy.tech/badge/stagesepx)](https://pepy.tech/project/stagesepx)  [![Downloads](https://pepy.tech/badge/stagesepx/month)](https://pepy.tech/project/stagesepx) [![Downloads](https://pepy.tech/badge/stagesepx/week)](https://pepy.tech/project/stagesepx)                                                              |
 
 ---
 
