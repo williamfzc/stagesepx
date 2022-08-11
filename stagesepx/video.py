@@ -117,6 +117,24 @@ class VideoObject(object):
 
     __repr__ = __str__
 
+    def sync_timestamp(self):
+        try:
+            import moviepy.editor as mpy
+        except ImportError:
+            logger.error(f"import moviepy failed, can not sync timestamp")
+            return
+        vid = mpy.VideoFileClip(self.path)
+
+        # moviepy start from 0, 0.0
+        # but stagesepx is 1, 0.0
+        assert self.data, "load_frames() first"
+        for frame_id, (timestamp, _) in enumerate(vid.iter_frames(with_times=True)):
+            if frame_id >= len(self.data):
+                # ignore the rest
+                break
+            self.data[frame_id].timestamp = timestamp
+        logger.info("sync timestamp with moviepy finished")
+
     def add_preload_hook(self, new_hook: "BaseHook"):
         """this hook only will be executed when preload"""
         self._hook_list.append(new_hook)

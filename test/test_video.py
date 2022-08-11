@@ -72,3 +72,8 @@ def test_preload_with_hook():
     hook = ExampleHook()
     v.add_preload_hook(hook)
     v.load_frames()
+
+def test_sync_timestamp():
+    v = VideoObject(VIDEO_PATH)
+    v.load_frames()
+    v.sync_timestamp()
