@@ -41,7 +41,7 @@ setup(
         "scikit-learn>=0.21.0",
         "pyecharts>=1.3.1",
         "findit>=0.5.8",
-        "Jinja2>=3.1.2",
+        "Jinja2>=3.0.3",
         "MarkupSafe>=2.1.1",
         "fire>=0.2.1",
         "keras>=2.3.1",
