@@ -50,16 +50,6 @@ def test_convert_first():
     assert len(v.data) == 36
 
 
-def test_custom_ffmpeg():
-    from stagesepx import constants
-
-    constants.FFMPEG = "unknown"
-    try:
-        VideoObject(VIDEO_PATH, fps=30)
-    except FileNotFoundError:
-        pass
-
-
 def test_contain_image():
     v = VideoObject(VIDEO_PATH)
     v.load_frames()
@@ -72,6 +62,7 @@ def test_preload_with_hook():
     hook = ExampleHook()
     v.add_preload_hook(hook)
     v.load_frames()
+
 
 def test_sync_timestamp():
     v = VideoObject(VIDEO_PATH)

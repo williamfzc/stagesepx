@@ -13,6 +13,3 @@ IGNORE_FLAG = r"-3"
 
 # config
 DEFAULT_THRESHOLD = 0.98
-
-# ext
-FFMPEG = r"ffmpeg"

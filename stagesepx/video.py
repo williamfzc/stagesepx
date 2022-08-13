@@ -1,12 +1,14 @@
 import os
+import tempfile
 import typing
+
 import cv2
+import imageio_ffmpeg
 import numpy as np
 from loguru import logger
-import tempfile
+import moviepy.editor as mpy
 
 from stagesepx import toolbox
-from stagesepx import constants
 
 if typing.TYPE_CHECKING:
     from stagesepx.hook import BaseHook
@@ -97,7 +99,9 @@ class VideoObject(object):
         if fps:
             video_path = os.path.join(tempfile.mkdtemp(), f"tmp_{fps}.mp4")
             logger.debug(f"convert video, and bind path to {video_path}")
-            toolbox.fps_convert(fps, self.path, video_path, constants.FFMPEG)
+            toolbox.fps_convert(
+                fps, self.path, video_path, imageio_ffmpeg.get_ffmpeg_exe()
+            )
             self.path = video_path
 
         with toolbox.video_capture(self.path) as cap:
@@ -118,11 +122,6 @@ class VideoObject(object):
     __repr__ = __str__
 
     def sync_timestamp(self):
-        try:
-            import moviepy.editor as mpy
-        except ImportError:
-            logger.error(f"import moviepy failed, can not sync timestamp")
-            return
         vid = mpy.VideoFileClip(self.path)
 
         # moviepy start from 0, 0.0
@@ -132,7 +131,10 @@ class VideoObject(object):
             if frame_id >= len(self.data):
                 # ignore the rest
                 break
-            self.data[frame_id].timestamp = timestamp
+            frame_id_real = frame_id + 1
+            if not self.data[frame_id].timestamp:
+                logger.debug(f"fix frame {frame_id_real}'s timestamp: {timestamp}")
+                self.data[frame_id].timestamp = timestamp
         logger.info("sync timestamp with moviepy finished")
 
     def add_preload_hook(self, new_hook: "BaseHook"):
@@ -173,6 +175,10 @@ class VideoObject(object):
         logger.info(
             f"frames loaded. frame count: {self.frame_count}, size: {self.frame_size}, memory cost: {total_cost} bytes"
         )
+
+        # sync timestamp for some newer versions opencv
+        # see: #178, #181
+        self.sync_timestamp()
 
     def _read_from_file(self) -> typing.Generator[VideoFrame, None, None]:
         with toolbox.video_capture(self.path) as cap:

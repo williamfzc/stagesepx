@@ -39,9 +39,11 @@ def video_jump(video_cap: cv2.VideoCapture, frame_id: int):
     # another -1 for re-read
     video_cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id - 1 - 1)
     video_cap.read()
-    logger.debug(
-        f"previous pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})"
-    )
+
+    # notice: this timestamp may not correct because of resync by moviepy
+    # logger.debug(
+    #     f"previous pointer: {get_current_frame_id(video_cap)}({get_current_frame_time(video_cap)})"
+    # )
 
 
 def compare_ssim(pic1: np.ndarray, pic2: np.ndarray) -> float:
