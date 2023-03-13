@@ -9,16 +9,17 @@
 
 ---
 
-| Type                 | Status                                                                                                                                                                                            |
-|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| package version      | [![PyPI version](https://badge.fury.io/py/stagesepx.svg)](https://badge.fury.io/py/stagesepx)                                                                                                    |
-| python version       | ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stagesepx)                                                                                                                       |
-| auto test            | ![CI Status](https://github.com/williamfzc/stagesepx/workflows/smoketest/badge.svg)                                                                                                              |
-| code maintainability | [![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/williamfzc/stagesepx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/williamfzc/stagesepx/context:python)                           |
-| code coverage        | [![codecov](https://codecov.io/gh/williamfzc/stagesepx/branch/master/graph/badge.svg)](https://codecov.io/gh/williamfzc/stagesepx)                                                               |
-| docker build status  | ![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/williamfzc/stagesepx) ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/williamfzc/stagesepx) |
-| code style           | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)                                                                                 |
-| stat           | [![Downloads](https://pepy.tech/badge/stagesepx)](https://pepy.tech/project/stagesepx)  [![Downloads](https://pepy.tech/badge/stagesepx/month)](https://pepy.tech/project/stagesepx) [![Downloads](https://pepy.tech/badge/stagesepx/week)](https://pepy.tech/project/stagesepx)                                                              |
+
+| Type                 | Status                                                                                                                                                                                                                                                                           |
+|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| package version      | [![PyPI version](https://badge.fury.io/py/stagesepx.svg)](https://badge.fury.io/py/stagesepx)                                                                                                                                                                                    |
+| python version       | ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stagesepx)                                                                                                                                                                                                       |
+| auto test            | ![CI Status](https://github.com/williamfzc/stagesepx/workflows/smoketest/badge.svg)                                                                                                                                                                                              |
+| code maintainability | [![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability)                                                                                                            |
+| code coverage        | [![codecov](https://codecov.io/gh/williamfzc/stagesepx/branch/master/graph/badge.svg)](https://codecov.io/gh/williamfzc/stagesepx)                                                                                                                                               |
+| code style           | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)                                                                                                                                                                 |
+| stat                 | [![Downloads](https://pepy.tech/badge/stagesepx)](https://pepy.tech/project/stagesepx)  [![Downloads](https://pepy.tech/badge/stagesepx/month)](https://pepy.tech/project/stagesepx) [![Downloads](https://pepy.tech/badge/stagesepx/week)](https://pepy.tech/project/stagesepx) |
+
 
 ---
 
