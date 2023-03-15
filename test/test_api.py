@@ -155,3 +155,9 @@ def test_diff():
     assert diff_object
     assert not diff_object.any_stage_lost()
     assert diff_object.stage_diff()
+
+
+def pytest_sessionfinish(session, exitstatus):
+    # if all the tests are skipped, lets not fail the entire CI run
+    if exitstatus == 5:
+        session.exitstatus = 0

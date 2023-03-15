@@ -17,6 +17,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+        with:
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
@@ -35,7 +37,12 @@ jobs:
         run: |
           pip install pytest
           pip install pytest-cov
-          pytest --cov=./stagesepx --cov-report=xml
+          pip install pytest-custom_exit_code
+          
+          wget https://github.com/opensibyl/squ/releases/download/v0.1.9/squ-linux-amd64
+          chmod +x ./squ-linux-amd64
+          
+          ./squ-linux-amd64 | xargs pytest --cov=./stagesepx --cov-report=xml --suppress-no-test-exit-code
         env:
           PYTHONPATH: .
       - name: Upload coverage to Codecov
