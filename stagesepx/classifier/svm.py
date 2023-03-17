@@ -139,6 +139,8 @@ class SVMClassifier(BaseModelClassifier):
         pic_object = self.feature_func(frame)
         pic_object = pic_object.reshape(1, -1)
 
+        # another fake edit
+
         # scores for each stages
         # IMPORTANT:
         # these scores are not always precise
