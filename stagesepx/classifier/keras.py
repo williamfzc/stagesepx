@@ -151,6 +151,7 @@ class KerasClassifier(BaseModelClassifier):
             ), f"dataset only contains one class. maybe some path errors happened: {p}?"
 
             # more than 6 classes?
+            # fake edit here
             assert number_of_dir <= self.MODEL_DENSE, (
                 f"dataset has {number_of_dir} classes (more than " + str(self.MODEL_DENSE) + "), please see "
                 f"https://github.com/williamfzc/stagesepx/issues/112 "
