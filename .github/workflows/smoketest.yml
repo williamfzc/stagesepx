@@ -39,7 +39,7 @@ jobs:
           pip install pytest-cov
           pip install pytest-custom_exit_code
           
-          wget https://github.com/opensibyl/squ/releases/download/v0.1.10/squ-linux-amd64
+          wget https://github.com/opensibyl/squ/releases/download/v0.1.11/squ-linux-amd64
           chmod +x ./squ-linux-amd64
           
           ./squ-linux-amd64 | xargs pytest --cov=./stagesepx --cov-report=xml --suppress-no-test-exit-code
