@@ -48,7 +48,7 @@ setup(
         "MarkupSafe==2.0.1;python_version<'3.7'",
         "fire>=0.2.1",
         "keras>=2.3.1",
-        "pydantic>=0.32.2",
+        "pydantic==1.*",
     ],
     entry_points={"console_scripts": ["stagesepx = stagesepx.cli:main"]},
 )
