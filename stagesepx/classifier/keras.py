@@ -9,7 +9,12 @@ try:
     import tensorflow
 except ImportError:
     raise ImportError("KerasClassifier requires tensorflow. install it first.")
-from keras.preprocessing.image import ImageDataGenerator
+
+try:
+    from keras.preprocessing.image import ImageDataGenerator
+except ImportError:
+    # https://stackoverflow.com/questions/78145837/importerror-cannot-import-name-imagedatagenerator-from-keras-preprocessing-i
+    from keras.src.legacy.preprocessing.image import ImageDataGenerator
 
 # https://github.com/tensorflow/models/issues/6177
 from tensorflow.keras.models import Sequential
