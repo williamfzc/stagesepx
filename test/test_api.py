@@ -20,7 +20,7 @@ def test_analyse():
 
 def test_train():
     trainset = os.path.join(PROJECT_PATH, _get_random_str())
-    mod = os.path.join(PROJECT_PATH, "a.h5")
+    mod = os.path.join(PROJECT_PATH, "a.weights.h5")
     config = {
         # fmt: off
         "video": {

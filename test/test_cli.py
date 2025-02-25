@@ -24,7 +24,7 @@ def test_analyse():
 
 
 def test_train():
-    mod = "output.h5"
+    mod = "output.weights.h5"
     subprocess.check_call(
         ["stagesepx", "train", CUTTER_RESULT_DIR, mod, "--epochs", "1"]
     )

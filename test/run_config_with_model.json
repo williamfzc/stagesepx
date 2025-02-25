@@ -4,7 +4,7 @@
     },
     "classifier": {
         "classifier_type": "keras",
-        "model": "output.h5"
+        "model": "output.weights.h5"
     },
     "output": "."
 }

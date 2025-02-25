@@ -42,11 +42,11 @@ cl = KerasClassifier(epochs=1)
 
 # train model and save weights
 cl.train(data_home)
-cl.save_model("keras_model.h5")
+cl.save_model("keras_model.weights.h5")
 
 # you would better reuse the trained model for less time cost
 # keras model takes much more time than SVM
-# cl.load_model("keras_model.h5")
+# cl.load_model("keras_model.weights.h5")
 
 classify_result = cl.classify(video, stable, keep_data=True)
 result_dict = classify_result.to_dict()

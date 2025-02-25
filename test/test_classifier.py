@@ -130,10 +130,10 @@ def test_keras():
     # set epochs to 1 for quickly training (test only)
     cl = KerasClassifier(epochs=1)
     cl.train(CUTTER_RESULT_DIR)
-    cl.save_model("haha.h5")
+    cl.save_model("haha.weights.h5")
     # recreate
     cl = KerasClassifier()
-    cl.load_model("haha.h5")
+    cl.load_model("haha.weights.h5")
     stable, _ = cutter_res.get_range()
     classify_result = cl.classify(VIDEO_PATH, stable, keep_data=True)
     assert classify_result.to_dict()
