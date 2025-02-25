@@ -34,7 +34,7 @@ setup(
     install_requires=[
         "opencv-python>=4.1.2.30",
         "opencv-contrib-python>=4.1.2.30",
-        "moviepy>=1.0.3",
+        "moviepy==1.0.3",
         "imageio>=2.5.0",
         "imageio-ffmpeg>=0.4.7",
         "numpy>=0.18.0",
