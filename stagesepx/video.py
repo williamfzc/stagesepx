@@ -6,7 +6,7 @@ import cv2
 import imageio_ffmpeg
 import numpy as np
 from loguru import logger
-import moviepy.editor as mpy
+from moviepy import VideoFileClip
 
 from stagesepx import toolbox
 
@@ -122,7 +122,7 @@ class VideoObject(object):
     __repr__ = __str__
 
     def sync_timestamp(self):
-        vid = mpy.VideoFileClip(self.path)
+        vid = VideoFileClip(self.path)
 
         # moviepy start from 0, 0.0
         # but stagesepx is 1, 0.0

@@ -34,10 +34,10 @@ setup(
     install_requires=[
         "opencv-python>=4.1.2.30",
         "opencv-contrib-python>=4.1.2.30",
-        "moviepy==1.0.3",
+        "moviepy>1.0.3",
         "imageio>=2.5.0",
         "imageio-ffmpeg>=0.4.7",
-        "numpy>=0.18.0",
+        "numpy>=1.25.0",
         "loguru>=0.2.5",
         "scikit-image>=0.16.0",
         "scikit-learn>=0.21.0",
@@ -48,7 +48,7 @@ setup(
         "MarkupSafe==2.0.1;python_version<'3.7'",
         "fire>=0.2.1",
         "keras>=2.3.1",
-        "pydantic==1.*",
+        "pydantic>=1.0",
     ],
     entry_points={"console_scripts": ["stagesepx = stagesepx.cli:main"]},
 )
